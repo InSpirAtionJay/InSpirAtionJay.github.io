@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[EKF详解]]></title>
     <url>%2F2019%2F05%2F23%2FEKF%E8%AF%A6%E8%A7%A3%2F</url>
-    <content type="text"><![CDATA[问题定义]]></content>
+    <content type="text"><![CDATA[问题定义 1$ J_\alpha(x) = \sum_&#123;m=0&#125;^\infty \frac&#123;(-1)^m&#125;&#123;m! \Gamma (m + \alpha + 1)&#125; &#123;\left(&#123; \frac&#123;x&#125;&#123;2&#125; &#125;\right)&#125;^&#123;2m + \alpha&#125; \text &#123;，行内公式示例&#125; $]]></content>
       <categories>
         <category>SLAM</category>
       </categories>
