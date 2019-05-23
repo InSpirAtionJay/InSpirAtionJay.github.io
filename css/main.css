@@ -1779,7 +1779,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #779cff;
+  background: #fff0ad;
 }
 .feed-link,
 .chat {
@@ -2136,6 +2136,40 @@ pre .javascript .function {
   top: 50%;
   transform: translate(-50%, -50%);
   color: #ccc;
+}
+.copy-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #333;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #fff;
+  border: none;
+  user-select: none;
+  outline: 0;
+}
+.highlight-wrap .copy-btn {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+  padding: 2px 6px;
+  position: absolute;
+  right: 0px;
+  height: 42px;
+}
+.highlight-wrap:hover .copy-btn,
+.highlight-wrap .copy-btn:focus {
+  opacity: 1;
+}
+.highlight-wrap {
+  position: relative;
+}
+.has-jax {
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 .page-archive .archive-page-counter {
   position: relative;
@@ -2543,19 +2577,6 @@ ul.breadcrumb li+li:last-child {
   background: #f9f9f9;
   border-bottom-color: #fff;
 }
-.menu-item-active a:after,
-.menu .menu-item a:hover:after,
-.menu .menu-item span.exturl:hover:after {
-  content: " ";
-  position: absolute;
-  top: 50%;
-  margin-top: -3px;
-  right: 15px;
-  width: 6px;
-  height: 6px;
-  background-color: #bbb;
-  border-radius: 50%;
-}
 .menu .menu-item {
   display: block;
   margin: 0;
@@ -2636,9 +2657,6 @@ ul.breadcrumb li+li:last-child {
 .sub-menu .menu-item-active a:hover {
   background: #fff !important;
   border-bottom-color: #fc6423;
-}
-.sub-menu .menu-item-active a:after {
-  content: initial;
 }
 .use-motion .sidebar .motion-element {
   opacity: 1;
