@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="问题定义 1$ J_\alpha(x) = \sum_&amp;#123;m=0&amp;#125;^\infty \frac&amp;#123;(-1)^m&amp;#125;&amp;#123;m! \Gamma (m + \alpha + 1)&amp;#125; &amp;#123;\left(&amp;#123; \frac&amp;#123;x&amp;#125;&amp;#123;2&amp;#125; &amp;#125;\right)&amp;#125;^&amp;#123;2m + \alph">
+  <meta name="description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
 <meta name="keywords" content="SLAM,EKF">
 <meta property="og:type" content="article">
 <meta property="og:title" content="EKF详解">
 <meta property="og:url" content="http://yoursite.com/2019/05/23/EKF详解/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="问题定义 1$ J_\alpha(x) = \sum_&amp;#123;m=0&amp;#125;^\infty \frac&amp;#123;(-1)^m&amp;#125;&amp;#123;m! \Gamma (m + \alpha + 1)&amp;#125; &amp;#123;\left(&amp;#123; \frac&amp;#123;x&amp;#125;&amp;#123;2&amp;#125; &amp;#125;\right)&amp;#125;^&amp;#123;2m + \alph">
+<meta property="og:description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-23T04:43:43.411Z">
+<meta property="og:updated_time" content="2019-05-23T13:56:41.991Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EKF详解">
-<meta name="twitter:description" content="问题定义 1$ J_\alpha(x) = \sum_&amp;#123;m=0&amp;#125;^\infty \frac&amp;#123;(-1)^m&amp;#125;&amp;#123;m! \Gamma (m + \alpha + 1)&amp;#125; &amp;#123;\left(&amp;#123; \frac&amp;#123;x&amp;#125;&amp;#123;2&amp;#125; &amp;#125;\right)&amp;#125;^&amp;#123;2m + \alph">
+<meta name="twitter:description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
 
 
 
@@ -274,7 +274,7 @@
       
     
 
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">4</span></a>
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">5</span></a>
 
   </li>
         
@@ -293,7 +293,7 @@
       
     
 
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">2</span></a>
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">3</span></a>
 
   </li>
         
@@ -312,7 +312,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">2</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">3</span></a>
 
   </li>
         
@@ -474,7 +474,7 @@
                 
               
 
-              <time title="Created: 2019-05-23 11:40:14 / Modified: 12:43:43" itemprop="dateCreated datePublished" datetime="2019-05-23T11:40:14+08:00">2019-05-23</time>
+              <time title="Created: 2019-05-23 11:40:14 / Modified: 21:56:41" itemprop="dateCreated datePublished" datetime="2019-05-23T11:40:14+08:00">2019-05-23</time>
             
 
             
@@ -544,8 +544,20 @@
       
         <a id="more"></a>
 <p>问题定义</p>
-<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="formula">$ J_<span class="tag">\<span class="name">alpha</span></span>(x) = <span class="tag">\<span class="name">sum</span></span>_&#123;m=0&#125;^<span class="tag">\<span class="name">infty</span></span> <span class="tag">\<span class="name">frac</span><span class="string">&#123;(-1)^m&#125;</span><span class="string">&#123;m! \Gamma (m + \alpha + 1)&#125;</span></span> &#123;<span class="tag">\<span class="name">left</span></span>(&#123; <span class="tag">\<span class="name">frac</span><span class="string">&#123;x&#125;</span><span class="string">&#123;2&#125;</span></span> &#125;<span class="tag">\<span class="name">right</span></span>)&#125;^&#123;2m + <span class="tag">\<span class="name">alpha</span></span>&#125; <span class="tag">\<span class="name">text</span></span> &#123;，行内公式示例&#125; $</span></span><br></pre></td></tr></table></figure>
-
+<script type="math/tex; mode=display">\frac ab=c</script><script type="math/tex; mode=display">\sqrt{2} \quad and \quad \sqrt[n]{3}</script><script type="math/tex; mode=display">\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}</script><script type="math/tex; mode=display">f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_n^2</script><script type="math/tex; mode=display">\vec{a} \cdot \vec{b}=0</script><script type="math/tex; mode=display">\int_0^1 {x^2} \,{\rm d}x</script><script type="math/tex; mode=display">\lim_{n \to +\infty} \frac{1}{n(n+1)} \quad and \quad \lim_{x\leftarrow{示例}} \frac{1}{n(n+1)}</script><script type="math/tex; mode=display">\sum_{i=1}^n \frac{1}{i^2} \quad and \quad \prod_{i=1}^n \frac{1}{i^2} \quad and \quad \bigcup_{i=1}^{2} R</script><script type="math/tex; mode=display">
+    f\left(
+       \left[ 
+         \frac{
+           1+\left\{x,y\right\}
+         }{
+           \left(
+              \frac{x}{y}+\frac{y}{x}
+           \right)
+           \left(u+1\right)
+         }+a
+       \right]^{3/2}
+    \right)
+    \tag{行标}</script>
       
     </div>
 
@@ -592,6 +604,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/24/git简单攻略/" rel="prev" title="git简单攻略">
+                git简单攻略 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -653,7 +669,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -674,7 +690,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">2</span>
+                      
+                    
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">categories</span>
                   </a>
                 </div>
@@ -699,7 +717,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">4</span>
+                      
+                    
+                    <span class="site-state-item-count">5</span>
                     <span class="site-state-item-name">tags</span>
                   </a>
                 </div>
@@ -1314,7 +1334,7 @@
     }
   });
 </script>
-<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
     
   
