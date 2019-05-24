@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库git init 添加文件git add reamde.md 提交文件到仓库git commit -m &amp;quot;message&amp;quot; 为什么git提交文件需要add和comm">
+  <meta name="description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库1git init 添加文件1git add reamde.md 提交文件到仓库1git commit -m &quot;message&quot; 为什么git提交文件需要add和commit两步呢，因">
 <meta name="keywords" content="git">
 <meta property="og:type" content="article">
 <meta property="og:title" content="git简单攻略">
 <meta property="og:url" content="http://yoursite.com/2019/05/24/git简单攻略/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库git init 添加文件git add reamde.md 提交文件到仓库git commit -m &amp;quot;message&amp;quot; 为什么git提交文件需要add和comm">
+<meta property="og:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库1git init 添加文件1git add reamde.md 提交文件到仓库1git commit -m &quot;message&quot; 为什么git提交文件需要add和commit两步呢，因">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-24T03:00:16.034Z">
+<meta property="og:updated_time" content="2019-05-24T03:06:21.570Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git简单攻略">
-<meta name="twitter:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库git init 添加文件git add reamde.md 提交文件到仓库git commit -m &amp;quot;message&amp;quot; 为什么git提交文件需要add和comm">
+<meta name="twitter:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库1git init 添加文件1git add reamde.md 提交文件到仓库1git commit -m &quot;message&quot; 为什么git提交文件需要add和commit两步呢，因">
 
 
 
@@ -474,7 +474,7 @@
                 
               
 
-              <time title="Created: 2019-05-24 10:04:10 / Modified: 11:00:16" itemprop="dateCreated datePublished" datetime="2019-05-24T10:04:10+08:00">2019-05-24</time>
+              <time title="Created: 2019-05-24 10:04:10 / Modified: 11:06:21" itemprop="dateCreated datePublished" datetime="2019-05-24T10:04:10+08:00">2019-05-24</time>
             
 
             
@@ -543,23 +543,24 @@
 
       
         <h3 id="git全局用户申明"><a href="#git全局用户申明" class="headerlink" title="git全局用户申明"></a>git全局用户申明</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git<span class="built_in"> config </span>--global user.name <span class="string">"Your Name"</span></span><br><span class="line">git<span class="built_in"> config </span>--global user.email <span class="string">"email@example.com"</span></span><br></pre></td></tr></table></figure>
-<h3 id="创建管理库"><a href="#创建管理库" class="headerlink" title="创建管理库"></a>创建管理库</h3><p><code>git init</code></p>
-<h3 id="添加文件"><a href="#添加文件" class="headerlink" title="添加文件"></a>添加文件</h3><p><code>git add reamde.md</code></p>
-<h3 id="提交文件到仓库"><a href="#提交文件到仓库" class="headerlink" title="提交文件到仓库"></a>提交文件到仓库</h3><p><code>git commit -m &quot;message&quot;</code></p>
+<h3 id="创建管理库"><a href="#创建管理库" class="headerlink" title="创建管理库"></a>创建管理库</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git init</span></span><br></pre></td></tr></table></figure>
+<h3 id="添加文件"><a href="#添加文件" class="headerlink" title="添加文件"></a>添加文件</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">add</span><span class="bash"> reamde.md</span></span><br></pre></td></tr></table></figure>
+<h3 id="提交文件到仓库"><a href="#提交文件到仓库" class="headerlink" title="提交文件到仓库"></a>提交文件到仓库</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git</span> commit -m <span class="string">"message"</span></span><br></pre></td></tr></table></figure>
 <p>为什么git提交文件需要add和commit两步呢，因为commit可以一次提交很多次add不同的文件，比如<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add file1.txt</span><br><span class="line">git add file2<span class="selector-class">.txt</span> file3.txt</span><br><span class="line">git commit -m <span class="string">"add 3files"</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="查看仓库状态"><a href="#查看仓库状态" class="headerlink" title="查看仓库状态"></a>查看仓库状态</h3><p><code>git status</code></p>
-<h3 id="查看文件修改内容"><a href="#查看文件修改内容" class="headerlink" title="查看文件修改内容"></a>查看文件修改内容</h3><p><code>git diff readme.txt</code></p>
-<h3 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h3><p><code>git log</code></p>
+<h3 id="查看仓库状态"><a href="#查看仓库状态" class="headerlink" title="查看仓库状态"></a>查看仓库状态</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git status</span></span><br></pre></td></tr></table></figure>
+<h3 id="查看文件修改内容"><a href="#查看文件修改内容" class="headerlink" title="查看文件修改内容"></a>查看文件修改内容</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">git</span> <span class="selector-tag">diff</span> <span class="selector-tag">readme</span><span class="selector-class">.txt</span></span><br></pre></td></tr></table></figure>
+<h3 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 <p>以便确定回退到哪个版本</p>
-<h3 id="查看命令历史"><a href="#查看命令历史" class="headerlink" title="查看命令历史"></a>查看命令历史</h3><p><code>git reflog</code><br>以便确定回到未来的哪个版本</p>
+<h3 id="查看命令历史"><a href="#查看命令历史" class="headerlink" title="查看命令历史"></a>查看命令历史</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git reflog</span></span><br></pre></td></tr></table></figure>
+<p>以便确定回到未来的哪个版本</p>
 <h3 id="版本指针"><a href="#版本指针" class="headerlink" title="版本指针"></a>版本指针</h3><p>HEAD 指向的版本就是当前的版本，HEAD^指向前一个版本，HEAD^^指向前前版本，HEAD~100指向第前100个版本。因此，git允许我们在历史之间穿梭。</p>
-<h3 id="版本穿梭"><a href="#版本穿梭" class="headerlink" title="版本穿梭"></a>版本穿梭</h3><p><code>git reset --hard commit_id</code></p>
-<h3 id="丢弃工作区的修改"><a href="#丢弃工作区的修改" class="headerlink" title="丢弃工作区的修改"></a>丢弃工作区的修改</h3><p><code>git checkout -- file</code></p>
+<h3 id="版本穿梭"><a href="#版本穿梭" class="headerlink" title="版本穿梭"></a>版本穿梭</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">reset</span> <span class="comment">--hard commit_id</span></span><br></pre></td></tr></table></figure>
+<h3 id="丢弃工作区的修改"><a href="#丢弃工作区的修改" class="headerlink" title="丢弃工作区的修改"></a>丢弃工作区的修改</h3><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout <span class="comment">-- file</span></span><br></pre></td></tr></table></figure>
 <p>命令<code>git checkout -- readme.txt</code>意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：</p>
 <p>一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；</p>
 <p>一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。</p>
 <p>总之，就是让这个文件回到最近一次git commit或git add时的状态。</p>
-<h3 id="从暂存区回到工作区"><a href="#从暂存区回到工作区" class="headerlink" title="从暂存区回到工作区"></a>从暂存区回到工作区</h3><p><code>git reset HEAD readme.txt</code></p>
+<h3 id="从暂存区回到工作区"><a href="#从暂存区回到工作区" class="headerlink" title="从暂存区回到工作区"></a>从暂存区回到工作区</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">reset</span> <span class="keyword">HEAD</span> readme.txt</span><br></pre></td></tr></table></figure>
 <p>如果你把文件git add到暂存区，但是还没有git commit到仓库，可以使用git reset HEAD file 将暂存区的修改撤销掉，重新放回到工作区。<br>git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本。</p>
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout — file。</p>
 <p>场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了场景1，第二步按场景1操作。</p>
@@ -569,11 +570,12 @@
 <p>现在你有两个选择，一是确实要从版本库中删除该文件，那就用命令git rm删掉，并且git commit，现在，文件就从版本库中被删除了。</p>
 <p>另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：<br><code>git checkout -- test.txt</code></p>
 <p>小提示：先手动删除文件，然后使用git rm <file>和git add<file>效果是一样的。<br>注意：从来没有被添加到版本库就被删除的文件，是无法恢复的！ </file></file></p>
-<h3 id="添加远程仓库"><a href="#添加远程仓库" class="headerlink" title="添加远程仓库"></a>添加远程仓库</h3><p><code>git remote add origin git@github.com:hahaha/hahaha.git</code></p>
-<h3 id="把本地库的所有内容推送到远程库上"><a href="#把本地库的所有内容推送到远程库上" class="headerlink" title="把本地库的所有内容推送到远程库上"></a>把本地库的所有内容推送到远程库上</h3><p><code>git push -u origin master</code></p>
+<h3 id="添加远程仓库"><a href="#添加远程仓库" class="headerlink" title="添加远程仓库"></a>添加远程仓库</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote <span class="keyword">add</span><span class="bash"> origin git@github.com:hahaha/hahaha.git</span></span><br></pre></td></tr></table></figure>
+<h3 id="把本地库的所有内容推送到远程库上"><a href="#把本地库的所有内容推送到远程库上" class="headerlink" title="把本地库的所有内容推送到远程库上"></a>把本地库的所有内容推送到远程库上</h3><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">push</span> -u <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure>
 <p>把本地库的内容推送到远程，用git push命令，实际上是把当前分支master推送到远程。由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。</p>
-<h3 id="提交仓库到到远程"><a href="#提交仓库到到远程" class="headerlink" title="提交仓库到到远程"></a>提交仓库到到远程</h3><p><code>git push origin master</code></p>
-<h3 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h3><p><code>git clone git@github.com:hahaha/gitskills.git</code><br>现在，假设我们从零开发，那么最好的方式是先创建远程库，然后，从远程库克隆。<br>首先，登陆GitHub，创建一个新的仓库，名字叫gitskills：<br>我们勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个README.md文件。创建完毕后，可以看到README.md文件：<br>现在，远程库已经准备好了，下一步是用命令git clone克隆一个本地库：</p>
+<h3 id="提交仓库到到远程"><a href="#提交仓库到到远程" class="headerlink" title="提交仓库到到远程"></a>提交仓库到到远程</h3><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">push</span> <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure>
+<h3 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">git</span>@github.com:hahaha/gitskills.git</span><br></pre></td></tr></table></figure>
+<p>现在，假设我们从零开发，那么最好的方式是先创建远程库，然后，从远程库克隆。<br>首先，登陆GitHub，创建一个新的仓库，名字叫gitskills：<br>我们勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个README.md文件。创建完毕后，可以看到README.md文件：<br>现在，远程库已经准备好了，下一步是用命令git clone克隆一个本地库：</p>
 <p>注意把Git库的地址换成你自己的，然后进入gitskills目录看看，已经有README.md文件了：</p>
 <h3 id="转载申明"><a href="#转载申明" class="headerlink" title="转载申明"></a>转载申明</h3><p>本文转载自廖雪峰的博客：(<a href="https://www.liaoxuefeng.com" target="_blank" rel="noopener">https://www.liaoxuefeng.com</a>)</p>
 
