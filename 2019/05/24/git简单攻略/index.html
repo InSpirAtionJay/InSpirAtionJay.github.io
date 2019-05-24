@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="随心小笔">
 <meta property="og:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库1git init 添加文件1git add reamde.md 提交文件到仓库1git commit -m &quot;message&quot; 为什么git提交文件需要add和commit两步呢，因">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-24T03:06:21.570Z">
+<meta property="og:updated_time" content="2019-05-24T03:11:52.329Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git简单攻略">
 <meta name="twitter:description" content="git全局用户申明12git config --global user.name &quot;Your Name&quot;git config --global user.email &quot;email@example.com&quot; 创建管理库1git init 添加文件1git add reamde.md 提交文件到仓库1git commit -m &quot;message&quot; 为什么git提交文件需要add和commit两步呢，因">
@@ -474,7 +474,7 @@
                 
               
 
-              <time title="Created: 2019-05-24 10:04:10 / Modified: 11:06:21" itemprop="dateCreated datePublished" datetime="2019-05-24T10:04:10+08:00">2019-05-24</time>
+              <time title="Created: 2019-05-24 10:04:10 / Modified: 11:11:52" itemprop="dateCreated datePublished" datetime="2019-05-24T10:04:10+08:00">2019-05-24</time>
             
 
             
@@ -550,10 +550,10 @@
 <h3 id="查看仓库状态"><a href="#查看仓库状态" class="headerlink" title="查看仓库状态"></a>查看仓库状态</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git status</span></span><br></pre></td></tr></table></figure>
 <h3 id="查看文件修改内容"><a href="#查看文件修改内容" class="headerlink" title="查看文件修改内容"></a>查看文件修改内容</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">git</span> <span class="selector-tag">diff</span> <span class="selector-tag">readme</span><span class="selector-class">.txt</span></span><br></pre></td></tr></table></figure>
 <h3 id="查看提交历史"><a href="#查看提交历史" class="headerlink" title="查看提交历史"></a>查看提交历史</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
-<p>以便确定回退到哪个版本</p>
+<p>以便确定回退到哪个版本。</p>
 <h3 id="查看命令历史"><a href="#查看命令历史" class="headerlink" title="查看命令历史"></a>查看命令历史</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">git reflog</span></span><br></pre></td></tr></table></figure>
-<p>以便确定回到未来的哪个版本</p>
-<h3 id="版本指针"><a href="#版本指针" class="headerlink" title="版本指针"></a>版本指针</h3><p>HEAD 指向的版本就是当前的版本，HEAD^指向前一个版本，HEAD^^指向前前版本，HEAD~100指向第前100个版本。因此，git允许我们在历史之间穿梭。</p>
+<p>以便确定回到未来的哪个版本。</p>
+<h3 id="版本指针"><a href="#版本指针" class="headerlink" title="版本指针"></a>版本指针</h3><p>HEAD指向的版本就是当前的版本，HEAD^指向前一个版本，HEAD^^指向前前版本，HEAD~100指向第前100个版本。因此，git允许我们在历史之间穿梭。</p>
 <h3 id="版本穿梭"><a href="#版本穿梭" class="headerlink" title="版本穿梭"></a>版本穿梭</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">reset</span> <span class="comment">--hard commit_id</span></span><br></pre></td></tr></table></figure>
 <h3 id="丢弃工作区的修改"><a href="#丢弃工作区的修改" class="headerlink" title="丢弃工作区的修改"></a>丢弃工作区的修改</h3><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout <span class="comment">-- file</span></span><br></pre></td></tr></table></figure>
 <p>命令<code>git checkout -- readme.txt</code>意思就是，把readme.txt文件在工作区的修改全部撤销，这里有两种情况：</p>
@@ -566,9 +566,9 @@
 <p>场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了场景1，第二步按场景1操作。</p>
 <p>场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。</p>
 <h3 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h3><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">rm</span> <span class="keyword">test</span>.txt</span><br><span class="line">git commit -<span class="keyword">m</span> <span class="string">"remove test.txt"</span></span><br></pre></td></tr></table></figure>
-<p>一般情况下，你通常直接在文件管理器中把没用的文件删了，或者用rm命令删了：<br><code>rm test.txt</code><br>这个时候，Git知道你删除了文件，因此，工作区和版本库就不一致了，git status命令会立刻告诉你哪些文件被删除了。</p>
+<p>一般情况下，你通常直接在文件管理器中把没用的文件删了，或者用rm命令删了：rm test.txt。这个时候，Git知道你删除了文件，因此，工作区和版本库就不一致了，git status命令会立刻告诉你哪些文件被删除了。</p>
 <p>现在你有两个选择，一是确实要从版本库中删除该文件，那就用命令git rm删掉，并且git commit，现在，文件就从版本库中被删除了。</p>
-<p>另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：<br><code>git checkout -- test.txt</code></p>
+<p>另一种情况是删错了，因为版本库里还有呢，所以可以很轻松地把误删的文件恢复到最新版本：<br><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout <span class="comment">-- test.txt</span></span><br></pre></td></tr></table></figure></p>
 <p>小提示：先手动删除文件，然后使用git rm <file>和git add<file>效果是一样的。<br>注意：从来没有被添加到版本库就被删除的文件，是无法恢复的！ </file></file></p>
 <h3 id="添加远程仓库"><a href="#添加远程仓库" class="headerlink" title="添加远程仓库"></a>添加远程仓库</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote <span class="keyword">add</span><span class="bash"> origin git@github.com:hahaha/hahaha.git</span></span><br></pre></td></tr></table></figure>
 <h3 id="把本地库的所有内容推送到远程库上"><a href="#把本地库的所有内容推送到远程库上" class="headerlink" title="把本地库的所有内容推送到远程库上"></a>把本地库的所有内容推送到远程库上</h3><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">push</span> -u <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure>
@@ -577,7 +577,7 @@
 <h3 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">git</span>@github.com:hahaha/gitskills.git</span><br></pre></td></tr></table></figure>
 <p>现在，假设我们从零开发，那么最好的方式是先创建远程库，然后，从远程库克隆。<br>首先，登陆GitHub，创建一个新的仓库，名字叫gitskills：<br>我们勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个README.md文件。创建完毕后，可以看到README.md文件：<br>现在，远程库已经准备好了，下一步是用命令git clone克隆一个本地库：</p>
 <p>注意把Git库的地址换成你自己的，然后进入gitskills目录看看，已经有README.md文件了：</p>
-<h3 id="转载申明"><a href="#转载申明" class="headerlink" title="转载申明"></a>转载申明</h3><p>本文转载自廖雪峰的博客：(<a href="https://www.liaoxuefeng.com" target="_blank" rel="noopener">https://www.liaoxuefeng.com</a>)</p>
+<h3 id="转载申明"><a href="#转载申明" class="headerlink" title="转载申明"></a>转载申明</h3><p>本文转载自廖雪峰的博客：[<a href="https://www.liaoxuefeng.com" target="_blank" rel="noopener">https://www.liaoxuefeng.com</a>]</p>
 
       
     </div>
