@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
+  <meta name="description" content="高斯函数p(x) = det(2\pi\Sigma)^{\frac {-1}{2} }">
 <meta name="keywords" content="SLAM,EKF">
 <meta property="og:type" content="article">
 <meta property="og:title" content="EKF详解">
 <meta property="og:url" content="http://yoursite.com/2019/05/23/EKF详解/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
+<meta property="og:description" content="高斯函数p(x) = det(2\pi\Sigma)^{\frac {-1}{2} }">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-23T13:56:41.991Z">
+<meta property="og:updated_time" content="2019-05-24T03:21:35.253Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EKF详解">
-<meta name="twitter:description" content="问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_">
+<meta name="twitter:description" content="高斯函数p(x) = det(2\pi\Sigma)^{\frac {-1}{2} }">
 
 
 
@@ -474,12 +474,24 @@
                 
               
 
-              <time title="Created: 2019-05-23 11:40:14 / Modified: 21:56:41" itemprop="dateCreated datePublished" datetime="2019-05-23T11:40:14+08:00">2019-05-23</time>
+              <time title="Created: 2019-05-23 11:40:14" itemprop="dateCreated datePublished" datetime="2019-05-23T11:40:14+08:00">2019-05-23</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-24 11:21:35" itemprop="dateModified" datetime="2019-05-24T11:21:35+08:00">2019-05-24</time>
               
             
           </span>
@@ -542,22 +554,10 @@
       
 
       
-        <a id="more"></a>
-<p>问题定义</p>
-<script type="math/tex; mode=display">\frac ab=c</script><script type="math/tex; mode=display">\sqrt{2} \quad and \quad \sqrt[n]{3}</script><script type="math/tex; mode=display">\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}</script><script type="math/tex; mode=display">f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_n^2</script><script type="math/tex; mode=display">\vec{a} \cdot \vec{b}=0</script><script type="math/tex; mode=display">\int_0^1 {x^2} \,{\rm d}x</script><script type="math/tex; mode=display">\lim_{n \to +\infty} \frac{1}{n(n+1)} \quad and \quad \lim_{x\leftarrow{示例}} \frac{1}{n(n+1)}</script><script type="math/tex; mode=display">\sum_{i=1}^n \frac{1}{i^2} \quad and \quad \prod_{i=1}^n \frac{1}{i^2} \quad and \quad \bigcup_{i=1}^{2} R</script><script type="math/tex; mode=display">
-    f\left(
-       \left[ 
-         \frac{
-           1+\left\{x,y\right\}
-         }{
-           \left(
-              \frac{x}{y}+\frac{y}{x}
-           \right)
-           \left(u+1\right)
-         }+a
-       \right]^{3/2}
-    \right)
-    \tag{行标}</script>
+        <ol>
+<li>高斯函数<script type="math/tex; mode=display">p(x) = det(2\pi\Sigma)^{\frac {-1}{2} }</script></li>
+</ol>
+
       
     </div>
 

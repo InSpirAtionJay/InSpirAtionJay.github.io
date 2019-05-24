@@ -14,7 +14,7 @@
   <entry>
     <title><![CDATA[EKF详解]]></title>
     <url>%2F2019%2F05%2F23%2FEKF%E8%AF%A6%E8%A7%A3%2F</url>
-    <content type="text"><![CDATA[问题定义 \frac ab=c\sqrt{2} \quad and \quad \sqrt[n]{3}\frac{a-1}{b-1} \quad and \quad {a+1\over b+1}f(x_1,x_2,\underbrace{\ldots}_{\rm ldots} ,x_n) = x_1^2 + x_2^2 + \underbrace{\cdots}_{\rm cdots} + x_n^2\vec{a} \cdot \vec{b}=0\int_0^1 {x^2} \,{\rm d}x\lim_{n \to +\infty} \frac{1}{n(n+1)} \quad and \quad \lim_{x\leftarrow{示例}} \frac{1}{n(n+1)}\sum_{i=1}^n \frac{1}{i^2} \quad and \quad \prod_{i=1}^n \frac{1}{i^2} \quad and \quad \bigcup_{i=1}^{2} R f\left( \left[ \frac{ 1+\left\{x,y\right\} }{ \left( \frac{x}{y}+\frac{y}{x} \right) \left(u+1\right) }+a \right]^{3/2} \right) \tag{行标}]]></content>
+    <content type="text"><![CDATA[高斯函数p(x) = det(2\pi\Sigma)^{\frac {-1}{2} }]]></content>
       <categories>
         <category>SLAM</category>
       </categories>
