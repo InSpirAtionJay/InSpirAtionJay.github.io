@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation}  所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$">
+  <meta name="description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation} 所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$\">
 <meta name="keywords" content="SLAM,EKF">
 <meta property="og:type" content="article">
 <meta property="og:title" content="EKF详解">
 <meta property="og:url" content="http://yoursite.com/2019/05/23/EKF详解/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation}  所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$">
+<meta property="og:description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation} 所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$\">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-24T09:34:54.292Z">
+<meta property="og:updated_time" content="2019-05-29T02:32:24.920Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EKF详解">
-<meta name="twitter:description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation}  所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$">
+<meta name="twitter:description" content="1. 高斯函数\begin{equation}p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}\label{eq:Gaussion}\end{equation} 所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$\">
 
 
 
@@ -274,7 +274,7 @@
       
     
 
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">9</span></a>
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">7</span></a>
 
   </li>
         
@@ -312,7 +312,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">6</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">7</span></a>
 
   </li>
         
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-05-24 17:34:54" itemprop="dateModified" datetime="2019-05-24T17:34:54+08:00">2019-05-24</time>
+                <time title="Modified: 2019-05-29 10:32:24" itemprop="dateModified" datetime="2019-05-29T10:32:24+08:00">2019-05-29</time>
               
             
           </span>
@@ -555,9 +555,7 @@
 
       
         <h4 id="1-高斯函数"><a href="#1-高斯函数" class="headerlink" title="1. 高斯函数"></a>1. 高斯函数</h4><p>\begin{equation}<br>p(x) = \det(2\pi\Sigma)^{- \frac {1}{2} }\exp{ \{ -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \}}<br>\label{eq:Gaussion}<br>\end{equation}</p>
-<blockquote>
 <p>所有的高斯技术都共享了基本思想，即置信度用多元正态分布来表示。$x$的密度用两个参数来表示，均值$\mu$和协方差$\Sigma$，均值$\mu$是一个向量，它与状态$x$的维数相同。协方差是对称半正定的二次型。其维数等于状态$x$的维数的二次方。高斯滤波中的参数均值和方差称为矩参数，这是因为均值和方差是概率分布的一阶矩和二阶矩；正态分布的其他矩都是零。</p>
-</blockquote>
 <h4 id="2-线性高斯系统"><a href="#2-线性高斯系统" class="headerlink" title="2. 线性高斯系统"></a>2. 线性高斯系统</h4><p>KF是由Swerling（1950）和Kalman（1960）作为线性高斯系统中的预测和滤波技术而发明的，是用矩来定义的。<br>KF用矩参数来表示置信度：在时刻$t$，置信度用均值$\mu_t$和方差$\Sigma_t$表示、如果除了贝叶斯滤波的马尔科夫假设以外，还具有如下的三个特性，则后验就是高斯的。</p>
 <hr>
 <ul>
@@ -694,7 +692,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -737,10 +735,6 @@
                     
                   
                     
-                    
-                      
-                    
-                      
                     
                       
                     
