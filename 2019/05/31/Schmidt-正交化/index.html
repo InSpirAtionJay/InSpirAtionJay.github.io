@@ -103,16 +103,18 @@
 
 
 
-  <meta name="description" content="学而时习之，不亦乐乎">
-<meta property="og:type" content="website">
-<meta property="og:title" content="随心小笔">
-<meta property="og:url" content="http://yoursite.com/tags/Next/index.html">
+  <meta name="description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
+<meta name="keywords" content="矩阵分解,Math,正交化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Schmidt 正交化">
+<meta property="og:url" content="http://yoursite.com/2019/05/31/Schmidt-正交化/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="学而时习之，不亦乐乎">
+<meta property="og:description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-04T03:19:48.170Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="随心小笔">
-<meta name="twitter:description" content="学而时习之，不亦乐乎">
+<meta name="twitter:title" content="Schmidt 正交化">
+<meta name="twitter:description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
 
 
 
@@ -120,7 +122,7 @@
 
   
   
-  <link rel="canonical" href="http://yoursite.com/tags/Next/">
+  <link rel="canonical" href="http://yoursite.com/2019/05/31/Schmidt-正交化/">
 
 
 
@@ -130,7 +132,7 @@
   };
 </script>
 
-  <title>Tag: Next | 随心小笔</title>
+  <title>Schmidt 正交化 | 随心小笔</title>
   
 
 
@@ -178,7 +180,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
@@ -260,7 +262,7 @@
         
         
           
-          <li class="menu-item menu-item-tags menu-item-active">
+          <li class="menu-item menu-item-tags">
 
     
     
@@ -409,89 +411,254 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Next<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/31/Schmidt-正交化/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
         
-          <a class="post-title-link" href="/2019/05/22/hello-world/" itemprop="url">
-            
-              <span itemprop="name">Hello World</span>
-            
-          </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Schmidt 正交化
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2019-05-22T20:10:08+08:00" content="2019-05-22">
-          05-22
-        </time>
-      </div>
+              
+            
+          </h1>
+        
 
-    </header>
-  </article>
+        <div class="post-meta">
+          <span class="post-time">
 
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-31 15:23:39" itemprop="dateCreated datePublished" datetime="2019-05-31T15:23:39+08:00">2019-05-31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-04 11:19:48" itemprop="dateModified" datetime="2019-06-04T11:19:48+08:00">2019-06-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Math/" itemprop="url" rel="index"><span itemprop="name">Math</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong><em>施密特正交化（Schmidt orthogonalization</em></strong> 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$，$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$与向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$等价，再将正交向量组中每个向量经过单位化，就得到一个标准正交向量组，这种方法称为施密特正交化。</p>
+<p><em>线性无关向量组</em>未必是<em>正交向量组</em>，但正交向量组又是重要的，因此现在就有一个问题：能否从一个线性无关向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，构造出一个标准正交向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$，并且使向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$与向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$等价呢?回答是肯定的，通过施密特正交化方法就可以实现。下面就来介绍这个方法，由于把一个正交向量组中每个向量经过单位化，就得到一个标准正交向量组，所以，上述问题的关键是如何由一个线性无关向量组来构造出一个正交向量组，我们以3个向量组成的线性无关组为例来说明这个方法。设向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\boldsymbol{\alpha_3}$线性无关，我们先来构造正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\boldsymbol{\beta_3}$，并且使$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_r}$与向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_r}$等价$(r=1,2,3)$。按所要求的条件，$\boldsymbol{\beta_1}$是$\boldsymbol{\alpha_1}$的线性组合，$\boldsymbol{\beta_2}$是$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2}$的线性组合，为方便起见，不妨设</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\beta_1}=\boldsymbol{\alpha_1},\boldsymbol{\beta_2}=\boldsymbol{\alpha_2}-k\boldsymbol{\beta_1}</script><p>其中，数值$k$的选取应满足$\boldsymbol{\beta_1}$与$\boldsymbol{\beta_2}$垂直，即</p>
+<script type="math/tex; mode=display">
+\langle\boldsymbol{\beta_2},\boldsymbol{\beta_1}\rangle=\langle\boldsymbol{\alpha_2},\boldsymbol{\beta_1}\rangle - k\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle=0</script><p>注意到$\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle &gt; 0$，于是得$k={\langle\boldsymbol{\alpha_2},\boldsymbol{\beta_1}\rangle} / {\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle}$，从而得</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\beta_1} =\boldsymbol{\alpha_1},\boldsymbol{\beta_2}=\boldsymbol{\alpha_2}-\frac{\langle\boldsymbol{\alpha_2},\boldsymbol{\beta_1}\rangle}{\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle}\boldsymbol{\beta_1}</script><p>对于上面已经构造的向量$\boldsymbol{\beta_1}$和$\boldsymbol{\beta_2}$，再来构造$\boldsymbol{\beta_3}$，为满足要求，可以令</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\beta_3} = \boldsymbol{\alpha_3}-k_1\boldsymbol{\beta_1}-k_2\boldsymbol{\beta_2}</script><p>其中，$k_1,k_2$的选取应满足$\boldsymbol{\beta_3}$分别与向量$\boldsymbol{\beta_1}$和$\boldsymbol{\beta_2}$垂直，即</p>
+<script type="math/tex; mode=display">
+\langle\boldsymbol{\beta_3},\boldsymbol{\beta_1}\rangle=\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_1}\rangle - k_1\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle=0，\langle\boldsymbol{\beta_3},\boldsymbol{\beta_2}\rangle=\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_2}\rangle - k_2\langle\boldsymbol{\beta_2},\boldsymbol{\beta_2}\rangle=0</script><p>由此解得</p>
+<script type="math/tex; mode=display">
+k_1=\frac{\langle \boldsymbol{\alpha_3},\boldsymbol{\beta_1}\rangle}{\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle},
+k_2=\frac{\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_2}\rangle}{\langle\boldsymbol{\beta_2},\boldsymbol{\beta_2}\rangle}</script><p>于是得</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\beta_3} = \boldsymbol{\alpha_3}-\frac{\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_1}\rangle}{\langle\boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle}\boldsymbol{\beta_1}-\frac{\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_2}\rangle}{\langle\boldsymbol{\beta_2},\boldsymbol{\beta_2}\rangle}\boldsymbol{\beta_2}</script><p>容易验证，向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_r}$是与$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_r}$等价的正交向量，若再将$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_r}$单位化，即令</p>
+<script type="math/tex; mode=display">
+\boldsymbol{e_i} = \frac{\boldsymbol{\beta_i}}{\Vert \boldsymbol{\beta_i} \Vert}(i=1,2,3)</script><p>则$\boldsymbol{e}_1,\boldsymbol{e_2},\boldsymbol{e_3}$就是满足要求的标准正交向量。</p>
+<p><strong><em>数学归纳法一般性定理</em></strong><br>设$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}(m\leq n)$是$\mathbb{R}^n$中的一个线性无关向量组，若令</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\boldsymbol{\beta_1} = \boldsymbol{\alpha_1}
+\\[2ex]
+\boldsymbol{\beta_2} = \boldsymbol{\alpha_2}-\frac{\langle \boldsymbol{\alpha_2} , \boldsymbol{\beta_1} \rangle } {\langle \boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle}\boldsymbol{\beta_1}
+\\[2ex]
+\boldsymbol{\beta_m} = \boldsymbol{\alpha_m} - \frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_1} \rangle } {\langle \boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle }\boldsymbol{\beta_1}-\frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_2} \rangle } {\langle \boldsymbol{\beta_2},\boldsymbol{\beta_2}\rangle }\boldsymbol{\beta_2}-\cdots-
+\frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_{m-1}} \rangle } {\langle \boldsymbol{\beta_{m-1}},\boldsymbol{\beta_{m-1}}\rangle }\beta_{m-1}
+\end{array} 
+$$　
+则$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$就是一个正交向量组，若再令</script><p>\boldsymbol{e_i}=\frac {\boldsymbol{\beta_i}}{\Vert \boldsymbol{\beta_i} \Vert}(i=1,2,\cdots,m)</p>
+<p>$$<br>就得到了一个标准正交向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$,且该向量和$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$<br>上述所说明的利用线性无关向量组，构造出一个标准正交向量组的方法，就是施密特正交化方法。</p>
 
       
     </div>
 
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/矩阵分解/" rel="tag"># 矩阵分解</a>
+          
+            <a href="/tags/Math/" rel="tag"># Math</a>
+          
+            <a href="/tags/正交化/" rel="tag"># 正交化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/31/矩阵分解/" rel="next" title="矩阵分解">
+                <i class="fa fa-chevron-left"></i> 矩阵分解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -822,6 +989,10 @@
 
 
   
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
 
   
 
@@ -840,6 +1011,8 @@
 
   
 
+
+  
 
 
   
@@ -1177,6 +1350,46 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 
