@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
+  <meta name="description" content="施密特正交化(Schmidt orthogonalization)是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
 <meta name="keywords" content="矩阵分解,Math,正交化">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Schmidt 正交化">
 <meta property="og:url" content="http://yoursite.com/2019/05/31/Schmidt-正交化/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
+<meta property="og:description" content="施密特正交化(Schmidt orthogonalization)是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-04T03:19:48.170Z">
+<meta property="og:updated_time" content="2019-06-04T04:25:54.583Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Schmidt 正交化">
-<meta name="twitter:description" content="施密特正交化（Schmidt orthogonalization 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
+<meta name="twitter:description" content="施密特正交化(Schmidt orthogonalization)是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\bo">
 
 
 
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-06-04 11:19:48" itemprop="dateModified" datetime="2019-06-04T11:19:48+08:00">2019-06-04</time>
+                <time title="Modified: 2019-06-04 12:25:54" itemprop="dateModified" datetime="2019-06-04T12:25:54+08:00">2019-06-04</time>
               
             
           </span>
@@ -554,7 +554,8 @@
       
 
       
-        <p><strong><em>施密特正交化（Schmidt orthogonalization</em></strong> 是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$，$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$与向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$等价，再将正交向量组中每个向量经过单位化，就得到一个标准正交向量组，这种方法称为施密特正交化。</p>
+        <p><strong><em>施密特正交化</em></strong>(Schmidt orthogonalization)是求欧氏空间正交基的一种方法。从欧氏空间任意线性无关的向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，求得正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$，$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$与向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$等价，再将正交向量组中每个向量经过单位化，就得到一个标准正交向量组，这种方法称为施密特正交化。</p>
+<hr>
 <p><em>线性无关向量组</em>未必是<em>正交向量组</em>，但正交向量组又是重要的，因此现在就有一个问题：能否从一个线性无关向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$出发，构造出一个标准正交向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$，并且使向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$与向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$等价呢?回答是肯定的，通过施密特正交化方法就可以实现。下面就来介绍这个方法，由于把一个正交向量组中每个向量经过单位化，就得到一个标准正交向量组，所以，上述问题的关键是如何由一个线性无关向量组来构造出一个正交向量组，我们以3个向量组成的线性无关组为例来说明这个方法。设向量组$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\boldsymbol{\alpha_3}$线性无关，我们先来构造正交向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\boldsymbol{\beta_3}$，并且使$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_r}$与向量组$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_r}$等价$(r=1,2,3)$。按所要求的条件，$\boldsymbol{\beta_1}$是$\boldsymbol{\alpha_1}$的线性组合，$\boldsymbol{\beta_2}$是$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2}$的线性组合，为方便起见，不妨设</p>
 <script type="math/tex; mode=display">
 \boldsymbol{\beta_1}=\boldsymbol{\alpha_1},\boldsymbol{\beta_2}=\boldsymbol{\alpha_2}-k\boldsymbol{\beta_1}</script><p>其中，数值$k$的选取应满足$\boldsymbol{\beta_1}$与$\boldsymbol{\beta_2}$垂直，即</p>
@@ -582,10 +583,9 @@ k_2=\frac{\langle\boldsymbol{\alpha_3},\boldsymbol{\beta_2}\rangle}{\langle\bold
 \\[2ex]
 \boldsymbol{\beta_m} = \boldsymbol{\alpha_m} - \frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_1} \rangle } {\langle \boldsymbol{\beta_1},\boldsymbol{\beta_1}\rangle }\boldsymbol{\beta_1}-\frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_2} \rangle } {\langle \boldsymbol{\beta_2},\boldsymbol{\beta_2}\rangle }\boldsymbol{\beta_2}-\cdots-
 \frac{\langle \boldsymbol{\alpha_m} , \boldsymbol{\beta_{m-1}} \rangle } {\langle \boldsymbol{\beta_{m-1}},\boldsymbol{\beta_{m-1}}\rangle }\beta_{m-1}
-\end{array} 
-$$　
-则$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$就是一个正交向量组，若再令</script><p>\boldsymbol{e_i}=\frac {\boldsymbol{\beta_i}}{\Vert \boldsymbol{\beta_i} \Vert}(i=1,2,\cdots,m)</p>
-<p>$$<br>就得到了一个标准正交向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$,且该向量和$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$<br>上述所说明的利用线性无关向量组，构造出一个标准正交向量组的方法，就是施密特正交化方法。</p>
+\end{array}</script><p>　<br>则$\boldsymbol{\beta_1},\boldsymbol{\beta_2},\cdots,\boldsymbol{\beta_m}$就是一个正交向量组，若再令</p>
+<script type="math/tex; mode=display">
+\boldsymbol{e_i}=\frac {\boldsymbol{\beta_i}}{\Vert \boldsymbol{\beta_i} \Vert}(i=1,2,\cdots,m)</script><p>就得到了一个标准正交向量组$\boldsymbol{e_1},\boldsymbol{e_2},\cdots,\boldsymbol{e_m}$， 且该向量和$\boldsymbol{\alpha_1},\boldsymbol{\alpha_2},\cdots,\boldsymbol{\alpha_m}$<br>上述所说明的利用线性无关向量组，构造出一个标准正交向量组的方法，就是施密特正交化方法。</p>
 
       
     </div>
