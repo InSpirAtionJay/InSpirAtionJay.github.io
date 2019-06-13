@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="随心小笔">
 <meta property="og:description" content="ORBextractor特征提取器1. ORBextractor 成员变量1.1 SCORE 得分常量1enum &amp;#123;HARRIS_SCORE=0, FAST_SCORE=1 &amp;#125;; 定义常量，HARRIS_SCORE=0, FAST_SCORE=1，特征点提取后通过得分进行筛选得到最佳的特征点 1.2 描述子的筛选模式1std::vector&amp;lt;cv::Point&amp;gt; p">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-11T02:03:36.285Z">
+<meta property="og:updated_time" content="2019-06-11T02:10:27.060Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ORB-SLAM2源码分析三">
 <meta name="twitter:description" content="ORBextractor特征提取器1. ORBextractor 成员变量1.1 SCORE 得分常量1enum &amp;#123;HARRIS_SCORE=0, FAST_SCORE=1 &amp;#125;; 定义常量，HARRIS_SCORE=0, FAST_SCORE=1，特征点提取后通过得分进行筛选得到最佳的特征点 1.2 描述子的筛选模式1std::vector&amp;lt;cv::Point&amp;gt; p">
@@ -274,7 +274,7 @@
       
     
 
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">14</span></a>
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">16</span></a>
 
   </li>
         
@@ -312,7 +312,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">11</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">16</span></a>
 
   </li>
         
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-06-11 10:03:36" itemprop="dateModified" datetime="2019-06-11T10:03:36+08:00">2019-06-11</time>
+                <time title="Modified: 2019-06-11 10:10:27" itemprop="dateModified" datetime="2019-06-11T10:10:27+08:00">2019-06-11</time>
               
             
           </span>
@@ -587,7 +587,7 @@
 <p>每个特征点的方向采用灰度质心法，即统计半径为15的圆内的灰度质心方向，主要调用IC_Angle函数。</p>
 <h3 id="2-6-IC-Angle-计算特征点的主方向"><a href="#2-6-IC-Angle-计算特征点的主方向" class="headerlink" title="2.6 IC_Angle 计算特征点的主方向"></a>2.6 <em>IC_Angle</em> 计算特征点的主方向</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> m_01 = <span class="number">0</span>, m_10 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> uchar* center = &amp;<span class="built_in">image</span>.at&lt;uchar&gt; (cvRound(pt.y), cvRound(pt.x));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Treat the center line differently, v=0</span></span><br><span class="line">    <span class="built_in">for</span> (<span class="keyword">int</span> u = -HALF_PATCH_SIZE; u &lt;= HALF_PATCH_SIZE; ++u)</span><br><span class="line">        m_10 += u * center[u];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Go line by line in the circuI853lar patch</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">step</span> = (<span class="keyword">int</span>)<span class="built_in">image</span>.step1();</span><br><span class="line">    <span class="built_in">for</span> (<span class="keyword">int</span> v = <span class="number">1</span>; v &lt;= HALF_PATCH_SIZE; ++v)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Proceed over the two lines</span></span><br><span class="line">        <span class="keyword">int</span> v_sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> d = u_max[v];</span><br><span class="line">        <span class="built_in">for</span> (<span class="keyword">int</span> u = -d; u &lt;= d; ++u)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> val_plus = center[u + v*<span class="built_in">step</span>], val_minus = center[u - v*<span class="built_in">step</span>];</span><br><span class="line">            v_sum += (val_plus - val_minus);</span><br><span class="line">            m_10 += u * (val_plus + val_minus);</span><br><span class="line">        &#125;</span><br><span class="line">        m_01 += v * v_sum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">return</span> fastAtan2((<span class="keyword">float</span>)m_01, (<span class="keyword">float</span>)m_10);</span><br></pre></td></tr></table></figure>
 <p>先令m_01和m_10都为0，然后计算水平中间线上的均值，注意算均值时，在中心点的左边或者下边距离值是负数。然后依次统计每一条截半径上的水平均值和（累和），以及垂直线上的均值（相减），最后返回tan(m_01,m_10)作为主方向。</p>
-<h3 id="3-初始化Current帧"><a href="#3-初始化Current帧" class="headerlink" title="3. 初始化Current帧"></a>3. 初始化Current帧</h3><p>```flow<br>st=&gt;start: Frame()构造函数生成当前帧<br>e=&gt;end: 得到mCurrent帧<br>op1=&gt;operation: 帧ID自加<br>op2=&gt;operation: 特征提取尺度信息初始化<br>op3=&gt;operation: 调用ExtractORB(0,imGray)来计算特征点Vector和描述符matrix，0表示単目，1表示双目，提取完的特征点存在mvKeys里面,描述符存在mDescriptors里面，这一步调用了特征提取器的括号运算符<br>op4=&gt;operation: 对提取的每一个特征点进行矫正去畸变UndistortKeyPoints<br>op5=&gt;operation: ComputeImageBounds(imGray)，计算图片边界，方便进行网格划分<br>op6=&gt;operation: 将特征点分配到对应的网格AssignFeaturesToGrid()<br>st-&gt;op1-&gt;op2-&gt;op3-&gt;op4-&gt;op5-&gt;op6-&gt;e</p>
+<h3 id="3-初始化Current帧"><a href="#3-初始化Current帧" class="headerlink" title="3. 初始化Current帧"></a>3. 初始化Current帧</h3><p><div id="flowchart-1" class="flow-chart"></div></p>
 <p><script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=>start: operator()生成特征点和描述符
 e=>end: 得到m特征点Vector和描述符Matrix
 op1=>operation: 参数输入，输入图片矩阵，引用关键点列表，引用描述符矩阵
@@ -595,7 +595,15 @@ op2=>operation: 调用ComputePyramid(image)计算图像金字塔，对每一层�
 op3=>operation: 调用ComputeKeyPointsOctTree(allKeypoints)计算特征点四叉树，构建初始网格图，对每一个网格进行特征点的提取
 op4=>operation: 调用FAST函数对每一个网格来计算特征点坐标，并进行网格坐标矫正
 op5=>operation: 对每一个特征点computeDescriptors(workingMat, keypoints, desc, pattern)计算描述符
-st->op1->op2->op3->op4->e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script></p>
+st->op1->op2->op3->op4->e</textarea><textarea id="flowchart-0-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-0-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-0", options);</script><textarea id="flowchart-1-code" style="display: none">st=>start: Frame()构造函数生成当前帧
+e=>end: 得到mCurrent帧
+op1=>operation: 帧ID自加
+op2=>operation: 特征提取尺度信息初始化
+op3=>operation: 调用ExtractORB(0,imGray)来计算特征点Vector和描述符matrix，0表示単目，1表示双目，提取完的特征点存在mvKeys里面,描述符存在mDescriptors里面，这一步调用了特征提取器的括号运算符
+op4=>operation: 对提取的每一个特征点进行矫正去畸变UndistortKeyPoints
+op5=>operation: ComputeImageBounds(imGray)，计算图片边界，方便进行网格划分
+op6=>operation: 将特征点分配到对应的网格AssignFeaturesToGrid()
+st->op1->op2->op3->op4->op5->op6->e</textarea><textarea id="flowchart-1-options" style="display: none">{"scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>  var code = document.getElementById("flowchart-1-code").value;  var options = JSON.parse(decodeURIComponent(document.getElementById("flowchart-1-options").value));  var diagram = flowchart.parse(code);  diagram.drawSVG("flowchart-1", options);</script></p>
 
       
     </div>
@@ -717,7 +725,7 @@ st->op1->op2->op3->op4->e</textarea><textarea id="flowchart-0-options" style="di
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-count">16</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
@@ -793,7 +801,11 @@ st->op1->op2->op3->op4->e</textarea><textarea id="flowchart-0-options" style="di
                     
                       
                     
-                    <span class="site-state-item-count">14</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
                     <span class="site-state-item-name">tags</span>
                   </a>
                 </div>

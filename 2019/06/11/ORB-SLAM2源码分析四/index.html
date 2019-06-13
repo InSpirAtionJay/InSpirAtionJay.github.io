@@ -103,20 +103,18 @@
 
 
 
-  <meta name="description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
-<meta name="keywords" content="Markdown笔记">
+  <meta name="description" content="初始器 Initializer类说明1. Initializer 成员变量说明1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.1 特征点匹配数据类型声明 Match1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点12345// Keypoints">
+<meta name="keywords" content="SLAM,Tracking">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Markdown flowchart.js画流程图">
-<meta property="og:url" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/index.html">
+<meta property="og:title" content="ORB-SLAM2源码分析四">
+<meta property="og:url" content="http://yoursite.com/2019/06/11/ORB-SLAM2源码分析四/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
+<meta property="og:description" content="初始器 Initializer类说明1. Initializer 成员变量说明1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.1 特征点匹配数据类型声明 Match1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点12345// Keypoints">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png">
-<meta property="og:updated_time" content="2019-05-29T03:09:39.383Z">
+<meta property="og:updated_time" content="2019-06-11T05:58:54.657Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Markdown flowchart.js画流程图">
-<meta name="twitter:description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
-<meta name="twitter:image" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png">
+<meta name="twitter:title" content="ORB-SLAM2源码分析四">
+<meta name="twitter:description" content="初始器 Initializer类说明1. Initializer 成员变量说明1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.1 特征点匹配数据类型声明 Match1typedef pair&amp;lt;int,int&amp;gt; Match; 定义Match类型 1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点12345// Keypoints">
 
 
 
@@ -124,7 +122,7 @@
 
   
   
-  <link rel="canonical" href="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/">
+  <link rel="canonical" href="http://yoursite.com/2019/06/11/ORB-SLAM2源码分析四/">
 
 
 
@@ -134,7 +132,7 @@
   };
 </script>
 
-  <title>Markdown flowchart.js画流程图 | 随心小笔</title>
+  <title>ORB-SLAM2源码分析四 | 随心小笔</title>
   
 
 
@@ -433,7 +431,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/11/ORB-SLAM2源码分析四/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="lemonlikelihood">
@@ -450,7 +448,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Markdown flowchart.js画流程图
+          <h1 class="post-title" itemprop="name headline">ORB-SLAM2源码分析四
 
               
             
@@ -476,24 +474,12 @@
                 
               
 
-              <time title="Created: 2019-05-28 20:39:02" itemprop="dateCreated datePublished" datetime="2019-05-28T20:39:02+08:00">2019-05-28</time>
+              <time title="Created: 2019-06-11 10:07:54 / Modified: 13:58:54" itemprop="dateCreated datePublished" datetime="2019-06-11T10:07:54+08:00">2019-06-11</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-05-29 11:09:39" itemprop="dateModified" datetime="2019-05-29T11:09:39+08:00">2019-05-29</time>
               
             
           </span>
@@ -510,7 +496,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
 
                 
                 
@@ -556,49 +542,34 @@
       
 
       
-        <h2 id="Markdown笔记：如何画流程图"><a href="#Markdown笔记：如何画流程图" class="headerlink" title="Markdown笔记：如何画流程图"></a>Markdown笔记：如何画流程图</h2><blockquote>
-<p>Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。 </p>
-</blockquote>
-<h3 id="1-先来看一段入门案例"><a href="#1-先来看一段入门案例" class="headerlink" title="1. 先来看一段入门案例"></a>1. 先来看一段入门案例</h3><p>流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">,,,flow</span><br><span class="line"><span class="attribute">st</span>=&gt;start: Start</span><br><span class="line"><span class="attribute">e</span>=&gt;end: End</span><br><span class="line"><span class="attribute">op1</span>=&gt;operation: My Operation</span><br><span class="line"><span class="attribute">sub1</span>=&gt;subroutine: My Subroutine</span><br><span class="line"><span class="attribute">cond</span>=&gt;condition: <span class="literal">Yes</span> <span class="keyword">or</span> <span class="literal">No</span>?</span><br><span class="line"><span class="attribute">io</span>=&gt;inputoutput: catch something<span class="built_in">..</span>.</span><br><span class="line">st-&gt;op1-&gt;cond</span><br><span class="line">cond(<span class="literal">yes</span>)-&gt;io-&gt;e</span><br><span class="line">cond(<span class="literal">no</span>)-&gt;sub1(right)-&gt;op1</span><br><span class="line">,,,</span><br></pre></td></tr></table></figure></p>
-<p>输出结果如图所示:<br><img src="/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png" alt="flowchart01.png"></p>
-<p>在markdown语法中，流程图的画法和代码段类似，也就是说，流程图是写在两个,,,之间的。<br>比如说php代码，会是这样一种格式:</p>
-<p align="center">
-,,,php<br>代码段<br>,,,</p>
-那么流程图就是这样的:
-
-<p align="center">
-,,,flow<br>代码段<br>,,,`</p>
-
-
-<h3 id="2-语法"><a href="#2-语法" class="headerlink" title="2. 语法"></a>2. 语法</h3><p>流程图的语法大体分为两部分:</p>
-<ul>
-<li>前面部分用来定义流程图元素；</li>
-<li>后面部分用来连接流程图元素，指定流程图的执行走向。</li>
-</ul>
-<h4 id="2-1-定义元素阶段的语法"><a href="#2-1-定义元素阶段的语法" class="headerlink" title="2.1 定义元素阶段的语法"></a>2.1 定义元素阶段的语法</h4><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">tag</span>=&gt;<span class="built_in">type</span>: conten<span class="variable">t:</span>&gt;url</span><br></pre></td></tr></table></figure>
-<p>上例中下面部分代码都是定义元素部分<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">st</span>=&gt;start: Start</span><br><span class="line"><span class="attribute">e</span>=&gt;end: End</span><br><span class="line"><span class="attribute">op1</span>=&gt;operation: My Operation</span><br><span class="line"><span class="attribute">sub1</span>=&gt;subroutine: My Subroutine</span><br><span class="line"><span class="attribute">cond</span>=&gt;condition: <span class="literal">Yes</span> <span class="keyword">or</span> <span class="literal">No</span>?</span><br><span class="line"><span class="attribute">io</span>=&gt;inputoutput: catch something<span class="built_in">..</span>.</span><br></pre></td></tr></table></figure></p>
-<p>说明：</p>
-<ul>
-<li>tag 是流程图中的标签，在第二段连接元素时会用到。名称可以任意，一般为流程的英文缩写和数字的组合。</li>
-<li>type 用来确定标签的类型，=&gt;后面表示类型。由于标签的名称可以任意指定，所以要依赖type来确定标签的类型。</li>
-<li>标签有6种类型：start end operation subroutine condition inputoutput。</li>
-<li>content 是流程图文本框中的描述内容，: 后面表示内容，中英文均可。特别注意，冒号与文本之间一定要有个<em>空格</em>。</li>
-<li>url是一个连接，与框框中的文本相绑定，:&gt;后面就是对应的 url 链接，点击文本时可以通过链接跳转到 url 指定页面。</li>
-</ul>
-<p>开始<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">st</span>=&gt;<span class="keyword">star</span><span class="variable">t:</span> 开始</span><br></pre></td></tr></table></figure></p>
-<p>操作<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">op1</span>=&gt;operation: 操作、执行说明</span><br></pre></td></tr></table></figure></p>
-<p>条件<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cond</span>=&gt;condition: 确认？</span><br></pre></td></tr></table></figure></p>
-<p>结束<br><figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e=&gt;<span class="keyword">end</span>: 结束</span><br></pre></td></tr></table></figure></p>
-<p>URL（貌似 SF 的编辑器不支持）<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e=&gt;点击本结束跳转<span class="symbol">:&gt;http</span><span class="symbol">://https</span><span class="symbol">://segmentfault</span>.com/blog/ingood</span><br></pre></td></tr></table></figure></p>
-<h4 id="2-2-连接流程图元素的语法"><a href="#2-2-连接流程图元素的语法" class="headerlink" title="2.2 连接流程图元素的语法"></a>2.2 连接流程图元素的语法</h4><p>示例代码后面部分</p>
-<p>st-&gt;op1-&gt;cond<br>cond(yes)-&gt;io-&gt;e<br>cond(no)-&gt;sub1(right)-&gt;op1</p>
-<p>连接流程图元素阶段的语法就简单多了，直接用-&gt;来连接两个元素，几点说明如下：<br>说明：</p>
-<ul>
-<li>使用 -&gt; 来连接两个元素</li>
-<li>对于condition类型，有yes和no两个分支，如示例中的cond(yes)和cond(no)</li>
-<li>每个元素可以制定分支走向，默认向下，也可以用right指向右边，如示例中sub1(right)。</li>
-</ul>
-<p>转载声明：<br>本文转载自:<a href="https://segmentfault.com/a/1190000006247465?utm_source=tag-newest" target="_blank" rel="noopener">https://segmentfault.com/a/1190000006247465?utm_source=tag-newest</a></p>
+        <h2 id="初始器-Initializer类说明"><a href="#初始器-Initializer类说明" class="headerlink" title="初始器 Initializer类说明"></a>初始器 Initializer类说明</h2><h3 id="1-Initializer-成员变量说明"><a href="#1-Initializer-成员变量说明" class="headerlink" title="1. Initializer 成员变量说明"></a>1. Initializer 成员变量说明</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="built_in">int</span>,<span class="built_in">int</span>&gt; <span class="built_in">Match</span>;</span><br></pre></td></tr></table></figure>
+<p>定义Match类型</p>
+<h3 id="1-1-特征点匹配数据类型声明-Match"><a href="#1-1-特征点匹配数据类型声明-Match" class="headerlink" title="1.1 特征点匹配数据类型声明 Match"></a>1.1 特征点匹配数据类型声明 Match</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="built_in">int</span>,<span class="built_in">int</span>&gt; <span class="built_in">Match</span>;</span><br></pre></td></tr></table></figure>
+<p>定义Match类型</p>
+<h4 id="1-2-mvKeys1，mvKeys2参考帧和当前帧中的特征点"><a href="#1-2-mvKeys1，mvKeys2参考帧和当前帧中的特征点" class="headerlink" title="1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点"></a>1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Keypoints from Reference Frame (Frame 1)</span></span><br><span class="line"><span class="built_in">vector</span>&lt;cv::KeyPoint&gt; mvKeys1; <span class="comment">///&lt; 存储Reference Frame中的特征点</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Keypoints from Current Frame (Frame 2)</span></span><br><span class="line"><span class="built_in">vector</span>&lt;cv::KeyPoint&gt; mvKeys2; <span class="comment">///&lt; 存储Current Frame中的特征点</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-3-特征匹配结构说明"><a href="#1-3-特征匹配结构说明" class="headerlink" title="1.3 特征匹配结构说明"></a>1.3 特征匹配结构说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Current Matches from Reference to Current</span></span><br><span class="line">   <span class="comment">// Reference Frame: 1, Current Frame: 2</span></span><br><span class="line">   <span class="built_in">vector</span>&lt;Match&gt; mvMatches12; <span class="comment">///&lt; Match的数据结构是pair,mvMatches12只记录Reference到Current匹配上的特征点对</span></span><br><span class="line">   <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; mvbMatched1; <span class="comment">///&lt; 记录Reference Frame的每个特征点在Current Frame是否有匹配的特征点</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-4-相机内参"><a href="#1-4-相机内参" class="headerlink" title="1.4 相机内参"></a>1.4 相机内参</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mK; <span class="comment">///&lt; 相机内参</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-5-测量误差"><a href="#1-5-测量误差" class="headerlink" title="1.5 测量误差"></a>1.5 测量误差</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Standard Deviation and Variance</span></span><br><span class="line">    <span class="keyword">float</span> mSigma, mSigma2; <span class="comment">///&lt; 测量误差</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-6-RANSAC迭代次数"><a href="#1-6-RANSAC迭代次数" class="headerlink" title="1.6 RANSAC迭代次数"></a>1.6 RANSAC迭代次数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Ransac max iterations</span></span><br><span class="line">   <span class="keyword">int</span> mMaxIterations; <span class="comment">///&lt; 算Fundamental和Homography矩阵时RANSAC迭代次数</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-7-特征匹配结构说明"><a href="#1-7-特征匹配结构说明" class="headerlink" title="1.7 特征匹配结构说明"></a>1.7 特征匹配结构说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Ransac sets</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; &gt; mvSets; <span class="comment">///&lt; 二维容器，外层容器的大小为迭代次数，内层容器大小为每次迭代算H或F矩阵需要的点</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-Initializer-成员函数说明"><a href="#2-Initializer-成员函数说明" class="headerlink" title="2. Initializer 成员函数说明"></a>2. Initializer 成员函数说明</h3><h4 id="2-1-Initializer构造函数说明"><a href="#2-1-Initializer构造函数说明" class="headerlink" title="2.1 Initializer构造函数说明"></a>2.1 Initializer构造函数说明</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">// Fix the reference frame</span></span><br><span class="line">    <span class="comment">// 用reference frame来初始化，这个reference frame就是SLAM正式开始的第一帧</span></span><br><span class="line">    Initializer(<span class="keyword">const</span> Frame &amp;ReferenceFrame, <span class="keyword">float</span> sigma = <span class="number">1.0</span>, <span class="keyword">int</span> iterations = <span class="number">200</span>);</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 给定参考帧构造Initializer</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 用reference frame来初始化，这个reference frame就是SLAM正式开始的第一帧</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> ReferenceFrame 参考帧</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> sigma          测量误差</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> iterations     RANSAC迭代次数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"> mK = ReferenceFrame.mK.<span class="keyword">clone</span>();</span><br><span class="line"></span><br><span class="line">    mvKeys1 = ReferenceFrame.mvKeysUn;</span><br><span class="line"></span><br><span class="line">    mSigma = sigma;</span><br><span class="line">    mSigma2 = sigma*sigma;</span><br><span class="line">    mMaxIterations = iterations;</span><br></pre></td></tr></table></figure>
+<h4 id="2-1-Initialize-函数说明"><a href="#2-1-Initialize-函数说明" class="headerlink" title="2.1 Initialize()函数说明"></a>2.1 Initialize()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Computes in parallel a fundamental matrix and a homography</span></span><br><span class="line">   <span class="comment">// Selects a model and tries to recover the motion and the structure from motion</span></span><br><span class="line">   <span class="comment">// 用current frame,也就是用SLAM逻辑上的第二帧来初始化整个SLAM，得到最开始两帧之间的R t,以及点云</span></span><br><span class="line">   <span class="function"><span class="keyword">bool</span> <span class="title">Initialize</span><span class="params">(<span class="keyword">const</span> Frame &amp;CurrentFrame, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp;vMatches12,</span></span></span><br><span class="line"><span class="function"><span class="params">                   cv::Mat &amp;R21, cv::Mat &amp;t21, <span class="built_in">vector</span>&lt;cv::Point3f&gt; &amp;vP3D, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbTriangulated)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>针对第一二帧图像进行初始化，初始化时需要确定第二帧相对于第一帧的旋转矩阵和平移向量，以及生成的三维地图点和是否能三角测量化，<br>并行地计算基础矩阵和单应性矩阵，选取其中一个模型，恢复出最开始两帧之间的相对姿态以及点云。</p>
+<p><em>初始化匹配特征点点</em><br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Fill structures with current keypoints and matches with reference frame</span></span><br><span class="line"><span class="comment">// Reference Frame: 1, Current Frame: 2</span></span><br><span class="line"><span class="comment">// Frame2 特征点</span></span><br><span class="line">mvKeys2 = CurrentFrame.mvKeysUn;</span><br><span class="line"></span><br><span class="line"><span class="comment">// mvMatches12记录匹配上的特征点对</span></span><br><span class="line">mvMatches12.<span class="built_in">clear</span>();</span><br><span class="line">mvMatches12.reserve(mvKeys2.<span class="built_in">size</span>());</span><br><span class="line"><span class="comment">// mvbMatched1记录每个特征点是否有匹配的特征点，</span></span><br><span class="line"><span class="comment">// 这个变量后面没有用到，后面只关心匹配上的特征点</span></span><br><span class="line">mvbMatched1.resize(mvKeys1.<span class="built_in">size</span>());</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-2-FindHomography-函数说明"><a href="#2-2-FindHomography-函数说明" class="headerlink" title="2.2 FindHomography()函数说明"></a>2.2 FindHomography()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1),并得到该模型的评分</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">FindHomography</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbMatchesInliers, <span class="keyword">float</span> &amp;score, cv::Mat &amp;H21)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>平面情况下评估Homograph矩阵并计算得分</p>
+<h4 id="2-3-FindFundamental-函数说明"><a href="#2-3-FindFundamental-函数说明" class="headerlink" title="2.3 FindFundamental()函数说明"></a>2.3 FindFundamental()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假设场景为非平面情况下通过前两帧求取Fundamental矩阵(current frame 2 到 reference frame 1),并得到该模型的评分</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">FindFundamental</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbInliers, <span class="keyword">float</span> &amp;score, cv::Mat &amp;F21)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>非平面情况下评估Fundamental矩并计算得分</p>
+<h4 id="2-4-ComputeH21-函数说明"><a href="#2-4-ComputeH21-函数说明" class="headerlink" title="2.4 ComputeH21()函数说明"></a>2.4 ComputeH21()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 被FindHomography函数调用具体来算Homography矩阵</span></span><br><span class="line">    cv::<span class="function">Mat <span class="title">ComputeH21</span><span class="params">(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::Point2f&gt; &amp;vP1, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::Point2f&gt; &amp;vP2)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-5-FindHomography-函数说明"><a href="#2-5-FindHomography-函数说明" class="headerlink" title="2.5 FindHomography()函数说明"></a>2.5 FindHomography()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 被FindFundamental函数调用具体来算Fundamental矩阵</span></span><br><span class="line">    cv::<span class="function">Mat <span class="title">ComputeF21</span><span class="params">(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::Point2f&gt; &amp;vP1, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::Point2f&gt; &amp;vP2)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-6-CheckHomography-函数说明"><a href="#2-6-CheckHomography-函数说明" class="headerlink" title="2.6 CheckHomography()函数说明"></a>2.6 CheckHomography()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 被FindHomography函数调用，具体来算假设使用Homography模型的得分</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">CheckHomography</span><span class="params">(<span class="keyword">const</span> cv::Mat &amp;H21, <span class="keyword">const</span> cv::Mat &amp;H12, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbMatchesInliers, <span class="keyword">float</span> sigma)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-7-FindHomography-函数说明"><a href="#2-7-FindHomography-函数说明" class="headerlink" title="2.7 FindHomography()函数说明"></a>2.7 FindHomography()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 被FindFundamental函数调用，具体来算假设使用Fundamental模型的得分</span></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">CheckFundamental</span><span class="params">(<span class="keyword">const</span> cv::Mat &amp;F21, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbMatchesInliers, <span class="keyword">float</span> sigma)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-8-ReconstructF-函数说明"><a href="#2-8-ReconstructF-函数说明" class="headerlink" title="2.8 ReconstructF()函数说明"></a>2.8 ReconstructF()函数说明</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分解F矩阵，并从分解后的多个解中找出合适的R，t</span></span><br><span class="line">    <span class="keyword">bool</span> ReconstructF(vector&lt;<span class="keyword">bool</span>&gt; &amp;vbMatchesInliers, cv::Mat &amp;F21, cv::Mat &amp;K,</span><br><span class="line">                      cv::Mat &amp;R21, cv::Mat &amp;t21, vector&lt;cv::Point3f&gt; &amp;vP3D, vector&lt;<span class="keyword">bool</span>&gt; &amp;vbTriangulated, <span class="keyword">float</span> minParallax, <span class="keyword">int</span> minTriangulated);</span><br></pre></td></tr></table></figure>
+<h4 id="2-9-ReconstructH-函数说明"><a href="#2-9-ReconstructH-函数说明" class="headerlink" title="2.9 ReconstructH()函数说明"></a>2.9 ReconstructH()函数说明</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分解H矩阵，并从分解后的多个解中找出合适的R，t</span></span><br><span class="line">    <span class="keyword">bool</span> ReconstructH(vector&lt;<span class="keyword">bool</span>&gt; &amp;vbMatchesInliers, cv::Mat &amp;H21, cv::Mat &amp;K,</span><br><span class="line">                      cv::Mat &amp;R21, cv::Mat &amp;t21, vector&lt;cv::Point3f&gt; &amp;vP3D, vector&lt;<span class="keyword">bool</span>&gt; &amp;vbTriangulated, <span class="keyword">float</span> minParallax, <span class="keyword">int</span> minTriangulated);</span><br></pre></td></tr></table></figure>
+<h4 id="2-10-Triangulate-函数说明"><a href="#2-10-Triangulate-函数说明" class="headerlink" title="2.10 Triangulate()函数说明"></a>2.10 Triangulate()函数说明</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过三角化方法，利用反投影矩阵将特征点恢复为3D点</span></span><br><span class="line">   void Triangulate(<span class="keyword">const</span> cv::KeyPoint &amp;kp1, <span class="keyword">const</span> cv::KeyPoint &amp;kp2, <span class="keyword">const</span> cv::Mat &amp;P1, <span class="keyword">const</span> cv::Mat &amp;P2, cv::Mat &amp;x3D);</span><br></pre></td></tr></table></figure>
+<h4 id="2-11-Normalize-函数说明"><a href="#2-11-Normalize-函数说明" class="headerlink" title="2.11 Normalize()函数说明"></a>2.11 Normalize()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 归一化三维空间点和帧间位移t</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Normalize</span><span class="params">(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::KeyPoint&gt; &amp;vKeys, <span class="built_in">vector</span>&lt;cv::Point2f&gt; &amp;vNormalizedPoints, cv::Mat &amp;T)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-12-CheckRT-函数说明"><a href="#2-12-CheckRT-函数说明" class="headerlink" title="2.12 CheckRT()函数说明"></a>2.12 CheckRT()函数说明</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReconstructF调用该函数进行cheirality check，从而进一步找出F分解后最合适的解</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">CheckRT</span><span class="params">(<span class="keyword">const</span> cv::Mat &amp;R, <span class="keyword">const</span> cv::Mat &amp;t, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::KeyPoint&gt; &amp;vKeys1, <span class="keyword">const</span> <span class="built_in">vector</span>&lt;cv::KeyPoint&gt; &amp;vKeys2,</span></span></span><br><span class="line"><span class="function"><span class="params">                       <span class="keyword">const</span> <span class="built_in">vector</span>&lt;Match&gt; &amp;vMatches12, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbInliers,</span></span></span><br><span class="line"><span class="function"><span class="params">                       <span class="keyword">const</span> cv::Mat &amp;K, <span class="built_in">vector</span>&lt;cv::Point3f&gt; &amp;vP3D, <span class="keyword">float</span> th2, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; &amp;vbGood, <span class="keyword">float</span> &amp;parallax)</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-13-DecomposeE-函数说明"><a href="#2-13-DecomposeE-函数说明" class="headerlink" title="2.13 DecomposeE()函数说明"></a>2.13 DecomposeE()函数说明</h4><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// F矩阵通过结合内参可以得到Essential矩阵，该函数用于分解E矩阵，将得到4组解</span></span><br><span class="line">    void DecomposeE(const <span class="symbol">cv::</span>Mat &amp;E, <span class="symbol">cv::</span>Mat &amp;R1, <span class="symbol">cv::</span>Mat &amp;R2, <span class="symbol">cv::</span>Mat <span class="variable">&amp;t</span>);</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -622,7 +593,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Markdown笔记/" rel="tag"># Markdown笔记</a>
+            <a href="/tags/SLAM/" rel="tag"># SLAM</a>
+          
+            <a href="/tags/Tracking/" rel="tag"># Tracking</a>
           
         </div>
       
@@ -635,8 +608,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/05/28/ORB-SLAM2源码分析二/" rel="next" title="ORB-SLAM2源码分析二">
-                <i class="fa fa-chevron-left"></i> ORB-SLAM2源码分析二
+              <a href="/2019/05/31/Schmidt-正交化/" rel="next" title="Schmidt 正交化">
+                <i class="fa fa-chevron-left"></i> Schmidt 正交化
               </a>
             
           </div>
@@ -645,8 +618,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/05/29/ORB-SLAM2源码分析三/" rel="prev" title="ORB-SLAM2源码分析三">
-                ORB-SLAM2源码分析三 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/06/11/ORB-SLAM2源码分析五/" rel="prev" title="ORB-SLAM2源码分析五">
+                ORB-SLAM2源码分析五 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -862,7 +835,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown笔记：如何画流程图"><span class="nav-text">Markdown笔记：如何画流程图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-先来看一段入门案例"><span class="nav-text">1. 先来看一段入门案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-语法"><span class="nav-text">2. 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-定义元素阶段的语法"><span class="nav-text">2.1 定义元素阶段的语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-连接流程图元素的语法"><span class="nav-text">2.2 连接流程图元素的语法</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始器-Initializer类说明"><span class="nav-text">初始器 Initializer类说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Initializer-成员变量说明"><span class="nav-text">1. Initializer 成员变量说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-特征点匹配数据类型声明-Match"><span class="nav-text">1.1 特征点匹配数据类型声明 Match</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-mvKeys1，mvKeys2参考帧和当前帧中的特征点"><span class="nav-text">1.2 mvKeys1，mvKeys2参考帧和当前帧中的特征点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-特征匹配结构说明"><span class="nav-text">1.3 特征匹配结构说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-相机内参"><span class="nav-text">1.4 相机内参</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-测量误差"><span class="nav-text">1.5 测量误差</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-RANSAC迭代次数"><span class="nav-text">1.6 RANSAC迭代次数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-特征匹配结构说明"><span class="nav-text">1.7 特征匹配结构说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Initializer-成员函数说明"><span class="nav-text">2. Initializer 成员函数说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Initializer构造函数说明"><span class="nav-text">2.1 Initializer构造函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Initialize-函数说明"><span class="nav-text">2.1 Initialize()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-FindHomography-函数说明"><span class="nav-text">2.2 FindHomography()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-FindFundamental-函数说明"><span class="nav-text">2.3 FindFundamental()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-ComputeH21-函数说明"><span class="nav-text">2.4 ComputeH21()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-FindHomography-函数说明"><span class="nav-text">2.5 FindHomography()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-CheckHomography-函数说明"><span class="nav-text">2.6 CheckHomography()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-7-FindHomography-函数说明"><span class="nav-text">2.7 FindHomography()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-8-ReconstructF-函数说明"><span class="nav-text">2.8 ReconstructF()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-9-ReconstructH-函数说明"><span class="nav-text">2.9 ReconstructH()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-10-Triangulate-函数说明"><span class="nav-text">2.10 Triangulate()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-11-Normalize-函数说明"><span class="nav-text">2.11 Normalize()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-12-CheckRT-函数说明"><span class="nav-text">2.12 CheckRT()函数说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-13-DecomposeE-函数说明"><span class="nav-text">2.13 DecomposeE()函数说明</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -1393,6 +1366,46 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 

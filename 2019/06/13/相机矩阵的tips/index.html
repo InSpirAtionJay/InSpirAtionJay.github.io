@@ -103,20 +103,20 @@
 
 
 
-  <meta name="description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
-<meta name="keywords" content="Markdown笔记">
+  <meta name="description" content="关于相机矩阵以及坐标系变换的Tips绕原点逆时针旋转$\theta$角度的旋转方程为  x&apos; = \begin{bmatrix}  cos\theta &amp; -sin\theta \\ sin\theta &amp; cos\theta  \end{bmatrix} x设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：  \begin{array}{c} \begin{bm">
+<meta name="keywords" content="Camera,Matrix,System Transform">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Markdown flowchart.js画流程图">
-<meta property="og:url" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/index.html">
+<meta property="og:title" content="相机矩阵的Tips">
+<meta property="og:url" content="http://yoursite.com/2019/06/13/相机矩阵的tips/index.html">
 <meta property="og:site_name" content="随心小笔">
-<meta property="og:description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
+<meta property="og:description" content="关于相机矩阵以及坐标系变换的Tips绕原点逆时针旋转$\theta$角度的旋转方程为  x&apos; = \begin{bmatrix}  cos\theta &amp; -sin\theta \\ sin\theta &amp; cos\theta  \end{bmatrix} x设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：  \begin{array}{c} \begin{bm">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png">
-<meta property="og:updated_time" content="2019-05-29T03:09:39.383Z">
+<meta property="og:image" content="http://yoursite.com/2019/06/13/相机矩阵的tips/coordinate.jpg">
+<meta property="og:updated_time" content="2019-06-13T06:27:06.120Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Markdown flowchart.js画流程图">
-<meta name="twitter:description" content="Markdown笔记：如何画流程图 Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。   1. 先来看一段入门案例流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)1234567891011,,,flowst=&amp;gt;start: Starte=&amp;gt;end:">
-<meta name="twitter:image" content="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png">
+<meta name="twitter:title" content="相机矩阵的Tips">
+<meta name="twitter:description" content="关于相机矩阵以及坐标系变换的Tips绕原点逆时针旋转$\theta$角度的旋转方程为  x&apos; = \begin{bmatrix}  cos\theta &amp; -sin\theta \\ sin\theta &amp; cos\theta  \end{bmatrix} x设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：  \begin{array}{c} \begin{bm">
+<meta name="twitter:image" content="http://yoursite.com/2019/06/13/相机矩阵的tips/coordinate.jpg">
 
 
 
@@ -124,7 +124,7 @@
 
   
   
-  <link rel="canonical" href="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/">
+  <link rel="canonical" href="http://yoursite.com/2019/06/13/相机矩阵的tips/">
 
 
 
@@ -134,7 +134,7 @@
   };
 </script>
 
-  <title>Markdown flowchart.js画流程图 | 随心小笔</title>
+  <title>相机矩阵的Tips | 随心小笔</title>
   
 
 
@@ -433,7 +433,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/Markdown-flowchart.js画流程图/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/13/相机矩阵的tips/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="lemonlikelihood">
@@ -450,7 +450,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Markdown flowchart.js画流程图
+          <h1 class="post-title" itemprop="name headline">相机矩阵的Tips
 
               
             
@@ -476,24 +476,12 @@
                 
               
 
-              <time title="Created: 2019-05-28 20:39:02" itemprop="dateCreated datePublished" datetime="2019-05-28T20:39:02+08:00">2019-05-28</time>
+              <time title="Created: 2019-06-13 11:30:07 / Modified: 14:27:06" itemprop="dateCreated datePublished" datetime="2019-06-13T11:30:07+08:00">2019-06-13</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-05-29 11:09:39" itemprop="dateModified" datetime="2019-05-29T11:09:39+08:00">2019-05-29</time>
               
             
           </span>
@@ -510,7 +498,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Markdown/" itemprop="url" rel="index"><span itemprop="name">Markdown</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
 
                 
                 
@@ -556,49 +544,26 @@
       
 
       
-        <h2 id="Markdown笔记：如何画流程图"><a href="#Markdown笔记：如何画流程图" class="headerlink" title="Markdown笔记：如何画流程图"></a>Markdown笔记：如何画流程图</h2><blockquote>
-<p>Flowchart.js 仅需几行代码即可在 Web 上完成流程图的构建。可以从文字表述中画出简单的 SVG 流程图，也可以画出彩色的图表。 </p>
-</blockquote>
-<h3 id="1-先来看一段入门案例"><a href="#1-先来看一段入门案例" class="headerlink" title="1. 先来看一段入门案例"></a>1. 先来看一段入门案例</h3><p>流程图代码在 Markdown 编辑中应该是下面这样的(由于渲染的问题，请把,,,改成三个点号)<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">,,,flow</span><br><span class="line"><span class="attribute">st</span>=&gt;start: Start</span><br><span class="line"><span class="attribute">e</span>=&gt;end: End</span><br><span class="line"><span class="attribute">op1</span>=&gt;operation: My Operation</span><br><span class="line"><span class="attribute">sub1</span>=&gt;subroutine: My Subroutine</span><br><span class="line"><span class="attribute">cond</span>=&gt;condition: <span class="literal">Yes</span> <span class="keyword">or</span> <span class="literal">No</span>?</span><br><span class="line"><span class="attribute">io</span>=&gt;inputoutput: catch something<span class="built_in">..</span>.</span><br><span class="line">st-&gt;op1-&gt;cond</span><br><span class="line">cond(<span class="literal">yes</span>)-&gt;io-&gt;e</span><br><span class="line">cond(<span class="literal">no</span>)-&gt;sub1(right)-&gt;op1</span><br><span class="line">,,,</span><br></pre></td></tr></table></figure></p>
-<p>输出结果如图所示:<br><img src="/2019/05/28/Markdown-flowchart.js画流程图/flowchart01.png" alt="flowchart01.png"></p>
-<p>在markdown语法中，流程图的画法和代码段类似，也就是说，流程图是写在两个,,,之间的。<br>比如说php代码，会是这样一种格式:</p>
-<p align="center">
-,,,php<br>代码段<br>,,,</p>
-那么流程图就是这样的:
-
-<p align="center">
-,,,flow<br>代码段<br>,,,`</p>
-
-
-<h3 id="2-语法"><a href="#2-语法" class="headerlink" title="2. 语法"></a>2. 语法</h3><p>流程图的语法大体分为两部分:</p>
-<ul>
-<li>前面部分用来定义流程图元素；</li>
-<li>后面部分用来连接流程图元素，指定流程图的执行走向。</li>
-</ul>
-<h4 id="2-1-定义元素阶段的语法"><a href="#2-1-定义元素阶段的语法" class="headerlink" title="2.1 定义元素阶段的语法"></a>2.1 定义元素阶段的语法</h4><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">tag</span>=&gt;<span class="built_in">type</span>: conten<span class="variable">t:</span>&gt;url</span><br></pre></td></tr></table></figure>
-<p>上例中下面部分代码都是定义元素部分<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">st</span>=&gt;start: Start</span><br><span class="line"><span class="attribute">e</span>=&gt;end: End</span><br><span class="line"><span class="attribute">op1</span>=&gt;operation: My Operation</span><br><span class="line"><span class="attribute">sub1</span>=&gt;subroutine: My Subroutine</span><br><span class="line"><span class="attribute">cond</span>=&gt;condition: <span class="literal">Yes</span> <span class="keyword">or</span> <span class="literal">No</span>?</span><br><span class="line"><span class="attribute">io</span>=&gt;inputoutput: catch something<span class="built_in">..</span>.</span><br></pre></td></tr></table></figure></p>
-<p>说明：</p>
-<ul>
-<li>tag 是流程图中的标签，在第二段连接元素时会用到。名称可以任意，一般为流程的英文缩写和数字的组合。</li>
-<li>type 用来确定标签的类型，=&gt;后面表示类型。由于标签的名称可以任意指定，所以要依赖type来确定标签的类型。</li>
-<li>标签有6种类型：start end operation subroutine condition inputoutput。</li>
-<li>content 是流程图文本框中的描述内容，: 后面表示内容，中英文均可。特别注意，冒号与文本之间一定要有个<em>空格</em>。</li>
-<li>url是一个连接，与框框中的文本相绑定，:&gt;后面就是对应的 url 链接，点击文本时可以通过链接跳转到 url 指定页面。</li>
-</ul>
-<p>开始<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">st</span>=&gt;<span class="keyword">star</span><span class="variable">t:</span> 开始</span><br></pre></td></tr></table></figure></p>
-<p>操作<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">op1</span>=&gt;operation: 操作、执行说明</span><br></pre></td></tr></table></figure></p>
-<p>条件<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cond</span>=&gt;condition: 确认？</span><br></pre></td></tr></table></figure></p>
-<p>结束<br><figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e=&gt;<span class="keyword">end</span>: 结束</span><br></pre></td></tr></table></figure></p>
-<p>URL（貌似 SF 的编辑器不支持）<br><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">e=&gt;点击本结束跳转<span class="symbol">:&gt;http</span><span class="symbol">://https</span><span class="symbol">://segmentfault</span>.com/blog/ingood</span><br></pre></td></tr></table></figure></p>
-<h4 id="2-2-连接流程图元素的语法"><a href="#2-2-连接流程图元素的语法" class="headerlink" title="2.2 连接流程图元素的语法"></a>2.2 连接流程图元素的语法</h4><p>示例代码后面部分</p>
-<p>st-&gt;op1-&gt;cond<br>cond(yes)-&gt;io-&gt;e<br>cond(no)-&gt;sub1(right)-&gt;op1</p>
-<p>连接流程图元素阶段的语法就简单多了，直接用-&gt;来连接两个元素，几点说明如下：<br>说明：</p>
-<ul>
-<li>使用 -&gt; 来连接两个元素</li>
-<li>对于condition类型，有yes和no两个分支，如示例中的cond(yes)和cond(no)</li>
-<li>每个元素可以制定分支走向，默认向下，也可以用right指向右边，如示例中sub1(right)。</li>
-</ul>
-<p>转载声明：<br>本文转载自:<a href="https://segmentfault.com/a/1190000006247465?utm_source=tag-newest" target="_blank" rel="noopener">https://segmentfault.com/a/1190000006247465?utm_source=tag-newest</a></p>
+        <h2 id="关于相机矩阵以及坐标系变换的Tips"><a href="#关于相机矩阵以及坐标系变换的Tips" class="headerlink" title="关于相机矩阵以及坐标系变换的Tips"></a>关于相机矩阵以及坐标系变换的Tips</h2><p>绕原点逆时针旋转$\theta$角度的旋转方程为</p>
+<script type="math/tex; mode=display">
+x' = \begin{bmatrix} 
+cos\theta & -sin\theta \\
+sin\theta & cos\theta 
+\end{bmatrix} x</script><p>设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}
+\begin{bmatrix} P_c & 1 \end{bmatrix} = T_{cw} * { \begin{bmatrix} P_w & 1 \end{bmatrix} } \\
+\begin{bmatrix} P_w & 1 \end{bmatrix} = T_{wc} * { \begin{bmatrix} P_c & 1 \end{bmatrix} }
+\end{array}</script><p>对标准坐标来说，分解成旋转矩阵和平移向量也就是</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}
+P_c = R_{cw} * P_w + t_{cw} \\
+P_w = R_{wc} * P_c + t_{wc}
+\end{array}</script><p>$R_{cw}$表示$T_{cw}$的左上角$3 \times 3$的矩阵，即<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Rcw = Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>);</span><br></pre></td></tr></table></figure></p>
+<p>$t_{cw}$表示$T_{cw}$的右上角$3 \times 1$的矩阵，即<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcw = Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong><em>平移向量$T_{cw}$表示在相机坐标系中，相机坐标系到世界坐标系间的向量，向量方向由相机坐标系指向世界坐标系，即相机坐标系中，世界坐标系的原点坐标。旋转矩阵R中的角度表示平移完成后，从相机坐标系逆时针旋转至世界坐标系的角度。</em></strong><br>以二维坐标旋转为例，如下图所示<br><img src="/2019/06/13/相机矩阵的tips/coordinate.jpg" alt="coordinate.jpg"></p>
+<p>反过来，$R_{wc}$表示坐标从相机坐标系转换世界坐标系的旋转矩阵，$R_{wc}=R_{cw}^T=R_{cw}^{-1}$<br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Rwc</span> = Rcw.t()<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong><em>$t_wc$也记作$Ow$，表示世界坐标系下世界坐标系到相机坐标系间的向量, 向量方向由世界坐标系指向相机坐标系，即世界坐标系下，相机中心点的坐标。$t_wc = R_{cw}^T \ast t_{cw}$ </em></strong><br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Ow</span> = -Rcw.t()*tcw<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -622,7 +587,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Markdown笔记/" rel="tag"># Markdown笔记</a>
+            <a href="/tags/Camera/" rel="tag"># Camera</a>
+          
+            <a href="/tags/Matrix/" rel="tag"># Matrix</a>
+          
+            <a href="/tags/System-Transform/" rel="tag"># System Transform</a>
           
         </div>
       
@@ -635,8 +604,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/05/28/ORB-SLAM2源码分析二/" rel="next" title="ORB-SLAM2源码分析二">
-                <i class="fa fa-chevron-left"></i> ORB-SLAM2源码分析二
+              <a href="/2019/06/11/ORB-SLAM2源码分析七/" rel="next" title="ORB-SLAM2源码分析七">
+                <i class="fa fa-chevron-left"></i> ORB-SLAM2源码分析七
               </a>
             
           </div>
@@ -644,10 +613,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/05/29/ORB-SLAM2源码分析三/" rel="prev" title="ORB-SLAM2源码分析三">
-                ORB-SLAM2源码分析三 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -862,7 +827,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown笔记：如何画流程图"><span class="nav-text">Markdown笔记：如何画流程图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-先来看一段入门案例"><span class="nav-text">1. 先来看一段入门案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-语法"><span class="nav-text">2. 语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-定义元素阶段的语法"><span class="nav-text">2.1 定义元素阶段的语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-连接流程图元素的语法"><span class="nav-text">2.2 连接流程图元素的语法</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于相机矩阵以及坐标系变换的Tips"><span class="nav-text">关于相机矩阵以及坐标系变换的Tips</span></a></li></ol></div>
             
 
           </div>
@@ -1393,6 +1358,46 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 
