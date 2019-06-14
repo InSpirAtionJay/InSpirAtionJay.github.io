@@ -112,7 +112,7 @@
 <meta property="og:description" content="关于相机矩阵以及坐标系变换的Tips绕原点逆时针旋转$\theta$角度的旋转方程为  x&apos; = \begin{bmatrix}  cos\theta &amp; -sin\theta \\ sin\theta &amp; cos\theta  \end{bmatrix} x设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：  \begin{array}{c} \begin{bm">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/06/13/相机矩阵的tips/coordinate.jpg">
-<meta property="og:updated_time" content="2019-06-13T06:27:06.120Z">
+<meta property="og:updated_time" content="2019-06-14T02:22:55.268Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="相机矩阵的Tips">
 <meta name="twitter:description" content="关于相机矩阵以及坐标系变换的Tips绕原点逆时针旋转$\theta$角度的旋转方程为  x&apos; = \begin{bmatrix}  cos\theta &amp; -sin\theta \\ sin\theta &amp; cos\theta  \end{bmatrix} x设$T_{cw}$表示从世界坐标系到摄像机坐标系的变换矩阵，也就是说，对于齐次坐标：  \begin{array}{c} \begin{bm">
@@ -476,12 +476,24 @@
                 
               
 
-              <time title="Created: 2019-06-13 11:30:07 / Modified: 14:27:06" itemprop="dateCreated datePublished" datetime="2019-06-13T11:30:07+08:00">2019-06-13</time>
+              <time title="Created: 2019-06-13 11:30:07" itemprop="dateCreated datePublished" datetime="2019-06-13T11:30:07+08:00">2019-06-13</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-14 10:22:55" itemprop="dateModified" datetime="2019-06-14T10:22:55+08:00">2019-06-14</time>
               
             
           </span>
@@ -563,7 +575,7 @@ P_w = R_{wc} * P_c + t_{wc}
 <p>$t_{cw}$表示$T_{cw}$的右上角$3 \times 1$的矩阵，即<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcw = Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>);</span><br></pre></td></tr></table></figure></p>
 <p><strong><em>平移向量$T_{cw}$表示在相机坐标系中，相机坐标系到世界坐标系间的向量，向量方向由相机坐标系指向世界坐标系，即相机坐标系中，世界坐标系的原点坐标。旋转矩阵R中的角度表示平移完成后，从相机坐标系逆时针旋转至世界坐标系的角度。</em></strong><br>以二维坐标旋转为例，如下图所示<br><img src="/2019/06/13/相机矩阵的tips/coordinate.jpg" alt="coordinate.jpg"></p>
 <p>反过来，$R_{wc}$表示坐标从相机坐标系转换世界坐标系的旋转矩阵，$R_{wc}=R_{cw}^T=R_{cw}^{-1}$<br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Rwc</span> = Rcw.t()<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
-<p><strong><em>$t_wc$也记作$Ow$，表示世界坐标系下世界坐标系到相机坐标系间的向量, 向量方向由世界坐标系指向相机坐标系，即世界坐标系下，相机中心点的坐标。$t_wc = R_{cw}^T \ast t_{cw}$ </em></strong><br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Ow</span> = -Rcw.t()*tcw<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong><em>$t_{wc}$也记作$Ow$，表示世界坐标系下世界坐标系到相机坐标系间的向量, 向量方向由世界坐标系指向相机坐标系，即世界坐标系下，相机中心点的坐标。$t_{wc} = R_{cw}^T \ast t_{cw}$ </em></strong><br><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Ow</span> = -Rcw.t()*tcw<span class="comment">;</span></span><br></pre></td></tr></table></figure></p>
 
       
     </div>
