@@ -112,7 +112,7 @@
 <meta property="og:description" content="1. 向量和坐标系如果我们确定一个坐标系$\vec{w_1}=\begin{bmatrix} e_1 \ e_2 \ e_3\end{bmatrix}$，也就是一个线性空间的基$e_1,e_2,e_3$那就可以谈论向量$a$在这组基下的坐标了，假设向量$a$在这个坐标系的坐标为$x_1 =\begin{bmatrix} a_1 \ a_2 \ a_3\end{bmatrix} $:  \vec{a">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/06/25/旋转向量和IMU/Lie.png">
-<meta property="og:updated_time" content="2019-07-01T09:07:56.011Z">
+<meta property="og:updated_time" content="2019-07-01T09:10:40.469Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="旋转向量和李代数">
 <meta name="twitter:description" content="1. 向量和坐标系如果我们确定一个坐标系$\vec{w_1}=\begin{bmatrix} e_1 \ e_2 \ e_3\end{bmatrix}$，也就是一个线性空间的基$e_1,e_2,e_3$那就可以谈论向量$a$在这组基下的坐标了，假设向量$a$在这个坐标系的坐标为$x_1 =\begin{bmatrix} a_1 \ a_2 \ a_3\end{bmatrix} $:  \vec{a">
@@ -493,7 +493,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-01 17:07:56" itemprop="dateModified" datetime="2019-07-01T17:07:56+08:00">2019-07-01</time>
+                <time title="Modified: 2019-07-01 17:10:40" itemprop="dateModified" datetime="2019-07-01T17:10:40+08:00">2019-07-01</time>
               
             
           </span>
@@ -634,16 +634,23 @@ R_{21}(\theta_3,\theta_2,\theta_1) = R_3(\theta_3)R_2(\theta_2)R_1(\theta_1)
 c_2c_3 & c_1s_3+s_1s_2c_3 & s_1s_3-c_1s_2c_3 \\
 -c_2s_3 & c_1c_3 -s_1s_2s_3 & s_1c_3 + c_1s_2s_3 \\
 s_2 & -s_1c_2 &c_1c_2
-\end{bmatrix}</script><h3 id="4-SO-n-特殊正交群-与-SE-n-特殊欧式群"><a href="#4-SO-n-特殊正交群-与-SE-n-特殊欧式群" class="headerlink" title="4. SO(n) 特殊正交群 与 SE(n) 特殊欧式群"></a>4. SO(n) 特殊正交群 与 SE(n) 特殊欧式群</h3>旋转矩阵是一个行列式为1的正交矩阵，反之，行列式为1的正交矩阵也是一个旋转矩阵。所以可以把旋转矩阵的集合定义如下：<script type="math/tex; mode=display">
-SO(3) = \{R \in \Bbb{R}^{n \times n}| RR^T=I,\det(R)=1\}</script><script type="math/tex; mode=display">
-R^{-1}=R^T</script>在欧氏变换中,除了旋转之外还有一个平移。关于变换矩阵$T$，它具有比较特别的结构：左上角为旋转矩阵，右侧为平移向量，左下角为0向量，右下角为1。这种矩阵又称为特殊欧氏群：<script type="math/tex; mode=display">
-SE(3) = \{T=\begin{bmatrix}R &t \\ 0^T & 1\end{bmatrix} \in \Bbb {R}^{4 \times 4}| R \in SO(3),t \in \Bbb {R}^3\}</script><script type="math/tex; mode=display">
-T^{-1} = \begin{bmatrix}R^T & -R^Tt \\ 0^T & 1\end{bmatrix}</script><h3 id="5-旋转向量"><a href="#5-旋转向量" class="headerlink" title="5. 旋转向量"></a>5. 旋转向量</h3>对于坐标系的旋转，我们知道，任意旋转都可以用一个旋转轴和一个旋转角来刻画。于是，我们可以使用一个向量，其方向与旋转轴一致，而长度等于旋转角。这种向量，称为旋转向量(或轴角，Axis-Angle)。这种表示法只需一个三维向量即可描述旋转。同样，对于变换矩阵，我们使用一个旋转向量和一个平移向量即可表达一次变换。这时的维数正好是六维。假设有一个旋转轴为$\alpha$，角度为$\theta$的旋转，显然，它对应的旋转向量为$\theta \alpha$。由旋转向量到旋转矩阵的过程由罗德里格斯公式表明：<script type="math/tex; mode=display">
-R = \cos \theta I + (1-\cos\theta)\alpha\alpha^T + \sin \theta \alpha\hat{}.</script>符号$\hat{}$是向量到反对称的转换符。反之，我们也可以计算从一个旋转矩阵到旋转向量的转换。对于转角$\theta$，有：<script type="math/tex; mode=display">
-tr(R) = \cos\theta tr(I) + (1-\cos \theta)tr(\alpha\alpha^T)+\sin\theta tr(\alpha\hat{})=3\cos\theta + (1-\cos\theta)= 1+2cos\theta</script>因此，有<script type="math/tex; mode=display">
-\theta  = \arccos (\frac{tr(R)-1}{2})</script>关于转轴$\alpha$，由于旋转轴上的向量在旋转后不发生改变，说明<script type="math/tex; mode=display">
-R\alpha=\alpha.</script>因此，转轴$\alpha$是矩阵$R$特征值1对应的特征向量。求解此方程，再归一化，就得到了旋转轴。</li>
+\end{bmatrix}</script></li>
 </ul>
+<h3 id="4-SO-n-特殊正交群-与-SE-n-特殊欧式群"><a href="#4-SO-n-特殊正交群-与-SE-n-特殊欧式群" class="headerlink" title="4. SO(n) 特殊正交群 与 SE(n) 特殊欧式群"></a>4. SO(n) 特殊正交群 与 SE(n) 特殊欧式群</h3><p>旋转矩阵是一个行列式为1的正交矩阵，反之，行列式为1的正交矩阵也是一个旋转矩阵。所以可以把旋转矩阵的集合定义如下：</p>
+<script type="math/tex; mode=display">
+SO(3) = \{R \in \Bbb{R}^{n \times n}| RR^T=I,\det(R)=1\}</script><script type="math/tex; mode=display">
+R^{-1}=R^T</script><p>在欧氏变换中,除了旋转之外还有一个平移。关于变换矩阵$T$，它具有比较特别的结构：左上角为旋转矩阵，右侧为平移向量，左下角为0向量，右下角为1。这种矩阵又称为特殊欧氏群：</p>
+<script type="math/tex; mode=display">
+SE(3) = \{T=\begin{bmatrix}R &t \\ 0^T & 1\end{bmatrix} \in \Bbb {R}^{4 \times 4}| R \in SO(3),t \in \Bbb {R}^3\}</script><script type="math/tex; mode=display">
+T^{-1} = \begin{bmatrix}R^T & -R^Tt \\ 0^T & 1\end{bmatrix}</script><h3 id="5-旋转向量"><a href="#5-旋转向量" class="headerlink" title="5. 旋转向量"></a>5. 旋转向量</h3><p>对于坐标系的旋转，我们知道，任意旋转都可以用一个旋转轴和一个旋转角来刻画。于是，我们可以使用一个向量，其方向与旋转轴一致，而长度等于旋转角。这种向量，称为旋转向量(或轴角，Axis-Angle)。这种表示法只需一个三维向量即可描述旋转。同样，对于变换矩阵，我们使用一个旋转向量和一个平移向量即可表达一次变换。这时的维数正好是六维。假设有一个旋转轴为$\alpha$，角度为$\theta$的旋转，显然，它对应的旋转向量为$\theta \alpha$。由旋转向量到旋转矩阵的过程由罗德里格斯公式表明：</p>
+<script type="math/tex; mode=display">
+R = \cos \theta I + (1-\cos\theta)\alpha\alpha^T + \sin \theta \alpha\hat{}.</script><p>符号$\hat{}$是向量到反对称的转换符。反之，我们也可以计算从一个旋转矩阵到旋转向量的转换。对于转角$\theta$，有：</p>
+<script type="math/tex; mode=display">
+tr(R) = \cos\theta tr(I) + (1-\cos \theta)tr(\alpha\alpha^T)+\sin\theta tr(\alpha\hat{})=3\cos\theta + (1-\cos\theta)= 1+2cos\theta</script><p>因此，有</p>
+<script type="math/tex; mode=display">
+\theta  = \arccos (\frac{tr(R)-1}{2})</script><p>关于转轴$\alpha$，由于旋转轴上的向量在旋转后不发生改变，说明</p>
+<script type="math/tex; mode=display">
+R\alpha=\alpha.</script><p>因此，转轴$\alpha$是矩阵$R$特征值1对应的特征向量。求解此方程，再归一化，就得到了旋转轴。</p>
 <h3 id="6-李代数"><a href="#6-李代数" class="headerlink" title="6. 李代数"></a>6. 李代数</h3><p>$SO(3)$对应的李代数$so(3)$是定义在$\Bbb {R}^3$的向量，我们记作$\phi$。根据前面的推导，每个$\phi$都可以生成一个反对称矩阵:</p>
 <script type="math/tex; mode=display">
 \Phi = \phi\hat{}=
