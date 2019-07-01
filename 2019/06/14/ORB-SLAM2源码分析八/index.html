@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MapPoint地图点1. MapPoint 成员变量1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数12long unsigned int mnId; ///&amp;lt; Global ID for MapPointstatic long unsigned int nNextId; 1.2 记录第一次创建该地图点的关键帧ID，以及帧ID12const long int">
+<meta name="keywords" content="SLAM,Tracking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ORB-SLAM2源码分析八">
+<meta property="og:url" content="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析八/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="MapPoint地图点1. MapPoint 成员变量1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数12long unsigned int mnId; ///&amp;lt; Global ID for MapPointstatic long unsigned int nNextId; 1.2 记录第一次创建该地图点的关键帧ID，以及帧ID12const long int">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-17T02:07:12.546Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ORB-SLAM2源码分析八">
+<meta name="twitter:description" content="MapPoint地图点1. MapPoint 成员变量1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数12long unsigned int mnId; ///&amp;lt; Global ID for MapPointstatic long unsigned int nNextId; 1.2 记录第一次创建该地图点的关键帧ID，以及帧ID12const long int">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析八/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ORB-SLAM2源码分析八 | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">18</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">8</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">22</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析八/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ORB-SLAM2源码分析八
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-14 11:00:20" itemprop="dateCreated datePublished" datetime="2019-06-14T11:00:20+08:00">2019-06-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-17 10:07:12" itemprop="dateModified" datetime="2019-06-17T10:07:12+08:00">2019-06-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MapPoint地图点"><a href="#MapPoint地图点" class="headerlink" title="MapPoint地图点"></a>MapPoint地图点</h2><h3 id="1-MapPoint-成员变量"><a href="#1-MapPoint-成员变量" class="headerlink" title="1. MapPoint 成员变量"></a>1. MapPoint 成员变量</h3><h4 id="1-1-MapPointId-地图点的ID，全局唯一，nNextId-静态计数"><a href="#1-1-MapPointId-地图点的ID，全局唯一，nNextId-静态计数" class="headerlink" title="1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数"></a>1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnId; <span class="comment">///&lt; Global ID for MapPoint</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> nNextId;</span><br></pre></td></tr></table></figure>
+<h4 id="1-2-记录第一次创建该地图点的关键帧ID，以及帧ID"><a href="#1-2-记录第一次创建该地图点的关键帧ID，以及帧ID" class="headerlink" title="1.2 记录第一次创建该地图点的关键帧ID，以及帧ID"></a>1.2 记录第一次创建该地图点的关键帧ID，以及帧ID</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">long</span> <span class="keyword">int</span> mnFirstKFid; <span class="comment">///&lt; 创建该MapPoint的关键帧ID</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">long</span> <span class="keyword">int</span> mnFirstFrame; <span class="comment">///&lt; 创建该MapPoint的帧ID（即每一关键帧有一个帧ID）</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-3-表示该地图点被观测的次数-nObs"><a href="#1-3-表示该地图点被观测的次数-nObs" class="headerlink" title="1.3 表示该地图点被观测的次数 nObs"></a>1.3 表示该地图点被观测的次数 nObs</h4><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int nObs<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-4-该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR-双目匹配-，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。"><a href="#1-4-该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR-双目匹配-，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。" class="headerlink" title="1.4 该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR(双目匹配)，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。"></a>1.4 该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR(双目匹配)，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by the tracking</span></span><br><span class="line">    <span class="keyword">float</span> mTrackProjX;</span><br><span class="line">    <span class="keyword">float</span> mTrackProjY;</span><br><span class="line">    <span class="keyword">float</span> mTrackProjXR;</span><br><span class="line">    <span class="keyword">int</span> mnTrackScaleLevel;</span><br><span class="line">    <span class="keyword">float</span> mTrackViewCos;</span><br></pre></td></tr></table></figure>
+<h4 id="1-5-该地图点是否需要进行重投影的标记变量，mbTrackInView-true表示需要进行重投影"><a href="#1-5-该地图点是否需要进行重投影的标记变量，mbTrackInView-true表示需要进行重投影" class="headerlink" title="1.5 该地图点是否需要进行重投影的标记变量，mbTrackInView = true表示需要进行重投影"></a>1.5 该地图点是否需要进行重投影的标记变量，mbTrackInView = true表示需要进行重投影</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TrackLocalMap - SearchByProjection中决定是否对该点进行投影的变量</span></span><br><span class="line"><span class="comment">// mbTrackInView==false的点有几种：</span></span><br><span class="line"><span class="comment">// a 已经和当前帧经过匹配（TrackReferenceKeyFrame，TrackWithMotionModel）但在优化过程中认为是外点</span></span><br><span class="line"><span class="comment">// b 已经和当前帧经过匹配且为内点，这类点也不需要再进行投影</span></span><br><span class="line"><span class="comment">// c 不在当前相机视野中的点（即未通过isInFrustum判断）</span></span><br><span class="line"><span class="keyword">bool</span> mbTrackInView;</span><br></pre></td></tr></table></figure>
+<h4 id="1-6-TrackLocalMap-UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记"><a href="#1-6-TrackLocalMap-UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记" class="headerlink" title="1.6 TrackLocalMap - UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记"></a>1.6 TrackLocalMap - UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记</h4><p>避免重复添加局部地图点到更新的局部地图<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TrackLocalMap - UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的标记</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnTrackReferenceForFrame;</span><br></pre></td></tr></table></figure></p>
+<h4 id="1-7-TrackLocalMap-SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量"><a href="#1-7-TrackLocalMap-SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量" class="headerlink" title="1.7 TrackLocalMap - SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量"></a>1.7 TrackLocalMap - SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TrackLocalMap - SearchLocalPoints中决定是否进行isInFrustum判断的变量</span></span><br><span class="line"><span class="comment">// mnLastFrameSeen==mCurrentFrame.mnId的点有几种：</span></span><br><span class="line"><span class="comment">// a 已经和当前帧经过匹配（TrackReferenceKeyFrame，TrackWithMotionModel）但在优化过程中认为是外点</span></span><br><span class="line"><span class="comment">// b 已经和当前帧经过匹配且为内点，这类点也不需要再进行投影</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnLastFrameSeen;</span><br></pre></td></tr></table></figure>
+<h4 id="1-8"><a href="#1-8" class="headerlink" title="1.8"></a>1.8</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by local mapping</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnBALocalForKF;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnFuseCandidateForKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-9"><a href="#1-9" class="headerlink" title="1.9"></a>1.9</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by loop closing</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnLoopPointForKF;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnCorrectedByKF;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnCorrectedReference;</span><br><span class="line">cv::Mat mPosGBA;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnBAGlobalForKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-10-MapPoint在世界坐标系下的坐标-地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息"><a href="#1-10-MapPoint在世界坐标系下的坐标-地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息" class="headerlink" title="1.10 MapPoint在世界坐标系下的坐标,地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息"></a>1.10 MapPoint在世界坐标系下的坐标,地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Position in absolute coordinates</span></span><br><span class="line">cv::Mat mWorldPos; <span class="comment">///&lt; MapPoint在世界坐标系下的坐标</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-11-观测到该MapPoint的KF和该MapPoint在KF中的索引"><a href="#1-11-观测到该MapPoint的KF和该MapPoint在KF中的索引" class="headerlink" title="1.11 观测到该MapPoint的KF和该MapPoint在KF中的索引"></a>1.11 观测到该MapPoint的KF和该MapPoint在KF中的索引</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Keyframes observing the point and associated index in keyframe</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt; mObservations; <span class="comment">///&lt; 观测到该MapPoint的KF和该MapPoint在KF中的索引</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-12-该MapPoint平均观测方向"><a href="#1-12-该MapPoint平均观测方向" class="headerlink" title="1.12 该MapPoint平均观测方向"></a>1.12 该MapPoint平均观测方向</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Mean viewing direction</span></span><br><span class="line"><span class="comment">// 该MapPoint平均观测方向</span></span><br><span class="line">cv::Mat mNormalVector;</span><br></pre></td></tr></table></figure>
+<h4 id="1-13-3D点的特征描述子"><a href="#1-13-3D点的特征描述子" class="headerlink" title="1.13 3D点的特征描述子"></a>1.13 3D点的特征描述子</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Best descriptor to fast matching</span></span><br><span class="line"><span class="comment">// 每个3D点也有一个descriptor</span></span><br><span class="line"><span class="comment">// 如果MapPoint与很多帧图像特征点对应（由keyframe来构造时），那么距离其它描述子的平均距离最小的描述子是最佳描述子</span></span><br><span class="line"><span class="comment">// MapPoint只与一帧的图像特征点对应（由frame来构造时），那么这个特征点的描述子就是该3D点的描述子</span></span><br><span class="line">cv::Mat mDescriptor; <span class="comment">///&lt; 通过 ComputeDistinctiveDescriptors() 得到的最优描述子</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-14-参考关键帧"><a href="#1-14-参考关键帧" class="headerlink" title="1.14 参考关键帧"></a>1.14 参考关键帧</h4><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Reference KeyFrame</span></span><br><span class="line">    KeyFrame* mpRefKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-15-跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息"><a href="#1-15-跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息" class="headerlink" title="1.15 跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息"></a>1.15 跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Tracking counters</span></span><br><span class="line">    <span class="keyword">int</span> mnVisible;</span><br><span class="line">    <span class="keyword">int</span> mnFound;</span><br></pre></td></tr></table></figure>
+<h4 id="1-16-坏的地图点标记，并没有显式的从内存中删除地图点"><a href="#1-16-坏的地图点标记，并没有显式的从内存中删除地图点" class="headerlink" title="1.16 坏的地图点标记，并没有显式的从内存中删除地图点"></a>1.16 坏的地图点标记，并没有显式的从内存中删除地图点</h4><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// <span class="type">Bad</span> flag (we <span class="keyword">do</span> <span class="keyword">not</span> currently erase <span class="type">MapPoint</span> <span class="keyword">from</span> memory)</span><br><span class="line">    <span class="built_in">bool</span> mbBad;</span><br><span class="line">    <span class="type">MapPoint</span>* mpReplaced;</span><br></pre></td></tr></table></figure>
+<h4 id="1-17-追踪时的地图点尺度信息"><a href="#1-17-追踪时的地图点尺度信息" class="headerlink" title="1.17 追踪时的地图点尺度信息"></a>1.17 追踪时的地图点尺度信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Scale invariance distances</span></span><br><span class="line">    <span class="keyword">float</span> mfMinDistance;</span><br><span class="line">    <span class="keyword">float</span> mfMaxDistance;</span><br></pre></td></tr></table></figure>
+<h4 id="1-18-该地图点所属于的地图"><a href="#1-18-该地图点所属于的地图" class="headerlink" title="1.18 该地图点所属于的地图"></a>1.18 该地图点所属于的地图</h4><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map* mpMap<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-成员函数"><a href="#2-成员函数" class="headerlink" title="2. 成员函数"></a>2. 成员函数</h3><h4 id="2-1-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-KeyFrame-pRefKF-Map-pMap"><a href="#2-1-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-KeyFrame-pRefKF-Map-pMap" class="headerlink" title="2.1 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, KeyFrame pRefKF, Map pMap)"></a>2.1 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, KeyFrame <em>pRefKF, Map</em> pMap)</h4><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//单目：CreateInitialMapMonocular()，LocalMapping::CreateNewMapPoints()</span></span><br><span class="line"><span class="comment">// 通过世界坐标，关键帧，以及地图指针来构建新的地图点，初始化所有的变量，赋默认值，并令计算器自增，这种情况下是不知道地图点所对应的关键帧特征点，需要下一步重投影来计算</span></span><br><span class="line">MapPoint<span class="type">::MapPoint</span>(const cv<span class="type">::Mat</span> &amp;Pos, KeyFrame *pRefKF, <span class="built_in">Map</span>* pMap);</span><br></pre></td></tr></table></figure>
+<h4 id="2-2-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF"><a href="#2-2-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF" class="headerlink" title="2.2 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map pMap, Frame pFrame, const int &amp;idxF)"></a>2.2 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map<em> pMap, Frame</em> pFrame, const int &amp;idxF)</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过世界坐标，地图指针，图像帧，以及该地图点所对应的图像中的特征点idx来构建新的地图点，已经有了匹配信息，可以计算出相关变量的值</span></span><br><span class="line">MapPoint::MapPoint(<span class="keyword">const</span> cv::Mat &amp;Pos, Map* pMap, Frame* pFrame, <span class="keyword">const</span> <span class="keyword">int</span> &amp;idxF)</span><br></pre></td></tr></table></figure>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 计算这个点在当前帧的最大最小尺度距离</span></span><br><span class="line">mfMaxDistance = dist*levelScaleFactor;</span><br><span class="line"><span class="function"><span class="title">mfMinDistance</span> = mfMaxDistance/pFrame-&gt;</span>mvScaleFactors[nLevels-<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 见mDescriptor在MapPoint.h中的注释，计算这个地图点在当前帧的描述符</span></span><br><span class="line"><span class="function"><span class="title">pFrame</span>-&gt;</span>mDescriptors.row(idxF).copyTo(mDescriptor);</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF"><a href="#2-3-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF" class="headerlink" title="2.3 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map pMap, Frame pFrame, const int &amp;idxF)"></a>2.3 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map<em> pMap, Frame</em> pFrame, const int &amp;idxF)</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过世界坐标，地图指针，图像帧，以及该地图点所对应的图像中的特征点idx来构建新的地图点，已经有了匹配信息，可以计算出相关变量的值</span></span><br><span class="line">MapPoint::MapPoint(<span class="keyword">const</span> cv::Mat &amp;Pos, Map* pMap, Frame* pFrame, <span class="keyword">const</span> <span class="keyword">int</span> &amp;idxF)</span><br></pre></td></tr></table></figure>
+<h4 id="2-4-set和get世界坐标"><a href="#2-4-set和get世界坐标" class="headerlink" title="2.4 set和get世界坐标"></a>2.4 set和get世界坐标</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">SetWorldPos</span><span class="params">(<span class="keyword">const</span> cv::Mat &amp;Pos)</span></span>;</span><br><span class="line">cv::<span class="function">Mat <span class="title">GetWorldPos</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+<h4 id="2-5-get平均观测向量"><a href="#2-5-get平均观测向量" class="headerlink" title="2.5 get平均观测向量"></a>2.5 get平均观测向量</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat MapPoint::GetNormal()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPos);</span><br><span class="line">    <span class="keyword">return</span> mNormalVector.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-6-get参考关键帧"><a href="#2-6-get参考关键帧" class="headerlink" title="2.6 get参考关键帧"></a>2.6 get参考关键帧</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KeyFrame* MapPoint::GetReferenceKeyFrame()</span><br><span class="line">&#123;</span><br><span class="line">     unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">     <span class="keyword">return</span> mpRefKF;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-7-添加观测信息到-mObservations-这个-map"><a href="#2-7-添加观测信息到-mObservations-这个-map" class="headerlink" title="2.7 添加观测信息到 mObservations 这个 map"></a>2.7 添加观测信息到 mObservations 这个 map</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> MapPoint::AddObservation(KeyFrame* pKF, <span class="keyword">size_t</span> idx)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">if</span>(mObservations.count(pKF))   <span class="comment">// 如果键值已存在，直接返回</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// 记录下能观测到该MapPoint的KF和该MapPoint在KF中的索引</span></span><br><span class="line">    mObservations[pKF]=idx;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(pKF-&gt;mvuRight[idx]&gt;=<span class="number">0</span>)</span><br><span class="line">        nObs+=<span class="number">2</span>; <span class="comment">// 双目或者grbd</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        nObs++; <span class="comment">// 单目，让该点的观测计数加1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-8-从mObservations-这个-map-删除观测信息-当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag"><a href="#2-8-从mObservations-这个-map-删除观测信息-当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag" class="headerlink" title="2.8 从mObservations 这个 map 删除观测信息 当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag"></a>2.8 从mObservations 这个 map 删除观测信息 当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">void MapPoint::EraseObservation(KeyFrame* pKF)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">bool</span> bBad=<span class="keyword">false</span>;       <span class="comment">// 默认该点不是坏点</span></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">        <span class="keyword">if</span>(mObservations.count(pKF))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> idx = mObservations[pKF];</span><br><span class="line">            <span class="keyword">if</span>(pKF-&gt;mvuRight[idx]&gt;=<span class="number">0</span>)</span><br><span class="line">                nObs-=<span class="number">2</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                nObs--;                  <span class="comment">// 让观测计数建减1</span></span><br><span class="line"></span><br><span class="line">            mObservations.erase(pKF);    <span class="comment">// 从mObservations 这个 map删除该关键帧</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果该keyFrame是参考帧，该Frame被删除后重新指定RefFrame</span></span><br><span class="line">            <span class="keyword">if</span>(mpRefKF==pKF)</span><br><span class="line">                mpRefKF=mObservations.begin()-&gt;first;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If only 2 observations or less, discard point</span></span><br><span class="line">            <span class="comment">// 当观测到该点的相机数目少于2时，丢弃该点</span></span><br><span class="line">            <span class="keyword">if</span>(nObs&lt;=<span class="number">2</span>)</span><br><span class="line">                bBad=<span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(bBad)     </span><br><span class="line">        SetBadFlag();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-9-GetObservations-返回观测信息-map"><a href="#2-9-GetObservations-返回观测信息-map" class="headerlink" title="2.9 GetObservations 返回观测信息 map"></a>2.9 GetObservations 返回观测信息 map</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">map</span>&lt;KeyFrame*, <span class="keyword">size_t</span>&gt; MapPoint::GetObservations()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> mObservations;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-10-返回观测计数-obs"><a href="#2-10-返回观测计数-obs" class="headerlink" title="2.10 返回观测计数 obs"></a>2.10 返回观测计数 obs</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> MapPoint::Observations()</span><br></pre></td></tr></table></figure>
+<h4 id="2-11-SetBadFlag-告知可以观测到该MapPoint的Frame，该MapPoint已被删除"><a href="#2-11-SetBadFlag-告知可以观测到该MapPoint的Frame，该MapPoint已被删除" class="headerlink" title="2.11 SetBadFlag 告知可以观测到该MapPoint的Frame，该MapPoint已被删除"></a>2.11 SetBadFlag 告知可以观测到该MapPoint的Frame，该MapPoint已被删除</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 告知可以观测到该MapPoint的Frame，该MapPoint已被删除</span></span><br><span class="line"><span class="keyword">void</span> MapPoint::SetBadFlag()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt; obs;</span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock1(mMutexFeatures);</span><br><span class="line">        unique_lock&lt;mutex&gt; lock2(mMutexPos);</span><br><span class="line">        mbBad=<span class="literal">true</span>;</span><br><span class="line">        obs = mObservations;<span class="comment">// 把mObservations转存到obs，obs和mObservations里存的是指针，赋值过程为浅拷贝</span></span><br><span class="line">        mObservations.clear();<span class="comment">// 把mObservations指向的内存释放，obs作为局部变量之后自动删除</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt;::iterator mit=obs.begin(), mend=obs.end(); mit!=mend; mit++)</span><br><span class="line">    &#123;</span><br><span class="line">        KeyFrame* pKF = mit-&gt;first;</span><br><span class="line">        pKF-&gt;EraseMapPointMatch(mit-&gt;second);<span class="comment">// 告诉可以观测到该MapPoint的KeyFrame，该MapPoint被删了</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mpMap-&gt;EraseMapPoint(<span class="keyword">this</span>);<span class="comment">// 擦除该MapPoint申请的内存</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-12-返回被替换的地图点"><a href="#2-12-返回被替换的地图点" class="headerlink" title="2.12 返回被替换的地图点"></a>2.12 返回被替换的地图点</h4><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MapPoint* <span class="symbol">MapPoint::</span>GetReplaced()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock<span class="params">&lt;mutex&gt;</span> lock1(mMutexFeatures);</span><br><span class="line">    unique_lock<span class="params">&lt;mutex&gt;</span> lock2(mMutexPos);</span><br><span class="line">    return mpReplaced;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-13-闭环更新"><a href="#2-13-闭环更新" class="headerlink" title="2.13 闭环更新"></a>2.13 闭环更新</h4><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在形成闭环的时候，会更新KeyFrame与MapPoint之间的关系</span></span><br><span class="line">void MapPoint::Replace(MapPoint* pMP)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="title">if</span>(pMP-&gt;</span><span class="function"><span class="title">mnId</span>==this-&gt;</span>mnId)</span><br><span class="line">        return;</span><br><span class="line"></span><br><span class="line">    int nvisible, nfound;</span><br><span class="line">    map&lt;KeyFrame*,size_t&gt; obs;<span class="comment">// 这一段和SetBadFlag函数相同</span></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock1(mMutexFeatures);</span><br><span class="line">        unique_lock&lt;mutex&gt; lock2(mMutexPos);</span><br><span class="line">        obs=mObservations;</span><br><span class="line">        mObservations.clear();</span><br><span class="line">        mbBad=<span class="literal">true</span>;</span><br><span class="line">        nvisible = mnVisible;</span><br><span class="line">        nfound = mnFound;</span><br><span class="line">        mpReplaced = pMP;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 所有能观测到该MapPoint的keyframe都要替换</span></span><br><span class="line">    <span class="keyword">for</span>(map&lt;KeyFrame*,size_t&gt;::iterator mit=obs.begin(), mend=obs.end(); mit!=mend; mit++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Replace measurement in keyframe</span></span><br><span class="line">        K<span class="function"><span class="title">eyFrame</span>* pKF = mit-&gt;</span>first;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="title">if</span>(!pMP-&gt;</span>IsInKeyFrame(pKF))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function"><span class="title">pKF</span>-&gt;</span>R<span class="function"><span class="title">eplaceMapPointMatch</span>(mit-&gt;</span>second, pMP);<span class="comment">// 让KeyFrame用pMP替换掉原来的MapPoint</span></span><br><span class="line">            <span class="function"><span class="title">pMP</span>-&gt;</span>A<span class="function"><span class="title">ddObservation</span>(pKF,mit-&gt;</span>second);<span class="comment">// 让MapPoint替换掉对应的KeyFrame</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 产生冲突，即pKF中有两个特征点a,b（这两个特征点的描述子是近似相同的），这两个特征点对应两个MapPoint为this,pMP</span></span><br><span class="line">            <span class="comment">// 然而在fuse的过程中pMP的观测更多，需要替换this，因此保留b与pMP的联系，去掉a与this的联系</span></span><br><span class="line">            <span class="function"><span class="title">pKF</span>-&gt;</span>E<span class="function"><span class="title">raseMapPointMatch</span>(mit-&gt;</span>second);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="title">pMP</span>-&gt;</span>IncreaseFound(nfound);</span><br><span class="line">    <span class="function"><span class="title">pMP</span>-&gt;</span>IncreaseVisible(nvisible);</span><br><span class="line">    <span class="function"><span class="title">pMP</span>-&gt;</span>ComputeDistinctiveDescriptors();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">mpMap</span>-&gt;</span>EraseMapPoint(this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-14-检测该点是否是一个坏点"><a href="#2-14-检测该点是否是一个坏点" class="headerlink" title="2.14 检测该点是否是一个坏点"></a>2.14 检测该点是否是一个坏点</h4><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool </span>MapPoint::isBad()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures)<span class="comment">;</span></span><br><span class="line">    unique_lock&lt;mutex&gt; lock2(mMutexPos)<span class="comment">;</span></span><br><span class="line">    return mbBad<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-15-增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点"><a href="#2-15-增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点" class="headerlink" title="2.15 增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点"></a>2.15 增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Increase Visible</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Visible表示：</span></span><br><span class="line"><span class="comment"> * 1. 该MapPoint在某些帧的视野范围内，通过Frame::isInFrustum()函数判断</span></span><br><span class="line"><span class="comment"> * 2. 该MapPoint被这些帧观测到，但并不一定能和这些帧的特征点匹配上</span></span><br><span class="line"><span class="comment"> *    例如：有一个MapPoint（记为M），在某一帧F的视野范围内，</span></span><br><span class="line"><span class="comment"> *    但并不表明该点M可以和F这一帧的某个特征点能匹配上</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> MapPoint::IncreaseVisible(<span class="keyword">int</span> n)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    mnVisible+=n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-16-能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点"><a href="#2-16-能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点" class="headerlink" title="2.16 能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点"></a>2.16 能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点</h4><figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @brief Increase Found</span><br><span class="line"> *</span><br><span class="line"> * 能找到该点的帧数+<span class="built_in">n</span>，<span class="built_in">n</span>默认为<span class="number">1</span></span><br><span class="line"> * @see Tracki<span class="symbol">ng:</span><span class="symbol">:Tr</span>ackLocalMap()</span><br><span class="line"> */</span><br><span class="line">void MapPoi<span class="symbol">nt:</span><span class="symbol">:In</span>creaseFound(<span class="built_in">int</span> <span class="built_in">n</span>)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    mnFound+=<span class="built_in">n</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-17-增加该地图点的可视性"><a href="#2-17-增加该地图点的可视性" class="headerlink" title="2.17 增加该地图点的可视性"></a>2.17 增加该地图点的可视性</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Increase Visible</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Visible表示：</span></span><br><span class="line"><span class="comment"> * 1. 该MapPoint在某些帧的视野范围内，通过Frame::isInFrustum()函数判断</span></span><br><span class="line"><span class="comment"> * 2. 该MapPoint被这些帧观测到，但并不一定能和这些帧的特征点匹配上</span></span><br><span class="line"><span class="comment"> *    例如：有一个MapPoint（记为M），在某一帧F的视野范围内，</span></span><br><span class="line"><span class="comment"> *    但并不表明该点M可以和F这一帧的某个特征点能匹配上</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> MapPoint::IncreaseVisible(<span class="keyword">int</span> n)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    mnVisible+=n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-18-返回匹配性与观测性的比例"><a href="#2-18-返回匹配性与观测性的比例" class="headerlink" title="2.18 返回匹配性与观测性的比例"></a>2.18 返回匹配性与观测性的比例</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> MapPoint::GetFoundRatio()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(mnFound)/mnVisible;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-19-计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值"><a href="#2-19-计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值" class="headerlink" title="2.19 计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值"></a>2.19 计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 计算具有代表的描述子</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 由于一个MapPoint会被许多相机观测到，因此在插入关键帧后，需要判断是否更新当前点的最适合的描述子 \n</span></span><br><span class="line"><span class="comment"> * 先获得当前点的所有描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值</span></span><br><span class="line"><span class="comment"> * @see III - C3.3</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> MapPoint::ComputeDistinctiveDescriptors()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Retrieve all observed descriptors</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;cv::Mat&gt; vDescriptors;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt; observations;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock1(mMutexFeatures);</span><br><span class="line">        <span class="keyword">if</span>(mbBad)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        observations=mObservations;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(observations.empty())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    vDescriptors.reserve(observations.size());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历观测到3d点的所有关键帧，获得orb描述子，并插入到vDescriptors中</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt;::iterator mit=observations.begin(), mend=observations.end(); mit!=mend; mit++)</span><br><span class="line">    &#123;</span><br><span class="line">        KeyFrame* pKF = mit-&gt;first;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(!pKF-&gt;isBad())</span><br><span class="line">            vDescriptors.push_back(pKF-&gt;mDescriptors.row(mit-&gt;second));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(vDescriptors.empty())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Compute distances between them</span></span><br><span class="line">    <span class="comment">// 获得这些描述子两两之间的距离</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">size_t</span> N = vDescriptors.size();</span><br><span class="line">	</span><br><span class="line">    <span class="comment">//float Distances[N][N];</span></span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; &gt; Distances;</span><br><span class="line">	Distances.resize(N, <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt;(N, <span class="number">0</span>));</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        Distances[i][i]=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">size_t</span> j=i+<span class="number">1</span>;j&lt;N;j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int</span> distij = ORBmatcher::DescriptorDistance(vDescriptors[i],vDescriptors[j]);</span><br><span class="line">            Distances[i][j]=distij;</span><br><span class="line">            Distances[j][i]=distij;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Take the descriptor with least median distance to the rest</span></span><br><span class="line">    <span class="keyword">int</span> BestMedian = INT_MAX;</span><br><span class="line">    <span class="keyword">int</span> BestIdx = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>;i&lt;N;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 第i个描述子到其它所有所有描述子之间的距离</span></span><br><span class="line">        <span class="comment">//vector&lt;int&gt; vDists(Distances[i],Distances[i]+N);</span></span><br><span class="line">		<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; vDists(Distances[i].begin(), Distances[i].end());</span><br><span class="line">		sort(vDists.begin(), vDists.end());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获得中值</span></span><br><span class="line">        <span class="keyword">int</span> median = vDists[<span class="number">0.5</span>*(N<span class="number">-1</span>)];</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 寻找最小的中值</span></span><br><span class="line">        <span class="keyword">if</span>(median&lt;BestMedian)</span><br><span class="line">        &#123;</span><br><span class="line">            BestMedian = median;</span><br><span class="line">            BestIdx = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 最好的描述子，该描述子相对于其他描述子有最小的距离中值</span></span><br><span class="line">        <span class="comment">// 简化来讲，中值代表了这个描述子到其它描述子的平均距离</span></span><br><span class="line">        <span class="comment">// 最好的描述子就是和其它描述子的平均距离最小</span></span><br><span class="line">        mDescriptor = vDescriptors[BestIdx].clone();       </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-20-GetDescriptor-获得mapPoint的描述符"><a href="#2-20-GetDescriptor-获得mapPoint的描述符" class="headerlink" title="2.20 GetDescriptor()获得mapPoint的描述符"></a>2.20 GetDescriptor()获得mapPoint的描述符</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat MapPoint::GetDescriptor()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> mDescriptor.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-21-返回该mapPoint所对应的特征点在指定关键帧的idx"><a href="#2-21-返回该mapPoint所对应的特征点在指定关键帧的idx" class="headerlink" title="2.21 返回该mapPoint所对应的特征点在指定关键帧的idx"></a>2.21 返回该mapPoint所对应的特征点在指定关键帧的idx</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> MapPoint::GetIndexInKeyFrame(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">if</span>(mObservations.count(pKF))</span><br><span class="line">        <span class="keyword">return</span> mObservations[pKF];</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-22-检查该地图点是否是某一帧图像的地图点"><a href="#2-22-检查该地图点是否是某一帧图像的地图点" class="headerlink" title="2.22 检查该地图点是否是某一帧图像的地图点"></a>2.22 检查该地图点是否是某一帧图像的地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> MapPoint::IsInKeyFrame(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> (mObservations.count(pKF));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-23-更新平均观测方向以及观测距离范围"><a href="#2-23-更新平均观测方向以及观测距离范围" class="headerlink" title="2.23 更新平均观测方向以及观测距离范围"></a>2.23 更新平均观测方向以及观测距离范围</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 更新平均观测方向以及观测距离范围</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 由于一个MapPoint会被许多相机观测到，因此在插入关键帧后，需要更新相应变量</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> III - C2.2 c2.4</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void MapPoint::UpdateNormalAndDepth()</span><br><span class="line">&#123;</span><br><span class="line">    map&lt;KeyFrame*,size_t&gt; observations;</span><br><span class="line">    KeyFrame* pRefKF;</span><br><span class="line">    cv::Mat Pos;</span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock1(mMutexFeatures);</span><br><span class="line">        unique_lock&lt;mutex&gt; lock2(mMutexPos);</span><br><span class="line">        <span class="keyword">if</span>(mbBad)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        observations=mObservations; <span class="comment">// 获得观测到该3d点的所有关键帧</span></span><br><span class="line">        pRefKF=mpRefKF;             <span class="comment">// 观测到该点的参考关键帧</span></span><br><span class="line">        Pos = mWorldPos.<span class="keyword">clone</span>();    <span class="comment">// 3d点在世界坐标系中的位置</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(observations.<span class="keyword">empty</span>())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    cv::Mat normal = cv::Mat::zeros(<span class="number">3</span>,<span class="number">1</span>,CV_32F);</span><br><span class="line">    <span class="keyword">int</span> n=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(map&lt;KeyFrame*,size_t&gt;::iterator mit=observations.begin(), mend=observations.end(); mit!=mend; mit++)</span><br><span class="line">    &#123;</span><br><span class="line">        KeyFrame* pKF = mit-&gt;first;</span><br><span class="line">        cv::Mat Owi = pKF-&gt;GetCameraCenter();</span><br><span class="line">        cv::Mat normali = mWorldPos - Owi;</span><br><span class="line">        normal = normal + normali/cv::norm(normali); <span class="comment">// 对所有关键帧对该点的观测方向归一化为单位向量进行求和</span></span><br><span class="line">        n++;</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    cv::Mat PC = Pos - pRefKF-&gt;GetCameraCenter(); <span class="comment">// 参考关键帧相机指向3D点的向量（在世界坐标系下的表示）</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> dist = cv::norm(PC); <span class="comment">// 该点到参考关键帧相机的距离</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> level = pRefKF-&gt;mvKeysUn[observations[pRefKF]].octave;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> levelScaleFactor =  pRefKF-&gt;mvScaleFactors[level];</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nLevels = pRefKF-&gt;mnScaleLevels; <span class="comment">// 金字塔层数</span></span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock3(mMutexPos);</span><br><span class="line">        <span class="comment">// 另见PredictScale函数前的注释</span></span><br><span class="line">        mfMaxDistance = dist*levelScaleFactor;                           <span class="comment">// 观测到该点的距离下限</span></span><br><span class="line">        mfMinDistance = mfMaxDistance/pRefKF-&gt;mvScaleFactors[nLevels<span class="number">-1</span>]; <span class="comment">// 观测到该点的距离上限</span></span><br><span class="line">        mNormalVector = normal/n;                                        <span class="comment">// 获得新的平均的观测方向</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-24-获得最小最大距离的方差"><a href="#2-24-获得最小最大距离的方差" class="headerlink" title="2.24 获得最小最大距离的方差"></a>2.24 获得最小最大距离的方差</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> MapPoint::GetMinDistanceInvariance()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPos);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.8f</span>*mfMinDistance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">float</span> MapPoint::GetMaxDistanceInvariance()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPos);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.2f</span>*mfMaxDistance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-25-预测当前地图点相对于参考帧的金字塔尺度"><a href="#2-25-预测当前地图点相对于参考帧的金字塔尺度" class="headerlink" title="2.25 预测当前地图点相对于参考帧的金字塔尺度"></a>2.25 预测当前地图点相对于参考帧的金字塔尺度</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//              ____</span></span><br><span class="line"><span class="comment">// Nearer      /____\     level:n-1 --&gt; dmin</span></span><br><span class="line"><span class="comment">//            /______\                       d/dmin = 1.2^(n-1-m)</span></span><br><span class="line"><span class="comment">//           /________\   level:m   --&gt; d</span></span><br><span class="line"><span class="comment">//          /__________\                     dmax/d = 1.2^m</span></span><br><span class="line"><span class="comment">// Farther /____________\ level:0   --&gt; dmax</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//           log(dmax/d)</span></span><br><span class="line"><span class="comment">// m = ceil(------------)</span></span><br><span class="line"><span class="comment">//            log(1.2)</span></span><br><span class="line"><span class="keyword">int</span> MapPoint::PredictScale(<span class="keyword">const</span> <span class="keyword">float</span> &amp;currentDist, KeyFrame* pKF)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> ratio;</span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexPos);</span><br><span class="line">        <span class="comment">// mfMaxDistance = ref_dist*levelScaleFactor为参考帧考虑上尺度后的距离</span></span><br><span class="line">        <span class="comment">// ratio = mfMaxDistance/currentDist = ref_dist/cur_dist</span></span><br><span class="line">        ratio = mfMaxDistance/currentDist;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 同时取log线性化</span></span><br><span class="line">    <span class="keyword">int</span> nScale = ceil(log(ratio)/pKF-&gt;mfLogScaleFactor);</span><br><span class="line">    <span class="keyword">if</span>(nScale&lt;<span class="number">0</span>)</span><br><span class="line">        nScale = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(nScale&gt;=pKF-&gt;mnScaleLevels)</span><br><span class="line">        nScale = pKF-&gt;mnScaleLevels<span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nScale;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> MapPoint::PredictScale(<span class="keyword">const</span> <span class="keyword">float</span> &amp;currentDist, Frame* pF)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> ratio;</span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexPos);</span><br><span class="line">        ratio = mfMaxDistance/currentDist;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> nScale = ceil(log(ratio)/pF-&gt;mfLogScaleFactor);</span><br><span class="line">    <span class="keyword">if</span>(nScale&lt;<span class="number">0</span>)</span><br><span class="line">        nScale = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(nScale&gt;=pF-&gt;mnScaleLevels)</span><br><span class="line">        nScale = pF-&gt;mnScaleLevels<span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nScale;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SLAM/" rel="tag"># SLAM</a>
+          
+            <a href="/tags/Tracking/" rel="tag"># Tracking</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/13/相机矩阵的tips/" rel="next" title="相机矩阵的Tips">
+                <i class="fa fa-chevron-left"></i> 相机矩阵的Tips
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/14/ORB-SLAM2源码分析九/" rel="prev" title="ORB-SLAM2源码分析九">
+                ORB-SLAM2源码分析九 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MapPoint地图点"><span class="nav-text">MapPoint地图点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-MapPoint-成员变量"><span class="nav-text">1. MapPoint 成员变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-MapPointId-地图点的ID，全局唯一，nNextId-静态计数"><span class="nav-text">1.1 MapPointId 地图点的ID，全局唯一，nNextId 静态计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-记录第一次创建该地图点的关键帧ID，以及帧ID"><span class="nav-text">1.2 记录第一次创建该地图点的关键帧ID，以及帧ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-表示该地图点被观测的次数-nObs"><span class="nav-text">1.3 表示该地图点被观测的次数 nObs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR-双目匹配-，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。"><span class="nav-text">1.4 该地图点被重投影到某一阵帧时的X坐标，Y坐标，以及在右视图中的坐标XR(双目匹配)，以及该地图点所对应的特征点被预测的尺度，以及该地图点在该帧下的观测向量与平均向量mNormalVector的夹角信息。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-该地图点是否需要进行重投影的标记变量，mbTrackInView-true表示需要进行重投影"><span class="nav-text">1.5 该地图点是否需要进行重投影的标记变量，mbTrackInView = true表示需要进行重投影</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-TrackLocalMap-UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记"><span class="nav-text">1.6 TrackLocalMap - UpdateLocalPoints中防止将MapPoints重复添加至mvpLocalMapPoints的参考帧标记</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-TrackLocalMap-SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量"><span class="nav-text">1.7 TrackLocalMap - SearchLocalPoints中决定是否进行isInFrustum判断的变量，判断该点是否需要进行视野判断的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-8"><span class="nav-text">1.8</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-9"><span class="nav-text">1.9</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-10-MapPoint在世界坐标系下的坐标-地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息"><span class="nav-text">1.10 MapPoint在世界坐标系下的坐标,地图点的坐标都是相对于世界坐标系，和当前帧无关，并没有存储局部坐标信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-11-观测到该MapPoint的KF和该MapPoint在KF中的索引"><span class="nav-text">1.11 观测到该MapPoint的KF和该MapPoint在KF中的索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-12-该MapPoint平均观测方向"><span class="nav-text">1.12 该MapPoint平均观测方向</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-13-3D点的特征描述子"><span class="nav-text">1.13 3D点的特征描述子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-14-参考关键帧"><span class="nav-text">1.14 参考关键帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-15-跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息"><span class="nav-text">1.15 跟踪计数，将局部地图关键帧和地图点重新跟踪投影时的计数信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-16-坏的地图点标记，并没有显式的从内存中删除地图点"><span class="nav-text">1.16 坏的地图点标记，并没有显式的从内存中删除地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-17-追踪时的地图点尺度信息"><span class="nav-text">1.17 追踪时的地图点尺度信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-18-该地图点所属于的地图"><span class="nav-text">1.18 该地图点所属于的地图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-成员函数"><span class="nav-text">2. 成员函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-KeyFrame-pRefKF-Map-pMap"><span class="nav-text">2.1 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, KeyFrame pRefKF, Map pMap)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF"><span class="nav-text">2.2 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map pMap, Frame pFrame, const int &amp;idxF)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-构造函数-MapPoint-MapPoint-const-cv-Mat-amp-Pos-Map-pMap-Frame-pFrame-const-int-amp-idxF"><span class="nav-text">2.3 构造函数 MapPoint::MapPoint(const cv::Mat &amp;Pos, Map pMap, Frame pFrame, const int &amp;idxF)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-set和get世界坐标"><span class="nav-text">2.4 set和get世界坐标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-get平均观测向量"><span class="nav-text">2.5 get平均观测向量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-get参考关键帧"><span class="nav-text">2.6 get参考关键帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-7-添加观测信息到-mObservations-这个-map"><span class="nav-text">2.7 添加观测信息到 mObservations 这个 map</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-8-从mObservations-这个-map-删除观测信息-当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag"><span class="nav-text">2.8 从mObservations 这个 map 删除观测信息 当删除观测信息时，会检测该点是否变为坏点，会重新设置badFlag</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-9-GetObservations-返回观测信息-map"><span class="nav-text">2.9 GetObservations 返回观测信息 map</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-10-返回观测计数-obs"><span class="nav-text">2.10 返回观测计数 obs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-11-SetBadFlag-告知可以观测到该MapPoint的Frame，该MapPoint已被删除"><span class="nav-text">2.11 SetBadFlag 告知可以观测到该MapPoint的Frame，该MapPoint已被删除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-12-返回被替换的地图点"><span class="nav-text">2.12 返回被替换的地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-13-闭环更新"><span class="nav-text">2.13 闭环更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-14-检测该点是否是一个坏点"><span class="nav-text">2.14 检测该点是否是一个坏点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-15-增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点"><span class="nav-text">2.15 增加该地图点的可视性，可以观察到，但不一定能够匹配到特征点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-16-能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点"><span class="nav-text">2.16 能找到该地图点的帧数加1，可以观察到该地图点，同时可以匹配到某一帧的特征点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-17-增加该地图点的可视性"><span class="nav-text">2.17 增加该地图点的可视性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-18-返回匹配性与观测性的比例"><span class="nav-text">2.18 返回匹配性与观测性的比例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-19-计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值"><span class="nav-text">2.19 计算具有代表的描述子，然后计算描述子之间的两两距离，最好的描述子与其他描述子应该具有最小的距离中值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-20-GetDescriptor-获得mapPoint的描述符"><span class="nav-text">2.20 GetDescriptor()获得mapPoint的描述符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-21-返回该mapPoint所对应的特征点在指定关键帧的idx"><span class="nav-text">2.21 返回该mapPoint所对应的特征点在指定关键帧的idx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-22-检查该地图点是否是某一帧图像的地图点"><span class="nav-text">2.22 检查该地图点是否是某一帧图像的地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-23-更新平均观测方向以及观测距离范围"><span class="nav-text">2.23 更新平均观测方向以及观测距离范围</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-24-获得最小最大距离的方差"><span class="nav-text">2.24 获得最小最大距离的方差</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-25-预测当前地图点相对于参考帧的金字塔尺度"><span class="nav-text">2.25 预测当前地图点相对于参考帧的金字塔尺度</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

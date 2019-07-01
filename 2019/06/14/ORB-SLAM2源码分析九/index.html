@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Frame 类说明1. Frame 类成员变量说明1.1 用于重定位的词典12// Vocabulary used for relocalization.ORBVocabulary* mpORBvocabulary; 1.2 当前帧的特征提取器12// Feature extractor. The right is used only in the stereo case.    ORBextra">
+<meta name="keywords" content="SLAM,Tracking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ORB-SLAM2源码分析九">
+<meta property="og:url" content="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析九/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="Frame 类说明1. Frame 类成员变量说明1.1 用于重定位的词典12// Vocabulary used for relocalization.ORBVocabulary* mpORBvocabulary; 1.2 当前帧的特征提取器12// Feature extractor. The right is used only in the stereo case.    ORBextra">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-18T12:11:35.511Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ORB-SLAM2源码分析九">
+<meta name="twitter:description" content="Frame 类说明1. Frame 类成员变量说明1.1 用于重定位的词典12// Vocabulary used for relocalization.ORBVocabulary* mpORBvocabulary; 1.2 当前帧的特征提取器12// Feature extractor. The right is used only in the stereo case.    ORBextra">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析九/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ORB-SLAM2源码分析九 | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">18</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">8</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">22</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析九/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ORB-SLAM2源码分析九
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-14 11:00:27" itemprop="dateCreated datePublished" datetime="2019-06-14T11:00:27+08:00">2019-06-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-18 20:11:35" itemprop="dateModified" datetime="2019-06-18T20:11:35+08:00">2019-06-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Frame-类说明"><a href="#Frame-类说明" class="headerlink" title="Frame 类说明"></a>Frame 类说明</h2><h3 id="1-Frame-类成员变量说明"><a href="#1-Frame-类成员变量说明" class="headerlink" title="1. Frame 类成员变量说明"></a>1. Frame 类成员变量说明</h3><h3 id="1-1-用于重定位的词典"><a href="#1-1-用于重定位的词典" class="headerlink" title="1.1 用于重定位的词典"></a>1.1 用于重定位的词典</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">//</span> Vocabulary used <span class="keyword">for</span> relocalization.</span><br><span class="line">ORBVocabulary* mpORBvocabulary;</span><br></pre></td></tr></table></figure>
+<h4 id="1-2-当前帧的特征提取器"><a href="#1-2-当前帧的特征提取器" class="headerlink" title="1.2 当前帧的特征提取器"></a>1.2 当前帧的特征提取器</h4><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// Feature extractor. The right <span class="literal">is</span> used <span class="keyword">only</span> <span class="keyword">in</span> the stereo <span class="keyword">case</span>.</span><br><span class="line">    ORBextractor* mpORBextractorLeft, *mpORBextractorRight;</span><br></pre></td></tr></table></figure>
+<h4 id="1-3-当前帧的时间戳"><a href="#1-3-当前帧的时间戳" class="headerlink" title="1.3 当前帧的时间戳"></a>1.3 当前帧的时间戳</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Frame timestamp.</span></span><br><span class="line">    <span class="keyword">double</span> mTimeStamp;</span><br></pre></td></tr></table></figure>
+<h4 id="1-3-当前帧的时间戳-1"><a href="#1-3-当前帧的时间戳-1" class="headerlink" title="1.3 当前帧的时间戳"></a>1.3 当前帧的时间戳</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Frame timestamp.</span></span><br><span class="line">    <span class="keyword">double</span> mTimeStamp;</span><br></pre></td></tr></table></figure>
+<h4 id="1-3-当前帧的时间戳-2"><a href="#1-3-当前帧的时间戳-2" class="headerlink" title="1.3 当前帧的时间戳"></a>1.3 当前帧的时间戳</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Frame timestamp.</span></span><br><span class="line">    <span class="keyword">double</span> mTimeStamp;</span><br></pre></td></tr></table></figure>
+<h4 id="1-4-相机参数"><a href="#1-4-相机参数" class="headerlink" title="1.4 相机参数"></a>1.4 相机参数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Calibration matrix and OpenCV distortion parameters.</span></span><br><span class="line">    cv::Mat mK;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> fx;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> fy;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> cx;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> cy;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> invfx;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">float</span> invfy;</span><br><span class="line">    cv::Mat mDistCoef;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Stereo baseline multiplied by fx.</span></span><br><span class="line">    <span class="keyword">float</span> mbf;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Stereo baseline in meters.</span></span><br><span class="line">    <span class="keyword">float</span> mb;</span><br></pre></td></tr></table></figure>
+<h4 id="1-4-截断深度"><a href="#1-4-截断深度" class="headerlink" title="1.4 截断深度"></a>1.4 截断深度</h4><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Threshold <span class="built_in">close</span>/far <span class="built_in">points</span>. Close <span class="built_in">points</span> are inserted from <span class="number">1</span> <span class="built_in">view</span>.</span><br><span class="line">    // Far <span class="built_in">points</span> are inserted as <span class="keyword">in</span> the monocular case from <span class="number">2</span> views.</span><br><span class="line">    <span class="built_in">float</span> mThDepth;</span><br></pre></td></tr></table></figure>
+<h4 id="1-5-特征点的数目"><a href="#1-5-特征点的数目" class="headerlink" title="1.5 特征点的数目"></a>1.5 特征点的数目</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Number of KeyPoints.</span></span><br><span class="line">    <span class="keyword">int</span> N; <span class="comment">///&lt; KeyPoints数量</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-6-特征点Vector"><a href="#1-6-特征点Vector" class="headerlink" title="1.6 特征点Vector"></a>1.6 特征点Vector</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Vector of keypoints (original for visualization) and undistorted (actually used by the system).</span></span><br><span class="line"><span class="comment">// In the stereo case, mvKeysUn is redundant as images must be rectified.</span></span><br><span class="line"><span class="comment">// In the RGB-D case, RGB images can be distorted.</span></span><br><span class="line"><span class="comment">// mvKeys:原始左图像提取出的特征点（未校正）</span></span><br><span class="line"><span class="comment">// mvKeysRight:原始右图像提取出的特征点（未校正）</span></span><br><span class="line"><span class="comment">// mvKeysUn:校正mvKeys后的特征点，对于双目摄像头，一般得到的图像都是校正好的，再校正一次有点多余</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;cv::KeyPoint&gt; mvKeys, mvKeysRight;</span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;cv::KeyPoint&gt; mvKeysUn;</span><br></pre></td></tr></table></figure>
+<h4 id="1-7-特征点的双目信息"><a href="#1-7-特征点的双目信息" class="headerlink" title="1.7 特征点的双目信息"></a>1.7 特征点的双目信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Corresponding stereo coordinate and depth for each keypoint.</span></span><br><span class="line">   <span class="comment">// "Monocular" keypoints have a negative value.</span></span><br><span class="line">   <span class="comment">// 对于双目，mvuRight存储了左目像素点在右目中的对应点的横坐标</span></span><br><span class="line">   <span class="comment">// mvDepth对应的深度</span></span><br><span class="line">   <span class="comment">// 单目摄像头，这两个容器中存的都是-1</span></span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvuRight;</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvDepth;</span><br></pre></td></tr></table></figure>
+<h4 id="1-8-当前帧的Bow以及特征点的Bow"><a href="#1-8-当前帧的Bow以及特征点的Bow" class="headerlink" title="1.8 当前帧的Bow以及特征点的Bow"></a>1.8 当前帧的Bow以及特征点的Bow</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bag of Words Vector structures.</span></span><br><span class="line">    DBoW2::BowVector mBowVec;</span><br><span class="line">    DBoW2::FeatureVector mFeatVec;</span><br></pre></td></tr></table></figure>
+<h4 id="1-9-当前帧的描述子"><a href="#1-9-当前帧的描述子" class="headerlink" title="1.9 当前帧的描述子"></a>1.9 当前帧的描述子</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ORB descriptor, each row associated to a keypoint.</span></span><br><span class="line">    <span class="comment">// 左目摄像头和右目摄像头特征点对应的描述子</span></span><br><span class="line">    cv::Mat mDescriptors, mDescriptorsRight;</span><br></pre></td></tr></table></figure>
+<h4 id="1-10-每个特征点对应的MapPoints"><a href="#1-10-每个特征点对应的MapPoints" class="headerlink" title="1.10 每个特征点对应的MapPoints"></a>1.10 每个特征点对应的MapPoints</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MapPoints associated to keypoints, NULL pointer if no association.</span></span><br><span class="line">   <span class="comment">// 每个特征点对应的MapPoint</span></span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MapPoint*&gt; mvpMapPoints;</span><br></pre></td></tr></table></figure>
+<h4 id="1-11-特征点是否是Outlier的flag"><a href="#1-11-特征点是否是Outlier的flag" class="headerlink" title="1.11 特征点是否是Outlier的flag"></a>1.11 特征点是否是Outlier的flag</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Flag to identify outlier associations.</span></span><br><span class="line">    <span class="comment">// 观测不到Map中的3D点</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt; mvbOutlier;</span><br></pre></td></tr></table></figure>
+<h4 id="1-12-Frame-网格信息划分-mGrid-FRAME-GRID-COLS-FRAME-GRID-ROWS-记录每一个网格包含的特征点的序号vector"><a href="#1-12-Frame-网格信息划分-mGrid-FRAME-GRID-COLS-FRAME-GRID-ROWS-记录每一个网格包含的特征点的序号vector" class="headerlink" title="1.12 Frame 网格信息划分 mGrid[FRAME_GRID_COLS][FRAME_GRID_ROWS]记录每一个网格包含的特征点的序号vector"></a>1.12 Frame 网格信息划分 mGrid[FRAME_GRID_COLS][FRAME_GRID_ROWS]记录每一个网格包含的特征点的序号vector</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Keypoints are assigned to cells in a grid to reduce matching complexity when projecting MapPoints.</span></span><br><span class="line">   <span class="comment">// 坐标乘以mfGridElementWidthInv和mfGridElementHeightInv就可以确定在哪个格子</span></span><br><span class="line">   <span class="keyword">static</span> <span class="keyword">float</span> mfGridElementWidthInv;</span><br><span class="line">   <span class="keyword">static</span> <span class="keyword">float</span> mfGridElementHeightInv;</span><br><span class="line">   <span class="comment">// 每个格子分配的特征点数，将图像分成格子，保证提取的特征点比较均匀</span></span><br><span class="line">   <span class="comment">// FRAME_GRID_ROWS 48</span></span><br><span class="line">   <span class="comment">// FRAME_GRID_COLS 64</span></span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="keyword">size_t</span>&gt; mGrid[FRAME_GRID_COLS][FRAME_GRID_ROWS];</span><br></pre></td></tr></table></figure>
+<h4 id="1-13-相机位姿"><a href="#1-13-相机位姿" class="headerlink" title="1.13 相机位姿"></a>1.13 相机位姿</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Camera pose.</span></span><br><span class="line">    cv::Mat mTcw; <span class="comment">///&lt; 相机姿态 世界坐标系到相机坐标坐标系的变换矩阵</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-14-当前帧和下一帧的id"><a href="#1-14-当前帧和下一帧的id" class="headerlink" title="1.14 当前帧和下一帧的id"></a>1.14 当前帧和下一帧的id</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Current and Next Frame id.</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> nNextId; <span class="comment">///&lt; Next Frame id.</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnId; <span class="comment">///&lt; Current Frame id.</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-15-当前帧的参考关键帧"><a href="#1-15-当前帧的参考关键帧" class="headerlink" title="1.15 当前帧的参考关键帧"></a>1.15 当前帧的参考关键帧</h4><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Reference Keyframe.</span></span><br><span class="line">    KeyFrame* mpReferenceKF;<span class="comment">//指针，指向参考关键帧</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-16-图像金字塔信息"><a href="#1-16-图像金字塔信息" class="headerlink" title="1.16 图像金字塔信息"></a>1.16 图像金字塔信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Scale pyramid info.</span></span><br><span class="line">    <span class="keyword">int</span> mnScaleLevels;<span class="comment">//图像提金字塔的层数</span></span><br><span class="line">    <span class="keyword">float</span> mfScaleFactor;<span class="comment">//图像提金字塔的尺度因子</span></span><br><span class="line">    <span class="keyword">float</span> mfLogScaleFactor;<span class="comment">//</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvScaleFactors;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvInvScaleFactors;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvLevelSigma2;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvInvLevelSigma2;</span><br></pre></td></tr></table></figure>
+<h4 id="1-17-用于确定画格子时的边界"><a href="#1-17-用于确定画格子时的边界" class="headerlink" title="1.17 用于确定画格子时的边界"></a>1.17 用于确定画格子时的边界</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Undistorted Image Bounds (computed once).</span></span><br><span class="line"><span class="comment">// 用于确定画格子时的边界</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">float</span> mnMinX;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">float</span> mnMaxX;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">float</span> mnMinY;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">float</span> mnMaxY;</span><br></pre></td></tr></table></figure>
+<h4 id="1-18-mbInitialComputations初始计算Flag"><a href="#1-18-mbInitialComputations初始计算Flag" class="headerlink" title="1.18 mbInitialComputations初始计算Flag"></a>1.18 mbInitialComputations初始计算Flag</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">bool</span> mbInitialComputations;</span><br></pre></td></tr></table></figure>
+<p>构造第一帧的时候，确定相机内参等，避免重复初始化计算</p>
+<h4 id="1-19-相机位姿的几个变换"><a href="#1-19-相机位姿的几个变换" class="headerlink" title="1.19 相机位姿的几个变换"></a>1.19 相机位姿的几个变换</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat mRcw; <span class="comment">///&lt; Rotation from world to camera</span></span><br><span class="line">cv::Mat mtcw; <span class="comment">///&lt; Translation from world to camera</span></span><br><span class="line">cv::Mat mRwc; <span class="comment">///&lt; Rotation from camera to world</span></span><br><span class="line">cv::Mat mOw;  <span class="comment">///&lt; mtwc,Translation from camera to world</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-20-图像帧划分格子数目"><a href="#1-20-图像帧划分格子数目" class="headerlink" title="1.20 图像帧划分格子数目"></a>1.20 图像帧划分格子数目</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FRAME_GRID_ROWS 48</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FRAME_GRID_COLS 64</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-Frame-类成员函数说明"><a href="#2-Frame-类成员函数说明" class="headerlink" title="2. Frame 类成员函数说明"></a>2. Frame 类成员函数说明</h3><h4 id="2-1-构造函数"><a href="#2-1-构造函数" class="headerlink" title="2.1 构造函数"></a>2.1 构造函数</h4><ul>
+<li><p>默认构造函数，建立一个空的Frame</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Frame</span>::<span class="keyword">Frame</span>()</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>复制构造函数，mLastFrame = Frame(mCurrentFrame)，完全复制当前帧的成员变量</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Frame::Frame(const Frame &amp;frame)</span><br><span class="line">    :mpORBvocabulary(frame.mpORBvocabulary), mpORBextractorLeft(frame.mpORBextractorLeft),     mpORBextractorRight(frame.mpORBextractorRight),</span><br><span class="line">     mTimeStamp(frame.mTimeStamp), mK(frame.mK.clone()), mDistCoef(frame.mDistCoef.clone()),</span><br><span class="line">     mbf(frame.mbf), mb(frame.mb), mThDepth(frame.mThDepth), N(frame.N), mvKeys(frame.mvKeys),</span><br><span class="line">     mvKeysRight(frame.mvKeysRight), mvKeysUn(frame.mvKeysUn),  mvuRight(frame.mvuRight),</span><br><span class="line">     mvDepth(frame.mvDepth), mBowVec(frame.mBowVec), mFeatVec(frame.mFeatVec),</span><br><span class="line">     mDescriptors(frame.mDescriptors.clone()), mDescriptorsRight(frame.mDescriptorsRight.clone()),</span><br><span class="line">     mvpMapPoints(frame.mvpMapPoints), mvbOutlier(frame.mvbOutlier), mnId(frame.mnId),</span><br><span class="line">     mpReferenceKF(frame.mpReferenceKF), mnScaleLevels(frame.mnScaleLevels),</span><br><span class="line">     mfScaleFactor(frame.mfScaleFactor), mfLogScaleFactor(frame.mfLogScaleFactor),</span><br><span class="line">     mvScaleFactors(frame.mvScaleFactors), mvInvScaleFactors(frame.mvInvScaleFactors),</span><br><span class="line">     mvLevelSigma2(frame.mvLevelSigma2), mvInvLevelSigma2(frame.mvInvLevelSigma2)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(int <span class="built_in">i</span>=<span class="number">0</span>;<span class="built_in">i</span>&lt;FRAME_GRID_COLS;<span class="built_in">i</span>++)</span><br><span class="line">        <span class="keyword">for</span>(int <span class="built_in">j</span>=<span class="number">0</span>; <span class="built_in">j</span>&lt;FRAME_GRID_ROWS; <span class="built_in">j</span>++)</span><br><span class="line">            mGrid[<span class="built_in">i</span>][<span class="built_in">j</span>]=frame.mGrid[<span class="built_in">i</span>][<span class="built_in">j</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(!frame.mTcw.empty())</span><br><span class="line">        SetPose(frame.mTcw);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>RGB-D 构造函数</p>
+</li>
+<li>Stereo 构造函数</li>
+<li>Monocular 构造函数，利用灰度图，时间戳，特征提取器，词典，相机内参，相机矫正参数，基线，深度截断值来构造一帧图像<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单目初始化</span></span><br><span class="line">Frame::Frame(<span class="keyword">const</span> cv::Mat &amp;imGray, <span class="keyword">const</span> <span class="keyword">double</span> &amp;timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &amp;K, cv::Mat &amp;distCoef, <span class="keyword">const</span> <span class="keyword">float</span> &amp;bf, <span class="keyword">const</span> <span class="keyword">float</span> &amp;thDepth)</span><br><span class="line">    :mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(<span class="keyword">static_cast</span>&lt;ORBextractor*&gt;(<span class="literal">NULL</span>)),</span><br><span class="line">     mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Frame ID</span></span><br><span class="line">    mnId=nNextId++;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Scale Level Info ，设置金字塔信息</span></span><br><span class="line">    mnScaleLevels = mpORBextractorLeft-&gt;GetLevels();</span><br><span class="line">    mfScaleFactor = mpORBextractorLeft-&gt;GetScaleFactor();</span><br><span class="line">    mfLogScaleFactor = <span class="built_in">log</span>(mfScaleFactor);</span><br><span class="line">    mvScaleFactors = mpORBextractorLeft-&gt;GetScaleFactors();</span><br><span class="line">    mvInvScaleFactors = mpORBextractorLeft-&gt;GetInverseScaleFactors();</span><br><span class="line">    mvLevelSigma2 = mpORBextractorLeft-&gt;GetScaleSigmaSquares();</span><br><span class="line">    mvInvLevelSigma2 = mpORBextractorLeft-&gt;GetInverseScaleSigmaSquares();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ORB extraction</span></span><br><span class="line">    ExtractORB(<span class="number">0</span>,imGray); <span class="comment">// 0表示単目，进行特征点的提取，提取的特征存在mvKeys里面</span></span><br><span class="line"></span><br><span class="line">    N = mvKeys.size();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(mvKeys.empty())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用OpenCV的矫正函数矫正orb提取的特征点</span></span><br><span class="line">    UndistortKeyPoints();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set no stereo information</span></span><br><span class="line">    mvuRight = <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt;(N,<span class="number">-1</span>);</span><br><span class="line">    mvDepth = <span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt;(N,<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">    mvpMapPoints = <span class="built_in">vector</span>&lt;MapPoint*&gt;(N,<span class="keyword">static_cast</span>&lt;MapPoint*&gt;(<span class="literal">NULL</span>));  <span class="comment">// 对特征点列表构造空的地图点列表</span></span><br><span class="line">    mvbOutlier = <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;(N,<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This is done only for the first Frame (or after a change in the calibration)</span></span><br><span class="line">    <span class="keyword">if</span>(mbInitialComputations)  </span><br><span class="line">    &#123;</span><br><span class="line">        ComputeImageBounds(imGray);</span><br><span class="line"></span><br><span class="line">        mfGridElementWidthInv=<span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(FRAME_GRID_COLS)/<span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(mnMaxX-mnMinX);</span><br><span class="line">        mfGridElementHeightInv=<span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(FRAME_GRID_ROWS)/<span class="keyword">static_cast</span>&lt;<span class="keyword">float</span>&gt;(mnMaxY-mnMinY);</span><br><span class="line"></span><br><span class="line">        fx = K.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">        fy = K.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">        cx = K.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>,<span class="number">2</span>);</span><br><span class="line">        cy = K.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">        invfx = <span class="number">1.0f</span>/fx;</span><br><span class="line">        invfy = <span class="number">1.0f</span>/fy;</span><br><span class="line"></span><br><span class="line">        mbInitialComputations=<span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mb = mbf/fx;</span><br><span class="line"></span><br><span class="line">    AssignFeaturesToGrid();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="2-2-获取特征点对应的格子坐标，并判断该特征点是否在原图像中"><a href="#2-2-获取特征点对应的格子坐标，并判断该特征点是否在原图像中" class="headerlink" title="2.2 获取特征点对应的格子坐标，并判断该特征点是否在原图像中"></a>2.2 获取特征点对应的格子坐标，并判断该特征点是否在原图像中</h4><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> Frame::PosInGrid(<span class="keyword">const</span> cv::KeyPoint &amp;kp, <span class="type">int</span> &amp;posX, <span class="type">int</span> &amp;posY)</span><br><span class="line">&#123;</span><br><span class="line">    posX = <span class="built_in">round</span>((kp.pt.x-mnMinX)*mfGridElementWidthInv);    <span class="comment">// 将实际坐标分散到各个网格中</span></span><br><span class="line">    posY = <span class="built_in">round</span>((kp.pt.y-mnMinY)*mfGridElementHeightInv);   </span><br><span class="line"></span><br><span class="line">    <span class="comment">//Keypoint's coordinates are undistorted, which could cause to go out of the image</span></span><br><span class="line">    <span class="keyword">if</span>(posX&lt;<span class="number">0</span> || posX&gt;=FRAME_GRID_COLS || posY&lt;<span class="number">0</span> || posY&gt;=FRAME_GRID_ROWS)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中"><a href="#2-3-将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中" class="headerlink" title="2.3 将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中"></a>2.3 将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Frame::AssignFeaturesToGrid()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> nReserve = <span class="number">0.5f</span>*N/(FRAME_GRID_COLS*FRAME_GRID_ROWS);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i=<span class="number">0</span>; i&lt;FRAME_GRID_COLS;i++)</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> j=<span class="number">0</span>; j&lt;FRAME_GRID_ROWS;j++)</span><br><span class="line">            mGrid[i][j].reserve(nReserve);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在mGrid中记录了各特征点</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;N;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">const</span> cv::KeyPoint &amp;kp = mvKeysUn[i];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> nGridPosX, nGridPosY;</span><br><span class="line">        <span class="keyword">if</span>(PosInGrid(kp,nGridPosX,nGridPosY))</span><br><span class="line">            mGrid[nGridPosX][nGridPosY].push_back(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-4-特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag-0単目提取，flag-1，双目提取"><a href="#2-4-特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag-0単目提取，flag-1，双目提取" class="headerlink" title="2.4 特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag = 0単目提取，flag = 1，双目提取"></a>2.4 特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag = 0単目提取，flag = 1，双目提取</h4><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">void</span> <span class="selector-tag">Frame</span><span class="selector-pseudo">::ExtractORB(int</span> <span class="selector-tag">flag</span>, <span class="selector-tag">const</span> <span class="selector-tag">cv</span><span class="selector-pseudo">::Mat</span> <span class="selector-tag">&amp;</span><span class="selector-tag">im</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="selector-tag">if</span>(flag==<span class="number">0</span>)</span><br><span class="line">        (*mpORBextractorLeft)(im,<span class="attribute">cv</span>::Mat(),mvKeys,mDescriptors);</span><br><span class="line">    <span class="selector-tag">else</span></span><br><span class="line">        (*mpORBextractorRight)(im,<span class="attribute">cv</span>::Mat(),mvKeysRight,mDescriptorsRight);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-5-设置相机姿态，随后会调用-UpdatePoseMatrices-来改变mRcw-mRwc等变量的值"><a href="#2-5-设置相机姿态，随后会调用-UpdatePoseMatrices-来改变mRcw-mRwc等变量的值" class="headerlink" title="2.5 设置相机姿态，随后会调用 UpdatePoseMatrices() 来改变mRcw,mRwc等变量的值"></a>2.5 设置相机姿态，随后会调用 UpdatePoseMatrices() 来改变mRcw,mRwc等变量的值</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> Set the camera pose.</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 设置相机姿态，随后会调用 UpdatePoseMatrices() 来改变mRcw,mRwc等变量的值</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> Tcw Transformation from world to camera</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void Frame::SetPose(cv::Mat Tcw)</span><br><span class="line">&#123;</span><br><span class="line">    mTcw = Tcw.<span class="keyword">clone</span>();</span><br><span class="line">    UpdatePoseMatrices();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-6-根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）"><a href="#2-6-根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）" class="headerlink" title="2.6 根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）"></a>2.6 根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Computes rotation, translation and camera center matrices from the camera pose.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 根据Tcw计算mRcw、mtcw和mRwc、mOw</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Frame::UpdatePoseMatrices()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// [x_camera 1] = [R|t]*[x_world 1]，坐标为齐次形式</span></span><br><span class="line">    <span class="comment">// x_camera = R*x_world + t</span></span><br><span class="line">    mRcw = mTcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>);</span><br><span class="line">    mRwc = mRcw.t();</span><br><span class="line">    mtcw = mTcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">// mtcw, 即相机坐标系下相机坐标系到世界坐标系间的向量, 向量方向由相机坐标系指向世界坐标系</span></span><br><span class="line">    <span class="comment">// mOw, 即世界坐标系下世界坐标系到相机坐标系间的向量, 向量方向由世界坐标系指向相机坐标系</span></span><br><span class="line">    mOw = -mRcw.t()*mtcw;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-7-判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度"><a href="#2-7-判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度" class="headerlink" title="2.7 判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度"></a>2.7 判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 判断一个点是否在视野内</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 计算了重投影坐标，观测方向夹角，预测在当前帧的尺度</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  pMP             MapPoint</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  viewingCosLimit 视角和平均视角的方向阈值,0.5 ,cos 60</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>                 true if is in view</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> SearchLocalPoints()</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">bool</span> Frame::isInFrustum(MapPoint *pMP, <span class="keyword">float</span> viewingCosLimit)</span><br><span class="line">&#123;</span><br><span class="line">    pMP-&gt;mbTrackInView = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3D in absolute coordinates</span></span><br><span class="line">    cv::Mat P = pMP-&gt;GetWorldPos(); </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3D in camera coordinates</span></span><br><span class="line">    <span class="comment">// 3D点P在相机坐标系下的坐标</span></span><br><span class="line">    <span class="keyword">const</span> cv::Mat Pc = mRcw*P+mtcw; <span class="comment">// 这里的Rt是经过初步的优化后的</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> &amp;PcX = Pc.at&lt;<span class="keyword">float</span>&gt;(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> &amp;PcY = Pc.at&lt;<span class="keyword">float</span>&gt;(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> &amp;PcZ = Pc.at&lt;<span class="keyword">float</span>&gt;(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check positive depth</span></span><br><span class="line">    <span class="keyword">if</span>(PcZ&lt;<span class="number">0.0</span>f)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Project in image and check it is not outside</span></span><br><span class="line">    <span class="comment">// V-D 1) 将MapPoint投影到当前帧, 并判断是否在图像内</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> invz = <span class="number">1.0</span>f/PcZ;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> u=fx*PcX*invz+cx;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> v=fy*PcY*invz+cy;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(u&lt;mnMinX || u&gt;mnMaxX)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span>(v&lt;mnMinY || v&gt;mnMaxY)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check distance is in the scale invariance region of the MapPoint</span></span><br><span class="line">    <span class="comment">// V-D 3) 计算MapPoint到相机中心的距离, 并判断是否在尺度变化的距离内</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> maxDistance = pMP-&gt;GetMaxDistanceInvariance();</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> minDistance = pMP-&gt;GetMinDistanceInvariance();</span><br><span class="line">    <span class="comment">// 世界坐标系下，相机到3D点P的向量, 向量方向由相机指向3D点P</span></span><br><span class="line">    <span class="keyword">const</span> cv::Mat PO = P-mOw;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> dist = cv::norm(PO);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(dist&lt;minDistance || dist&gt;maxDistance)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check viewing angle</span></span><br><span class="line">    <span class="comment">// V-D 2) 计算当前视角和平均视角夹角的余弦值, 若小于cos(60), 即夹角大于60度则返回</span></span><br><span class="line">    cv::Mat Pn = pMP-&gt;GetNormal();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> viewCos = PO.dot(Pn)/dist;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(viewCos&lt;viewingCosLimit)   <span class="comment">// viewingCosLimit = 0.5</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Predict scale in the image</span></span><br><span class="line">    <span class="comment">// V-D 4) 根据深度预测尺度（对应特征点在一层）</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nPredictedLevel = pMP-&gt;PredictScale(dist,this);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Data used by the tracking</span></span><br><span class="line">    <span class="comment">// 标记该点将来要被投影</span></span><br><span class="line">    pMP-&gt;mbTrackInView = <span class="keyword">true</span>;</span><br><span class="line">    pMP-&gt;mTrackProjX = u;</span><br><span class="line">    pMP-&gt;mTrackProjXR = u - mbf*invz; <span class="comment">//该3D点投影到双目右侧相机上的横坐标</span></span><br><span class="line">    pMP-&gt;mTrackProjY = v;</span><br><span class="line">    pMP-&gt;mnTrackScaleLevel = nPredictedLevel;</span><br><span class="line">    pMP-&gt;mTrackViewCos = viewCos;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-8-找到在以x-y为中心，边长为2r的方形内且在-minLevel-maxLevel-的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点"><a href="#2-8-找到在以x-y为中心，边长为2r的方形内且在-minLevel-maxLevel-的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点" class="headerlink" title="2.8 找到在以x,y为中心，边长为2r的方形内且在[minLevel, maxLevel]的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点"></a>2.8 找到在以x,y为中心，边长为2r的方形内且在[minLevel, maxLevel]的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 找到在 以x,y为中心,边长为2r的方形内且在[minLevel, maxLevel]的特征点</span></span><br><span class="line"><span class="comment"> * @param x        图像坐标u</span></span><br><span class="line"><span class="comment"> * @param y        图像坐标v</span></span><br><span class="line"><span class="comment"> * @param r        边长</span></span><br><span class="line"><span class="comment"> * @param minLevel 最小尺度</span></span><br><span class="line"><span class="comment"> * @param maxLevel 最大尺度</span></span><br><span class="line"><span class="comment"> * @return         满足条件的特征点的序号</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"> <span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; Frame::GetFeaturesInArea(<span class="keyword">const</span> <span class="keyword">float</span> &amp;x, <span class="keyword">const</span> <span class="keyword">float</span>  &amp;y, <span class="keyword">const</span> <span class="keyword">float</span>  &amp;r, <span class="keyword">const</span> <span class="keyword">int</span> minLevel, <span class="keyword">const</span> <span class="keyword">int</span> maxLevel) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; vIndices;</span><br><span class="line">    vIndices.reserve(N);    <span class="comment">// 预留所有的特征点</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 判断最小最大距离是否越界，并计算坐标点所在的格子坐标，先计算出圆所在的格子区域区间</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMinCellX = max(<span class="number">0</span>,(<span class="keyword">int</span>)<span class="built_in">floor</span>((x-mnMinX-r)*mfGridElementWidthInv));</span><br><span class="line">    <span class="keyword">if</span>(nMinCellX&gt;=FRAME_GRID_COLS)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMaxCellX = min((<span class="keyword">int</span>)FRAME_GRID_COLS<span class="number">-1</span>,(<span class="keyword">int</span>)<span class="built_in">ceil</span>((x-mnMinX+r)*mfGridElementWidthInv));</span><br><span class="line">    <span class="keyword">if</span>(nMaxCellX&lt;<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> vIndices;      </span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMinCellY = max(<span class="number">0</span>,(<span class="keyword">int</span>)<span class="built_in">floor</span>((y-mnMinY-r)*mfGridElementHeightInv));</span><br><span class="line">    <span class="keyword">if</span>(nMinCellY&gt;=FRAME_GRID_ROWS)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMaxCellY = min((<span class="keyword">int</span>)FRAME_GRID_ROWS<span class="number">-1</span>,(<span class="keyword">int</span>)<span class="built_in">ceil</span>((y-mnMinY+r)*mfGridElementHeightInv));</span><br><span class="line">    <span class="keyword">if</span>(nMaxCellY&lt;<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">bool</span> bCheckLevels = (minLevel&gt;<span class="number">0</span>) || (maxLevel&gt;=<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> ix = nMinCellX; ix&lt;=nMaxCellX; ix++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> iy = nMinCellY; iy&lt;=nMaxCellY; iy++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; vCell = mGrid[ix][iy];  <span class="comment">// vCell 存的是该格子区域的所有特征点对应的MvKeysUn序号</span></span><br><span class="line">            <span class="keyword">if</span>(vCell.empty())</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">size_t</span> j=<span class="number">0</span>, jend=vCell.size(); j&lt;jend; j++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">const</span> cv::KeyPoint &amp;kpUn = mvKeysUn[vCell[j]];</span><br><span class="line">                <span class="keyword">if</span>(bCheckLevels)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span>(kpUn.octave&lt;minLevel)            <span class="comment">// 判断该特征点的金字塔level是否满足要求</span></span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    <span class="keyword">if</span>(maxLevel&gt;=<span class="number">0</span>)</span><br><span class="line">                        <span class="keyword">if</span>(kpUn.octave&gt;maxLevel)</span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">const</span> <span class="keyword">float</span> distx = kpUn.pt.x-x;</span><br><span class="line">                <span class="keyword">const</span> <span class="keyword">float</span> disty = kpUn.pt.y-y;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">fabs</span>(distx)&lt;r &amp;&amp; <span class="built_in">fabs</span>(disty)&lt;r)</span><br><span class="line">                    vIndices.push_back(vCell[j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> vIndices;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-9-计算当前帧的词包词典"><a href="#2-9-计算当前帧的词包词典" class="headerlink" title="2.9 计算当前帧的词包词典"></a>2.9 计算当前帧的词包词典</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void Frame::ComputeBoW()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(mBowVec.<span class="keyword">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        vector&lt;cv::Mat&gt; vCurrentDesc = Converter::toDescriptorVector(mDescriptors);</span><br><span class="line">        mpORBvocabulary-&gt;transform(vCurrentDesc,mBowVec,mFeatVec,<span class="number">4</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-10-调用OpenCV的矫正函数矫正orb提取的特征点"><a href="#2-10-调用OpenCV的矫正函数矫正orb提取的特征点" class="headerlink" title="2.10 调用OpenCV的矫正函数矫正orb提取的特征点"></a>2.10 调用OpenCV的矫正函数矫正orb提取的特征点</h4><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">void Frame::UndistortKeyPoints()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 如果没有图像是矫正过的，没有失真</span></span><br><span class="line">    <span class="keyword">if</span>(mDistCoef.at&lt;float&gt;(0)==0.0)</span><br><span class="line">    &#123;</span><br><span class="line">        mvKeysUn=mvKeys;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fill matrix with points</span></span><br><span class="line">    <span class="comment">// N为提取的特征点数量，将N个特征点保存在N*2的mat中</span></span><br><span class="line">    cv::<span class="keyword">Mat</span> <span class="keyword">mat</span>(<span class="keyword">N</span>,2,CV_32F);</span><br><span class="line">    <span class="keyword">for</span>(int i=0; i&lt;<span class="keyword">N</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">mat</span>.at&lt;float&gt;(i,0)=mvKeys[i].pt.x;</span><br><span class="line">        <span class="keyword">mat</span>.at&lt;float&gt;(i,1)=mvKeys[i].pt.y;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Undistort points</span></span><br><span class="line">    <span class="comment">// 调整mat的通道为2，矩阵的行列形状不变</span></span><br><span class="line">    <span class="keyword">mat</span>=<span class="keyword">mat</span>.<span class="keyword">reshape</span>(2);</span><br><span class="line">    cv::undistortPoints(<span class="keyword">mat</span>,<span class="keyword">mat</span>,mK,mDistCoef,cv::<span class="keyword">Mat</span>(),mK); <span class="comment">// 用cv的函数进行失真校正</span></span><br><span class="line">    <span class="keyword">mat</span>=<span class="keyword">mat</span>.<span class="keyword">reshape</span>(1);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Fill undistorted keypoint vector</span></span><br><span class="line">    <span class="comment">// 存储校正后的特征点</span></span><br><span class="line">    mvKeysUn.resize(<span class="keyword">N</span>);</span><br><span class="line">    <span class="keyword">for</span>(int i=0; i&lt;<span class="keyword">N</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        cv::KeyPoint kp = mvKeys[i];</span><br><span class="line">        kp.pt.x=<span class="keyword">mat</span>.at&lt;float&gt;(i,0);</span><br><span class="line">        kp.pt.y=<span class="keyword">mat</span>.at&lt;float&gt;(i,1);</span><br><span class="line">        mvKeysUn[i]=kp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-11-计算图像边界"><a href="#2-11-计算图像边界" class="headerlink" title="2.11 计算图像边界"></a>2.11 计算图像边界</h4><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">void Frame::ComputeImageBounds(<span class="keyword">const</span> cv::<span class="keyword">Mat</span> &amp;imLeft)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(mDistCoef.at&lt;float&gt;(0)!=0.0)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 矫正前四个边界点：(0,0) (cols,0) (0,rows) (cols,rows)</span></span><br><span class="line">        cv::<span class="keyword">Mat</span> <span class="keyword">mat</span>(4,2,CV_32F);</span><br><span class="line">        <span class="keyword">mat</span>.at&lt;float&gt;(0,0)=0.0;         <span class="comment">//左上</span></span><br><span class="line">		<span class="keyword">mat</span>.at&lt;float&gt;(0,1)=0.0;</span><br><span class="line">        <span class="keyword">mat</span>.at&lt;float&gt;(1,0)=imLeft.cols; <span class="comment">//右上</span></span><br><span class="line">		<span class="keyword">mat</span>.at&lt;float&gt;(1,1)=0.0;</span><br><span class="line">		<span class="keyword">mat</span>.at&lt;float&gt;(2,0)=0.0;         <span class="comment">//左下</span></span><br><span class="line">		<span class="keyword">mat</span>.at&lt;float&gt;(2,1)=imLeft.rows;</span><br><span class="line">        <span class="keyword">mat</span>.at&lt;float&gt;(3,0)=imLeft.cols; <span class="comment">//右下</span></span><br><span class="line">		<span class="keyword">mat</span>.at&lt;float&gt;(3,1)=imLeft.rows;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Undistort corners</span></span><br><span class="line">        <span class="keyword">mat</span>=<span class="keyword">mat</span>.<span class="keyword">reshape</span>(2);</span><br><span class="line">        cv::undistortPoints(<span class="keyword">mat</span>,<span class="keyword">mat</span>,mK,mDistCoef,cv::<span class="keyword">Mat</span>(),mK);</span><br><span class="line">        <span class="keyword">mat</span>=<span class="keyword">mat</span>.<span class="keyword">reshape</span>(1);</span><br><span class="line"></span><br><span class="line">        mnMinX = <span class="built_in">min</span>(<span class="keyword">mat</span>.at&lt;float&gt;(0,0),<span class="keyword">mat</span>.at&lt;float&gt;(2,0));<span class="comment">//左上和左下横坐标最小的</span></span><br><span class="line">        mnMaxX = <span class="built_in">max</span>(<span class="keyword">mat</span>.at&lt;float&gt;(1,0),<span class="keyword">mat</span>.at&lt;float&gt;(3,0));<span class="comment">//右上和右下横坐标最大的</span></span><br><span class="line">        mnMinY = <span class="built_in">min</span>(<span class="keyword">mat</span>.at&lt;float&gt;(0,1),<span class="keyword">mat</span>.at&lt;float&gt;(1,1));<span class="comment">//左上和右上纵坐标最小的</span></span><br><span class="line">        mnMaxY = <span class="built_in">max</span>(<span class="keyword">mat</span>.at&lt;float&gt;(2,1),<span class="keyword">mat</span>.at&lt;float&gt;(3,1));<span class="comment">//左下和右下纵坐标最小的</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        mnMinX = 0.0f;</span><br><span class="line">        mnMaxX = imLeft.cols;</span><br><span class="line">        mnMinY = 0.0f;</span><br><span class="line">        mnMaxY = imLeft.rows;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SLAM/" rel="tag"># SLAM</a>
+          
+            <a href="/tags/Tracking/" rel="tag"># Tracking</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/14/ORB-SLAM2源码分析八/" rel="next" title="ORB-SLAM2源码分析八">
+                <i class="fa fa-chevron-left"></i> ORB-SLAM2源码分析八
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/14/ORB-SLAM2源码分析十/" rel="prev" title="ORB-SLAM2源码分析十">
+                ORB-SLAM2源码分析十 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Frame-类说明"><span class="nav-text">Frame 类说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Frame-类成员变量说明"><span class="nav-text">1. Frame 类成员变量说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-用于重定位的词典"><span class="nav-text">1.1 用于重定位的词典</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-当前帧的特征提取器"><span class="nav-text">1.2 当前帧的特征提取器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-当前帧的时间戳"><span class="nav-text">1.3 当前帧的时间戳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-当前帧的时间戳-1"><span class="nav-text">1.3 当前帧的时间戳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-当前帧的时间戳-2"><span class="nav-text">1.3 当前帧的时间戳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-相机参数"><span class="nav-text">1.4 相机参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-截断深度"><span class="nav-text">1.4 截断深度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-特征点的数目"><span class="nav-text">1.5 特征点的数目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-特征点Vector"><span class="nav-text">1.6 特征点Vector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-特征点的双目信息"><span class="nav-text">1.7 特征点的双目信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-8-当前帧的Bow以及特征点的Bow"><span class="nav-text">1.8 当前帧的Bow以及特征点的Bow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-9-当前帧的描述子"><span class="nav-text">1.9 当前帧的描述子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-10-每个特征点对应的MapPoints"><span class="nav-text">1.10 每个特征点对应的MapPoints</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-11-特征点是否是Outlier的flag"><span class="nav-text">1.11 特征点是否是Outlier的flag</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-12-Frame-网格信息划分-mGrid-FRAME-GRID-COLS-FRAME-GRID-ROWS-记录每一个网格包含的特征点的序号vector"><span class="nav-text">1.12 Frame 网格信息划分 mGrid[FRAME_GRID_COLS][FRAME_GRID_ROWS]记录每一个网格包含的特征点的序号vector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-13-相机位姿"><span class="nav-text">1.13 相机位姿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-14-当前帧和下一帧的id"><span class="nav-text">1.14 当前帧和下一帧的id</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-15-当前帧的参考关键帧"><span class="nav-text">1.15 当前帧的参考关键帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-16-图像金字塔信息"><span class="nav-text">1.16 图像金字塔信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-17-用于确定画格子时的边界"><span class="nav-text">1.17 用于确定画格子时的边界</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-18-mbInitialComputations初始计算Flag"><span class="nav-text">1.18 mbInitialComputations初始计算Flag</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-19-相机位姿的几个变换"><span class="nav-text">1.19 相机位姿的几个变换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-20-图像帧划分格子数目"><span class="nav-text">1.20 图像帧划分格子数目</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Frame-类成员函数说明"><span class="nav-text">2. Frame 类成员函数说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-构造函数"><span class="nav-text">2.1 构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-获取特征点对应的格子坐标，并判断该特征点是否在原图像中"><span class="nav-text">2.2 获取特征点对应的格子坐标，并判断该特征点是否在原图像中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中"><span class="nav-text">2.3 将矫正过的特征点分配到各个网格中，判断矫正过的特征点在哪个网格中，并将其加入到对应的表格vector中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag-0単目提取，flag-1，双目提取"><span class="nav-text">2.4 特征提取函数ExtractORB，调用初始化的特征提取器进行特征提取，flag = 0単目提取，flag = 1，双目提取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-设置相机姿态，随后会调用-UpdatePoseMatrices-来改变mRcw-mRwc等变量的值"><span class="nav-text">2.5 设置相机姿态，随后会调用 UpdatePoseMatrices() 来改变mRcw,mRwc等变量的值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）"><span class="nav-text">2.6 根据Tcw计算mRcw、mtcw和mRwc、mOw（Twc）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-7-判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度"><span class="nav-text">2.7 判断一个点是否在当前帧的视野内，将该地图点投影到图像中然后计算观测方向夹角，预测在当前帧的尺度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-8-找到在以x-y为中心，边长为2r的方形内且在-minLevel-maxLevel-的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点"><span class="nav-text">2.8 找到在以x,y为中心，边长为2r的方形内且在[minLevel, maxLevel]的特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-9-计算当前帧的词包词典"><span class="nav-text">2.9 计算当前帧的词包词典</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-10-调用OpenCV的矫正函数矫正orb提取的特征点"><span class="nav-text">2.10 调用OpenCV的矫正函数矫正orb提取的特征点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-11-计算图像边界"><span class="nav-text">2.11 计算图像边界</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

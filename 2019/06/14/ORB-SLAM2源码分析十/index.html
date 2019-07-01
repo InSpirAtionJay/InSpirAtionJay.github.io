@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="KeyFrame 类说明1234/* KeyFrame * 关键帧，和普通的Frame不一样，但是可以由Frame来构造 * 许多数据会被三个线程同时访问，所以用锁的地方很普遍 */ 1. KeyFrame 类成员变量说明1.1 关键帧id和下一个关键帧id,nNextId用于计数1234// nNextID名字改为nLastID更合适，表示上一个KeyFrame的ID号static long u">
+<meta name="keywords" content="SLAM,Tracking">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ORB-SLAM2源码分析十">
+<meta property="og:url" content="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析十/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="KeyFrame 类说明1234/* KeyFrame * 关键帧，和普通的Frame不一样，但是可以由Frame来构造 * 许多数据会被三个线程同时访问，所以用锁的地方很普遍 */ 1. KeyFrame 类成员变量说明1.1 关键帧id和下一个关键帧id,nNextId用于计数1234// nNextID名字改为nLastID更合适，表示上一个KeyFrame的ID号static long u">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-19T06:27:21.327Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ORB-SLAM2源码分析十">
+<meta name="twitter:description" content="KeyFrame 类说明1234/* KeyFrame * 关键帧，和普通的Frame不一样，但是可以由Frame来构造 * 许多数据会被三个线程同时访问，所以用锁的地方很普遍 */ 1. KeyFrame 类成员变量说明1.1 关键帧id和下一个关键帧id,nNextId用于计数1234// nNextID名字改为nLastID更合适，表示上一个KeyFrame的ID号static long u">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析十/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ORB-SLAM2源码分析十 | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">18</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">8</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">22</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/14/ORB-SLAM2源码分析十/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ORB-SLAM2源码分析十
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-14 11:00:35" itemprop="dateCreated datePublished" datetime="2019-06-14T11:00:35+08:00">2019-06-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-19 14:27:21" itemprop="dateModified" datetime="2019-06-19T14:27:21+08:00">2019-06-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="KeyFrame-类说明"><a href="#KeyFrame-类说明" class="headerlink" title="KeyFrame 类说明"></a>KeyFrame 类说明</h2><figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/* KeyFrame</span><br><span class="line"> * 关键帧，和普通的<span class="keyword">Frame</span>不一样，但是可以由<span class="keyword">Frame</span>来构造</span><br><span class="line"> * 许多数据会被三个线程同时访问，所以用锁的地方很普遍</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<h3 id="1-KeyFrame-类成员变量说明"><a href="#1-KeyFrame-类成员变量说明" class="headerlink" title="1. KeyFrame 类成员变量说明"></a>1. KeyFrame 类成员变量说明</h3><h4 id="1-1-关键帧id和下一个关键帧id-nNextId用于计数"><a href="#1-1-关键帧id和下一个关键帧id-nNextId用于计数" class="headerlink" title="1.1 关键帧id和下一个关键帧id,nNextId用于计数"></a>1.1 关键帧id和下一个关键帧id,nNextId用于计数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// nNextID名字改为nLastID更合适，表示上一个KeyFrame的ID号</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> nNextId;</span><br><span class="line"><span class="comment">// 在nNextID的基础上加1就得到了mnID，为当前KeyFrame的ID号</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnId;</span><br></pre></td></tr></table></figure>
+<h4 id="1-2-mnFrameId记录了该KeyFrame是由哪个Frame初始化的"><a href="#1-2-mnFrameId记录了该KeyFrame是由哪个Frame初始化的" class="headerlink" title="1.2 mnFrameId记录了该KeyFrame是由哪个Frame初始化的"></a>1.2 mnFrameId记录了该KeyFrame是由哪个Frame初始化的</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每个KeyFrame基本属性是它是一个Frame，KeyFrame初始化的时候需要Frame，</span></span><br><span class="line"><span class="comment">// mnFrameId记录了该KeyFrame是由哪个Frame初始化的</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnFrameId;</span><br></pre></td></tr></table></figure>
+<h4 id="1-3-该关键帧的时间戳"><a href="#1-3-该关键帧的时间戳" class="headerlink" title="1.3 该关键帧的时间戳"></a>1.3 该关键帧的时间戳</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> mTimeStamp;</span><br></pre></td></tr></table></figure>
+<h4 id="1-4-网格信息，和Frame中定义的一样，用于加速特征匹配"><a href="#1-4-网格信息，和Frame中定义的一样，用于加速特征匹配" class="headerlink" title="1.4 网格信息，和Frame中定义的一样，用于加速特征匹配"></a>1.4 网格信息，和Frame中定义的一样，用于加速特征匹配</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Grid (to speed up feature matching)</span></span><br><span class="line"><span class="comment">// 和Frame类中的定义相同</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnGridCols;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnGridRows;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> mfGridElementWidthInv;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> mfGridElementHeightInv;</span><br></pre></td></tr></table></figure>
+<h4 id="1-5-用于Tracking的变量"><a href="#1-5-用于Tracking的变量" class="headerlink" title="1.5 用于Tracking的变量"></a>1.5 用于Tracking的变量</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">// Variables used by the tracking</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnTrackReferenceForFrame;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnFuseTargetForKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-6-用于local-mapping的变量"><a href="#1-6-用于local-mapping的变量" class="headerlink" title="1.6 用于local mapping的变量"></a>1.6 用于local mapping的变量</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by the local mapping</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnBALocalForKF;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnBAFixedForKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-7-用于关键帧数据库的变量"><a href="#1-7-用于关键帧数据库的变量" class="headerlink" title="1.7 用于关键帧数据库的变量"></a>1.7 用于关键帧数据库的变量</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by the keyframe database</span></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnLoopQuery;</span><br><span class="line"><span class="keyword">int</span> mnLoopWords;</span><br><span class="line"><span class="keyword">float</span> mLoopScore;</span><br><span class="line"><span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnRelocQuery;</span><br><span class="line"><span class="keyword">int</span> mnRelocWords;</span><br><span class="line"><span class="keyword">float</span> mRelocScore;</span><br></pre></td></tr></table></figure>
+<h4 id="1-8-用于回环检测的变量"><a href="#1-8-用于回环检测的变量" class="headerlink" title="1.8 用于回环检测的变量"></a>1.8 用于回环检测的变量</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Variables used by loop closing</span></span><br><span class="line"> cv::Mat mTcwGBA;</span><br><span class="line"> cv::Mat mTcwBefGBA;</span><br><span class="line"> <span class="keyword">long</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> mnBAGlobalForKF;</span><br></pre></td></tr></table></figure>
+<h4 id="1-9-相机参数"><a href="#1-9-相机参数" class="headerlink" title="1.9 相机参数"></a>1.9 相机参数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Calibration parameters</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> fx, fy, cx, cy, invfx, invfy, mbf, mb, mThDepth;</span><br></pre></td></tr></table></figure>
+<h4 id="1-10-特征点数目"><a href="#1-10-特征点数目" class="headerlink" title="1.10 特征点数目"></a>1.10 特征点数目</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Number of KeyPoints</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N;</span><br></pre></td></tr></table></figure>
+<h4 id="1-11-Bow信息"><a href="#1-11-Bow信息" class="headerlink" title="1.11 Bow信息"></a>1.11 Bow信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//BoW</span></span><br><span class="line">DBoW2::BowVector mBowVec; <span class="comment">///&lt; Vector of words to represent images</span></span><br><span class="line">DBoW2::FeatureVector mFeatVec; <span class="comment">///&lt; Vector of nodes with indexes of local features</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-12-相对于父关键帧的位姿"><a href="#1-12-相对于父关键帧的位姿" class="headerlink" title="1.12 相对于父关键帧的位姿"></a>1.12 相对于父关键帧的位姿</h4><figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">//</span> Pose relative to parent (<span class="keyword">this</span> <span class="keyword">is</span> computed <span class="keyword">when</span> bad flag <span class="keyword">is</span> activated)</span><br><span class="line">    cv::Mat mTcp;</span><br></pre></td></tr></table></figure>
+<h4 id="1-13-尺度信息"><a href="#1-13-尺度信息" class="headerlink" title="1.13 尺度信息"></a>1.13 尺度信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Scale</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnScaleLevels;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> mfScaleFactor;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> mfLogScaleFactor;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvScaleFactors;<span class="comment">// 尺度因子，scale^n，scale=1.2，n为层数</span></span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvLevelSigma2;<span class="comment">// 尺度因子的平方</span></span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; mvInvLevelSigma2;</span><br></pre></td></tr></table></figure>
+<h4 id="1-14-图像边界"><a href="#1-14-图像边界" class="headerlink" title="1.14 图像边界"></a>1.14 图像边界</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnMinX;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnMinY;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnMaxX;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> mnMaxY;</span><br></pre></td></tr></table></figure>
+<h4 id="1-15-相机内参"><a href="#1-15-相机内参" class="headerlink" title="1.15 相机内参"></a>1.15 相机内参</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cv::Mat mK;</span><br></pre></td></tr></table></figure>
+<h4 id="1-16-相机位姿"><a href="#1-16-相机位姿" class="headerlink" title="1.16 相机位姿"></a>1.16 相机位姿</h4><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// SE3 Pose <span class="keyword">and</span> camera <span class="built_in">center</span></span><br><span class="line"><span class="built_in">cv</span>::Mat Tcw;</span><br><span class="line"><span class="built_in">cv</span>::Mat Twc;</span><br><span class="line"><span class="built_in">cv</span>::Mat Ow;</span><br><span class="line"><span class="built_in">cv</span>::Mat Cw; // Stereo middel point. Only <span class="keyword">for</span> visualization</span><br></pre></td></tr></table></figure>
+<h4 id="1-17-关键帧地图点"><a href="#1-17-关键帧地图点" class="headerlink" title="1.17 关键帧地图点"></a>1.17 关键帧地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MapPoints associated to keypoints</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;MapPoint*&gt; mvpMapPoints;</span><br></pre></td></tr></table></figure>
+<h4 id="1-18-Bow"><a href="#1-18-Bow" class="headerlink" title="1.18 Bow"></a>1.18 Bow</h4><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// BoW</span><br><span class="line">KeyFrameDatabase* mpKeyFrameDB<span class="comment">;</span></span><br><span class="line">ORBVocabulary* mpORBvocabulary<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-19-网格划分"><a href="#1-19-网格划分" class="headerlink" title="1.19 网格划分"></a>1.19 网格划分</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Grid over the image to speed up feature matching</span></span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">vector</span>&lt; <span class="built_in">std</span>::<span class="built_in">vector</span> &lt;<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; &gt; &gt; mGrid;</span><br></pre></td></tr></table></figure>
+<h4 id="1-20-共视图信息"><a href="#1-20-共视图信息" class="headerlink" title="1.20 共视图信息"></a>1.20 共视图信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Covisibility Graph</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">int</span>&gt; mConnectedKeyFrameWeights; <span class="comment">///&lt; 与该关键帧连接的关键帧与权重</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;KeyFrame*&gt; mvpOrderedConnectedKeyFrames; <span class="comment">///&lt; 排序后的关键帧</span></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; mvOrderedWeights; <span class="comment">///&lt; 排序后的权重(从大到小)</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-21-生成树信息"><a href="#1-21-生成树信息" class="headerlink" title="1.21 生成树信息"></a>1.21 生成树信息</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Spanning Tree and Loop Edges</span></span><br><span class="line">   <span class="comment">// std::set是集合，相比vector，进行插入数据这样的操作时会自动排序</span></span><br><span class="line">   <span class="keyword">bool</span> mbFirstConnection;</span><br><span class="line">   KeyFrame* mpParent;</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">set</span>&lt;KeyFrame*&gt; mspChildrens;</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">set</span>&lt;KeyFrame*&gt; mspLoopEdges;</span><br></pre></td></tr></table></figure>
+<h4 id="1-22-Bad-flags"><a href="#1-22-Bad-flags" class="headerlink" title="1.22 Bad flags"></a>1.22 Bad flags</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bad flags</span></span><br><span class="line"><span class="keyword">bool</span> mbNotErase;</span><br><span class="line"><span class="keyword">bool</span> mbToBeErased;</span><br><span class="line"><span class="keyword">bool</span> mbBad;</span><br></pre></td></tr></table></figure>
+<h4 id="1-23-mHalfBaseline"><a href="#1-23-mHalfBaseline" class="headerlink" title="1.23 mHalfBaseline"></a>1.23 mHalfBaseline</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> mHalfBaseline; <span class="comment">// Only for visualization</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-24-map指针"><a href="#1-24-map指针" class="headerlink" title="1.24 map指针"></a>1.24 map指针</h4><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map* mpMap<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-KeyFrame-成员函数说明"><a href="#2-KeyFrame-成员函数说明" class="headerlink" title="2. KeyFrame 成员函数说明"></a>2. KeyFrame 成员函数说明</h3><h4 id="2-1-构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧"><a href="#2-1-构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧" class="headerlink" title="2.1 构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧"></a>2.1 构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧</h4><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KeyFrame(<span class="name">Frame</span> <span class="symbol">&amp;F</span>, Map *pMap, KeyFrameDatabase *pKFDB)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h4 id="2-2-计算Bow"><a href="#2-2-计算Bow" class="headerlink" title="2.2 计算Bow"></a>2.2 计算Bow</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> Bag of Words Representation</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 计算mBowVec，并且将描述子分散在第4层上，即mFeatVec记录了属于第i个node的ni个描述子</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> ProcessNewKeyFrame()</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void KeyFrame::ComputeBoW()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(mBowVec.<span class="keyword">empty</span>() || mFeatVec.<span class="keyword">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        vector&lt;cv::Mat&gt; vCurrentDesc = Converter::toDescriptorVector(mDescriptors);</span><br><span class="line">        <span class="comment">// Feature vector associate features with nodes in the 4th level (from leaves up)</span></span><br><span class="line">        <span class="comment">// We assume the vocabulary tree has 6 levels, change the 4 otherwise</span></span><br><span class="line">        mpORBvocabulary-&gt;transform(vCurrentDesc,mBowVec,mFeatVec,<span class="number">4</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-3-设置相机参数，计算-T-cw-R-cw-t-cw-T-wc-R-wc-t-wc"><a href="#2-3-设置相机参数，计算-T-cw-R-cw-t-cw-T-wc-R-wc-t-wc" class="headerlink" title="2.3 设置相机参数，计算$T_{cw},R_{cw},t_{cw},T_{wc},R_{wc},t_{wc}$"></a>2.3 设置相机参数，计算$T_{cw},R_{cw},t_{cw},T_{wc},R_{wc},t_{wc}$</h4><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">void</span> KeyFrame<span class="type">::SetPose</span>(const cv<span class="type">::Mat</span> &amp;Tcw_)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    Tcw_.copyTo(Tcw);</span><br><span class="line">    cv<span class="type">::Mat</span> Rcw = Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>);</span><br><span class="line">    cv<span class="type">::Mat</span> tcw = Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>);</span><br><span class="line">    cv<span class="type">::Mat</span> Rwc = Rcw.t();</span><br><span class="line">    Ow = <span class="params">-Rwc</span>*tcw;</span><br><span class="line"></span><br><span class="line">    Twc = cv<span class="type">::Mat</span><span class="type">::eye</span>(<span class="number">4</span>,<span class="number">4</span>,Tcw.<span class="keyword">type</span>());</span><br><span class="line">    Rwc.copyTo(Twc.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>));</span><br><span class="line">    Ow.copyTo(Twc.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>));</span><br><span class="line">    <span class="comment">// center为相机坐标系（左目）下，立体相机中心的坐标</span></span><br><span class="line">    <span class="comment">// 立体相机中心点坐标与左目相机坐标之间只是在x轴上相差mHalfBaseline,</span></span><br><span class="line">    <span class="comment">// 因此可以看出，立体相机中两个摄像头的连线为x轴，正方向为左目相机指向右目相机</span></span><br><span class="line">    cv<span class="type">::Mat</span> center = (cv<span class="type">::Mat_</span>&lt;float&gt;(<span class="number">4</span>,<span class="number">1</span>) &lt;&lt; mHalfBaseline, <span class="number">0</span> , <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 世界坐标系下，左目相机中心到立体相机中心的向量，方向由左目相机指向立体相机中心</span></span><br><span class="line">    Cw = Twc*center;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-4-GetPose"><a href="#2-4-GetPose" class="headerlink" title="2.4 GetPose"></a>2.4 GetPose</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetPose()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Tcw.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-5-GetPoseInverse"><a href="#2-5-GetPoseInverse" class="headerlink" title="2.5 GetPoseInverse"></a>2.5 GetPoseInverse</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetPoseInverse()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Twc.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-6-GetCameraCenter"><a href="#2-6-GetCameraCenter" class="headerlink" title="2.6 GetCameraCenter"></a>2.6 GetCameraCenter</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetCameraCenter()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Ow.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-7-GetStereoCenter"><a href="#2-7-GetStereoCenter" class="headerlink" title="2.7 GetStereoCenter"></a>2.7 GetStereoCenter</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetStereoCenter()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Cw.<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-8-GetRotation"><a href="#2-8-GetRotation" class="headerlink" title="2.8 GetRotation"></a>2.8 GetRotation</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetRotation()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>).<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-9-GetTranslation"><a href="#2-9-GetTranslation" class="headerlink" title="2.9 GetTranslation"></a>2.9 GetTranslation</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cv::Mat KeyFrame::GetTranslation()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">    <span class="keyword">return</span> Tcw.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>).<span class="keyword">clone</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-10-为关键帧之间添加连接"><a href="#2-10-为关键帧之间添加连接" class="headerlink" title="2.10 为关键帧之间添加连接"></a>2.10 为关键帧之间添加连接</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 为关键帧之间添加连接</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 更新了mConnectedKeyFrameWeights</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> pKF    关键帧</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> weight 权重，该关键帧与pKF共同观测到的3d点数量</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> KeyFrame::AddConnection(KeyFrame *pKF, <span class="keyword">const</span> <span class="keyword">int</span> &amp;weight)</span><br><span class="line">&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">unique_lock&lt;mutex&gt; <span class="title">lock</span><span class="params">(mMutexConnections)</span></span>;</span><br><span class="line">        <span class="comment">// std::map::count函数只可能返回0或1两种情况</span></span><br><span class="line">        <span class="keyword">if</span>(!mConnectedKeyFrameWeights.count(pKF)) <span class="comment">// count函数返回0，mConnectedKeyFrameWeights中没有pKF，之前没有连接</span></span><br><span class="line">            mConnectedKeyFrameWeights[pKF]=weight;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(mConnectedKeyFrameWeights[pKF]!=weight) <span class="comment">// 之前连接的权重不一样</span></span><br><span class="line">            mConnectedKeyFrameWeights[pKF]=weight;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    UpdateBestCovisibles();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-11-按权重对关键帧进行排序-从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中"><a href="#2-11-按权重对关键帧进行排序-从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中" class="headerlink" title="2.11 按权重对关键帧进行排序,从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中"></a>2.11 按权重对关键帧进行排序,从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 按照权重对连接的关键帧进行排序</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 更新后的变量存储在mvpOrderedConnectedKeyFrames和mvOrderedWeights中</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> KeyFrame::UpdateBestCovisibles()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="comment">// http://stackoverflow.com/questions/3389648/difference-between-stdliststdpair-and-stdmap-in-c-stl</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>,KeyFrame*&gt; &gt; vPairs;</span><br><span class="line">    vPairs.reserve(mConnectedKeyFrameWeights.size());</span><br><span class="line">    <span class="comment">// 取出所有连接的关键帧，mConnectedKeyFrameWeights的类型为std::map&lt;KeyFrame*,int&gt;，而vPairs变量将共视的3D点数放在前面，利于排序</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">int</span>&gt;::iterator mit=mConnectedKeyFrameWeights.begin(), mend=mConnectedKeyFrameWeights.end(); mit!=mend; mit++)</span><br><span class="line">       vPairs.push_back(make_pair(mit-&gt;second,mit-&gt;first));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 按照权重进行排序</span></span><br><span class="line">    sort(vPairs.begin(),vPairs.end());</span><br><span class="line">    <span class="built_in">list</span>&lt;KeyFrame*&gt; lKFs; <span class="comment">// keyframe</span></span><br><span class="line">    <span class="built_in">list</span>&lt;<span class="keyword">int</span>&gt; lWs; <span class="comment">// weight</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>, iend=vPairs.size(); i&lt;iend;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        lKFs.push_front(vPairs[i].second);</span><br><span class="line">        lWs.push_front(vPairs[i].first);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 权重从大到小</span></span><br><span class="line">    mvpOrderedConnectedKeyFrames = <span class="built_in">vector</span>&lt;KeyFrame*&gt;(lKFs.begin(),lKFs.end());</span><br><span class="line">    mvOrderedWeights = <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(lWs.begin(), lWs.end());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-12-得到与该关键帧连接的关键帧，返回的是是关键帧set"><a href="#2-12-得到与该关键帧连接的关键帧，返回的是是关键帧set" class="headerlink" title="2.12 得到与该关键帧连接的关键帧，返回的是是关键帧set"></a>2.12 得到与该关键帧连接的关键帧，返回的是是关键帧set</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 得到与该关键帧连接的关键帧</span></span><br><span class="line"><span class="comment"> * @return 连接的关键帧</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">set</span>&lt;KeyFrame*&gt; KeyFrame::GetConnectedKeyFrames()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="built_in">set</span>&lt;KeyFrame*&gt; s;</span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">int</span>&gt;::iterator mit=mConnectedKeyFrameWeights.begin();mit!=mConnectedKeyFrameWeights.end();mit++)</span><br><span class="line">        s.insert(mit-&gt;first);</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-13-得到与该关键帧连接的关键帧-已按权值排序-返回mvpOrderedConnectedKeyFrames，是一个vector"><a href="#2-13-得到与该关键帧连接的关键帧-已按权值排序-返回mvpOrderedConnectedKeyFrames，是一个vector" class="headerlink" title="2.13 得到与该关键帧连接的关键帧(已按权值排序),返回mvpOrderedConnectedKeyFrames，是一个vector"></a>2.13 得到与该关键帧连接的关键帧(已按权值排序),返回mvpOrderedConnectedKeyFrames，是一个vector</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 得到与该关键帧连接的关键帧(已按权值排序)</span></span><br><span class="line"><span class="comment"> * @return 连接的关键帧</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">vector</span>&lt;KeyFrame*&gt; KeyFrame::GetVectorCovisibleKeyFrames()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mvpOrderedConnectedKeyFrames;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-14-得到与该关键帧连接的前N个关键帧-已按权值排序"><a href="#2-14-得到与该关键帧连接的前N个关键帧-已按权值排序" class="headerlink" title="2.14 得到与该关键帧连接的前N个关键帧(已按权值排序)"></a>2.14 得到与该关键帧连接的前N个关键帧(已按权值排序)</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 得到与该关键帧连接的前N个关键帧(已按权值排序)</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 如果连接的关键帧少于N，则返回所有连接的关键帧</span></span><br><span class="line"><span class="comment"> * @param N 前N个</span></span><br><span class="line"><span class="comment"> * @return 连接的关键帧</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">vector</span>&lt;KeyFrame*&gt; KeyFrame::GetBestCovisibilityKeyFrames(<span class="keyword">const</span> <span class="keyword">int</span> &amp;N)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="keyword">if</span>((<span class="keyword">int</span>)mvpOrderedConnectedKeyFrames.size()&lt;N)</span><br><span class="line">        <span class="keyword">return</span> mvpOrderedConnectedKeyFrames;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">vector</span>&lt;KeyFrame*&gt;(mvpOrderedConnectedKeyFrames.begin(),mvpOrderedConnectedKeyFrames.begin()+N);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-15-得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序"><a href="#2-15-得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序" class="headerlink" title="2.15 得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序"></a>2.15 得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 得到与该关键帧连接的权重大于等于w的关键帧</span></span><br><span class="line"><span class="comment"> * @param w 权重</span></span><br><span class="line"><span class="comment"> * @return 连接的关键帧</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">vector</span>&lt;KeyFrame*&gt; KeyFrame::GetCovisiblesByWeight(<span class="keyword">const</span> <span class="keyword">int</span> &amp;w)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(mvpOrderedConnectedKeyFrames.empty())</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">vector</span>&lt;KeyFrame*&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// http://www.cplusplus.com/reference/algorithm/upper_bound/</span></span><br><span class="line">    <span class="comment">// 从mvOrderedWeights找出第一个大于w的那个迭代器</span></span><br><span class="line">    <span class="comment">// 这里应该使用lower_bound，因为lower_bound是返回小于等于，而upper_bound只能返回第一个大于的</span></span><br><span class="line">    <span class="comment">// 自注释：这里没问题，因为自定义的比较函数weightComp是按大于排序的</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;::iterator it = upper_bound(mvOrderedWeights.begin(),mvOrderedWeights.end(),w,KeyFrame::weightComp);</span><br><span class="line">    <span class="keyword">if</span>(it==mvOrderedWeights.end() &amp;&amp; *mvOrderedWeights.rbegin()&lt;w)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">vector</span>&lt;KeyFrame*&gt;();</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> n = it-mvOrderedWeights.begin();</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">vector</span>&lt;KeyFrame*&gt;(mvpOrderedConnectedKeyFrames.begin(), mvpOrderedConnectedKeyFrames.begin()+n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-16-得到该关键帧与pKF的权重"><a href="#2-16-得到该关键帧与pKF的权重" class="headerlink" title="2.16 得到该关键帧与pKF的权重"></a>2.16 得到该关键帧与pKF的权重</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 得到该关键帧与pKF的权重</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  pKF 关键帧</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>     权重</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">int</span> KeyFrame::GetWeight(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="keyword">if</span>(mConnectedKeyFrameWeights.count(pKF))</span><br><span class="line">        <span class="keyword">return</span> mConnectedKeyFrameWeights[pKF];</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-17-在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号"><a href="#2-17-在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号" class="headerlink" title="2.17 在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号"></a>2.17 在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> Add MapPoint to KeyFrame</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> pMP MapPoint</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> idx MapPoint在KeyFrame中的索引</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> KeyFrame::AddMapPoint(MapPoint *pMP, <span class="keyword">const</span> size_t &amp;idx)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function">unique_lock&lt;mutex&gt; <span class="title">lock</span><span class="params">(mMutexFeatures)</span></span>;</span><br><span class="line">    mvpMapPoints[idx]=pMP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-18-传入地图点序号，清除地图点"><a href="#2-18-传入地图点序号，清除地图点" class="headerlink" title="2.18 传入地图点序号，清除地图点"></a>2.18 传入地图点序号，清除地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::EraseMapPointMatch(<span class="keyword">const</span> <span class="keyword">size_t</span> &amp;idx)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    mvpMapPoints[idx]=<span class="keyword">static_cast</span>&lt;MapPoint*&gt;(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-19-传入地图点指针，清除地图点"><a href="#2-19-传入地图点指针，清除地图点" class="headerlink" title="2.19 传入地图点指针，清除地图点"></a>2.19 传入地图点指针，清除地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::EraseMapPointMatch(MapPoint* pMP)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> idx = pMP-&gt;GetIndexInKeyFrame(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">if</span>(idx&gt;=<span class="number">0</span>)</span><br><span class="line">        mvpMapPoints[idx]=<span class="keyword">static_cast</span>&lt;MapPoint*&gt;(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-20-传入地图点序号和新的地图点指针，替换原来的地图点"><a href="#2-20-传入地图点序号和新的地图点指针，替换原来的地图点" class="headerlink" title="2.20 传入地图点序号和新的地图点指针，替换原来的地图点"></a>2.20 传入地图点序号和新的地图点指针，替换原来的地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::ReplaceMapPointMatch(<span class="keyword">const</span> <span class="keyword">size_t</span> &amp;idx, MapPoint* pMP)</span><br><span class="line">&#123;</span><br><span class="line">    mvpMapPoints[idx]=pMP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-21-返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点"><a href="#2-21-返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点" class="headerlink" title="2.21 返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点"></a>2.21 返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span>&lt;MapPoint*&gt; KeyFrame::GetMapPoints()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="built_in">set</span>&lt;MapPoint*&gt; s;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>, iend=mvpMapPoints.size(); i&lt;iend; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(!mvpMapPoints[i])</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        MapPoint* pMP = mvpMapPoints[i];</span><br><span class="line">        <span class="keyword">if</span>(!pMP-&gt;isBad())</span><br><span class="line">            s.insert(pMP);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-22-关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值"><a href="#2-22-关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值" class="headerlink" title="2.22 关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值"></a>2.22 关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 关键帧中，大于等于minObs的MapPoints的数量</span></span><br><span class="line"><span class="comment"> * minObs就是一个阈值，大于minObs就表示该MapPoint是一个高质量的MapPoint</span></span><br><span class="line"><span class="comment"> * 一个高质量的MapPoint会被多个KeyFrame观测到，</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  minObs 最小观测</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">int</span> KeyFrame::TrackedMapPoints(<span class="keyword">const</span> <span class="keyword">int</span> &amp;minObs)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> nPoints=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">bool</span> bCheckObs = minObs&gt;<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        MapPoint* pMP = mvpMapPoints[i];</span><br><span class="line">        <span class="keyword">if</span>(pMP)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!pMP-&gt;isBad())</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span>(bCheckObs)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 该MapPoint是一个高质量的MapPoint</span></span><br><span class="line">                    <span class="keyword">if</span>(mvpMapPoints[i]-&gt;Observations()&gt;=minObs)</span><br><span class="line">                        nPoints++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    nPoints++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nPoints;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-23-获得该关键帧所有的MapPoints"><a href="#2-23-获得该关键帧所有的MapPoints" class="headerlink" title="2.23 获得该关键帧所有的MapPoints"></a>2.23 获得该关键帧所有的MapPoints</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Get MapPoint Matches</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 获取该关键帧的MapPoints</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">vector</span>&lt;MapPoint*&gt; KeyFrame::GetMapPointMatches()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> mvpMapPoints;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-24-通过地图点的序号来获得关键帧地图点"><a href="#2-24-通过地图点的序号来获得关键帧地图点" class="headerlink" title="2.24 通过地图点的序号来获得关键帧地图点"></a>2.24 通过地图点的序号来获得关键帧地图点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MapPoint* KeyFrame::GetMapPoint(<span class="keyword">const</span> <span class="keyword">size_t</span> &amp;idx)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">    <span class="keyword">return</span> mvpMapPoints[idx];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-25-新建一个关键帧后，更新共视图的连接"><a href="#2-25-新建一个关键帧后，更新共视图的连接" class="headerlink" title="2.25 新建一个关键帧后，更新共视图的连接"></a>2.25 新建一个关键帧后，更新共视图的连接</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief 更新图的连接</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * 1. 首先获得该关键帧的所有MapPoint点，统计观测到这些3d点的每个关键帧与该帧图像的共视程度，</span></span><br><span class="line"><span class="comment"> *    对每一个找到的关键帧，建立一条边，边的权重是该关键帧与当前关键帧公共3d点的个数。</span></span><br><span class="line"><span class="comment"> * 2. 并且该权重必须大于一个阈值，如果没有超过该阈值的权重，那么就只保留权重最大的边（与其它关键帧的共视程度比较高）</span></span><br><span class="line"><span class="comment"> * 3. 对这些连接按照权重从大到小进行排序，以方便将来的处理</span></span><br><span class="line"><span class="comment"> *    更新完covisibility图之后，如果没有初始化过，则初始化为连接权重最大的边（与其它关键帧共视程度最高的那个关键帧），类似于最大生成树</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">void</span> KeyFrame::UpdateConnections()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 在没有执行这个函数前，关键帧只和MapPoints之间有连接关系，这个函数可以更新关键帧之间的连接关系</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//===============1==================================</span></span><br><span class="line">    <span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">int</span>&gt; KFcounter; <span class="comment">// 关键帧-权重，权重为其它关键帧与当前关键帧共视3d点的个数</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">vector</span>&lt;MapPoint*&gt; vpMP;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 获得该关键帧的所有3D点</span></span><br><span class="line">        unique_lock&lt;mutex&gt; lockMPs(mMutexFeatures);</span><br><span class="line">        vpMP = mvpMapPoints;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//For all map points in keyframe check in which other keyframes are they seen</span></span><br><span class="line">    <span class="comment">//Increase counter for those keyframes</span></span><br><span class="line">    <span class="comment">// 通过3D点间接统计可以观测到这些3D点的所有关键帧之间的共视程度</span></span><br><span class="line">    <span class="comment">// 即统计每一个关键帧都有多少关键帧与它存在共视关系，统计结果放在KFcounter</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">vector</span>&lt;MapPoint*&gt;::iterator vit=vpMP.begin(), vend=vpMP.end(); vit!=vend; vit++)</span><br><span class="line">    &#123;</span><br><span class="line">        MapPoint* pMP = *vit;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(!pMP)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(pMP-&gt;isBad())</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 对于每一个MapPoint点，observations记录了可以观测到该MapPoint的所有关键帧</span></span><br><span class="line">        <span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt; observations = pMP-&gt;GetObservations();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">size_t</span>&gt;::iterator mit=observations.begin(), mend=observations.end(); mit!=mend; mit++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 除去自身，自己与自己不算共视</span></span><br><span class="line">            <span class="keyword">if</span>(mit-&gt;first-&gt;mnId==mnId)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            KFcounter[mit-&gt;first]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This should not happen</span></span><br><span class="line">    <span class="keyword">if</span>(KFcounter.empty())</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//===============2==================================</span></span><br><span class="line">    <span class="comment">// If the counter is greater than threshold add connection</span></span><br><span class="line">    <span class="comment">// In case no keyframe counter is over threshold add the one with maximum counter</span></span><br><span class="line">    <span class="keyword">int</span> nmax=<span class="number">0</span>;</span><br><span class="line">    KeyFrame* pKFmax=<span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">int</span> th = <span class="number">15</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// vPairs记录与其它关键帧共视帧数大于th的关键帧</span></span><br><span class="line">    <span class="comment">// pair&lt;int,KeyFrame*&gt;将关键帧的权重写在前面，关键帧写在后面方便后面排序</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;pair&lt;<span class="keyword">int</span>,KeyFrame*&gt; &gt; vPairs;</span><br><span class="line">    vPairs.reserve(KFcounter.size());</span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">map</span>&lt;KeyFrame*,<span class="keyword">int</span>&gt;::iterator mit=KFcounter.begin(), mend=KFcounter.end(); mit!=mend; mit++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(mit-&gt;second&gt;nmax)</span><br><span class="line">        &#123;</span><br><span class="line">            nmax=mit-&gt;second;</span><br><span class="line">            <span class="comment">// 找到对应权重最大的关键帧（共视程度最高的关键帧）</span></span><br><span class="line">            pKFmax=mit-&gt;first;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(mit-&gt;second&gt;=th)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 对应权重需要大于阈值，对这些关键帧建立连接</span></span><br><span class="line">            vPairs.push_back(make_pair(mit-&gt;second,mit-&gt;first));</span><br><span class="line">            <span class="comment">// 更新KFcounter中该关键帧的mConnectedKeyFrameWeights</span></span><br><span class="line">            <span class="comment">// 更新其它KeyFrame的mConnectedKeyFrameWeights，更新其它关键帧与当前帧的连接权重</span></span><br><span class="line">            (mit-&gt;first)-&gt;AddConnection(<span class="keyword">this</span>,mit-&gt;second);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果没有超过阈值的权重，则对权重最大的关键帧建立连接</span></span><br><span class="line">    <span class="keyword">if</span>(vPairs.empty())</span><br><span class="line">    &#123;</span><br><span class="line">	    <span class="comment">// 如果每个关键帧与它共视的关键帧的个数都少于th，</span></span><br><span class="line">        <span class="comment">// 那就只更新与其它关键帧共视程度最高的关键帧的mConnectedKeyFrameWeights</span></span><br><span class="line">        <span class="comment">// 这是对之前th这个阈值可能过高的一个补丁</span></span><br><span class="line">        vPairs.push_back(make_pair(nmax,pKFmax));</span><br><span class="line">        pKFmax-&gt;AddConnection(<span class="keyword">this</span>,nmax);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// vPairs里存的都是相互共视程度比较高的关键帧和共视权重，由小到大</span></span><br><span class="line">    sort(vPairs.begin(),vPairs.end());</span><br><span class="line">    <span class="comment">// lKFs 和 lWs 排序都是从大到小</span></span><br><span class="line">    <span class="built_in">list</span>&lt;KeyFrame*&gt; lKFs;</span><br><span class="line">    <span class="built_in">list</span>&lt;<span class="keyword">int</span>&gt; lWs;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">size_t</span> i=<span class="number">0</span>; i&lt;vPairs.size();i++)</span><br><span class="line">    &#123;</span><br><span class="line">        lKFs.push_front(vPairs[i].second);</span><br><span class="line">        lWs.push_front(vPairs[i].first);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//===============3==================================</span></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// mspConnectedKeyFrames = spConnectedKeyFrames;</span></span><br><span class="line">        <span class="comment">// 更新图的连接(权重)</span></span><br><span class="line">        mConnectedKeyFrameWeights = KFcounter;<span class="comment">//更新该KeyFrame的mConnectedKeyFrameWeights，更新当前帧与其它关键帧的连接权重</span></span><br><span class="line">        mvpOrderedConnectedKeyFrames = <span class="built_in">vector</span>&lt;KeyFrame*&gt;(lKFs.begin(),lKFs.end());</span><br><span class="line">        mvOrderedWeights = <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(lWs.begin(), lWs.end());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更新生成树的连接</span></span><br><span class="line">        <span class="keyword">if</span>(mbFirstConnection &amp;&amp; mnId!=<span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 初始化该关键帧的父关键帧为共视程度最高的那个关键帧</span></span><br><span class="line">            mpParent = mvpOrderedConnectedKeyFrames.front();</span><br><span class="line">            <span class="comment">// 建立双向连接关系</span></span><br><span class="line">            mpParent-&gt;AddChild(<span class="keyword">this</span>);</span><br><span class="line">            mbFirstConnection = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-26-增加子树节点"><a href="#2-26-增加子树节点" class="headerlink" title="2.26 增加子树节点"></a>2.26 增加子树节点</h4><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void KeyFrame::<span class="keyword">AddChild(KeyFrame </span>*pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections)<span class="comment">;</span></span><br><span class="line">    mspChildrens.<span class="keyword">insert(pKF);</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="2-27-删除子树节点"><a href="#2-27-删除子树节点" class="headerlink" title="2.27 删除子树节点"></a>2.27 删除子树节点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::EraseChild(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    mspChildrens.erase(pKF);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-28-改变父节点"><a href="#2-28-改变父节点" class="headerlink" title="2.28 改变父节点"></a>2.28 改变父节点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::ChangeParent(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    mpParent = pKF;</span><br><span class="line">    pKF-&gt;AddChild(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-29-获得所有子树节点set"><a href="#2-29-获得所有子树节点set" class="headerlink" title="2.29 获得所有子树节点set"></a>2.29 获得所有子树节点set</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span>&lt;KeyFrame*&gt; KeyFrame::GetChilds()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mspChildrens;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-30-获得该帧的父节点"><a href="#2-30-获得该帧的父节点" class="headerlink" title="2.30 获得该帧的父节点"></a>2.30 获得该帧的父节点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KeyFrame* KeyFrame::GetParent()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mpParent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-31-判断某一帧是否含有某一个关键帧子节点"><a href="#2-31-判断某一帧是否含有某一个关键帧子节点" class="headerlink" title="2.31 判断某一帧是否含有某一个关键帧子节点"></a>2.31 判断某一帧是否含有某一个关键帧子节点</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> KeyFrame::hasChild(KeyFrame *pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mspChildrens.count(pKF);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-32-将某一关键帧加入回环边集合"><a href="#2-32-将某一关键帧加入回环边集合" class="headerlink" title="2.32 将某一关键帧加入回环边集合"></a>2.32 将某一关键帧加入回环边集合</h4><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void KeyFrame::<span class="keyword">AddLoopEdge(KeyFrame </span>*pKF)</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections)<span class="comment">;</span></span><br><span class="line">    mbNotErase = true<span class="comment">;</span></span><br><span class="line">    mspLoopEdges.<span class="keyword">insert(pKF);</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="2-33-获得回环关键帧集合"><a href="#2-33-获得回环关键帧集合" class="headerlink" title="2.33 获得回环关键帧集合"></a>2.33 获得回环关键帧集合</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span>&lt;KeyFrame*&gt; KeyFrame::GetLoopEdges()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lockCon(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mspLoopEdges;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-34-设置某一关键帧不可擦除"><a href="#2-34-设置某一关键帧不可擦除" class="headerlink" title="2.34 设置某一关键帧不可擦除"></a>2.34 设置某一关键帧不可擦除</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> KeyFrame::SetNotErase()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    mbNotErase = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-35-删除关键帧，修改父子连接关系"><a href="#2-35-删除关键帧，修改父子连接关系" class="headerlink" title="2.35 删除关键帧，修改父子连接关系"></a>2.35 删除关键帧，修改父子连接关系</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">void KeyFrame::SetBadFlag()</span><br><span class="line">&#123;   </span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">        <span class="keyword">if</span>(mnId==<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(mbNotErase)<span class="comment">// mbNotErase表示不应该擦除该KeyFrame，于是把mbToBeErased置为true，表示已经擦除了，其实没有擦除</span></span><br><span class="line">        &#123;</span><br><span class="line">            mbToBeErased = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(map&lt;KeyFrame*,int&gt;::iterator mit = mConnectedKeyFrameWeights.begin(), mend=mConnectedKeyFrameWeights.end(); mit!=mend; mit++)</span><br><span class="line">        mit-&gt;first-&gt;EraseConnection(this);<span class="comment">// 让其它的KeyFrame删除与自己的联系</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(size_t i=<span class="number">0</span>; i&lt;mvpMapPoints.size(); i++)</span><br><span class="line">        <span class="keyword">if</span>(mvpMapPoints[i])</span><br><span class="line">            mvpMapPoints[i]-&gt;EraseObservation(this);<span class="comment">// 让与自己有联系的MapPoint删除与自己的联系</span></span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">        unique_lock&lt;mutex&gt; lock1(mMutexFeatures);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//清空自己与其它关键帧之间的联系</span></span><br><span class="line">        mConnectedKeyFrameWeights.clear();</span><br><span class="line">        mvpOrderedConnectedKeyFrames.clear();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Update Spanning Tree</span></span><br><span class="line">        set&lt;KeyFrame*&gt; sParentCandidates;</span><br><span class="line">        sParentCandidates.insert(mpParent);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Assign at each iteration one children with a parent (the pair with highest covisibility weight)</span></span><br><span class="line">        <span class="comment">// Include that children as new parent candidate for the rest</span></span><br><span class="line">        <span class="comment">// 如果这个关键帧有自己的孩子关键帧，告诉这些子关键帧，它们的父关键帧不行了，赶紧找新的父关键帧</span></span><br><span class="line">        <span class="keyword">while</span>(!mspChildrens.<span class="keyword">empty</span>())</span><br><span class="line">        &#123;</span><br><span class="line">            bool bContinue = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">            int max = <span class="number">-1</span>;</span><br><span class="line">            KeyFrame* pC;</span><br><span class="line">            KeyFrame* pP;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 遍历每一个子关键帧，让它们更新它们指向的父关键帧</span></span><br><span class="line">            <span class="keyword">for</span>(set&lt;KeyFrame*&gt;::iterator sit=mspChildrens.begin(), send=mspChildrens.end(); sit!=send; sit++)</span><br><span class="line">            &#123;</span><br><span class="line">                KeyFrame* pKF = *sit;</span><br><span class="line">                <span class="keyword">if</span>(pKF-&gt;isBad())</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Check if a parent candidate is connected to the keyframe</span></span><br><span class="line">                <span class="comment">// 子关键帧遍历每一个与它相连的关键帧（共视关键帧）</span></span><br><span class="line">                vector&lt;KeyFrame*&gt; vpConnected = pKF-&gt;GetVectorCovisibleKeyFrames();</span><br><span class="line">                <span class="keyword">for</span>(size_t i=<span class="number">0</span>, iend=vpConnected.size(); i&lt;iend; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">for</span>(set&lt;KeyFrame*&gt;::iterator spcit=sParentCandidates.begin(), spcend=sParentCandidates.end(); spcit!=spcend; spcit++)</span><br><span class="line">                    &#123;</span><br><span class="line">                    <span class="comment">// 如果该帧的子节点和父节点（祖孙节点）之间存在连接关系（共视）</span></span><br><span class="line">                    <span class="comment">// 举例：B--&gt;A（B的父节点是A） C--&gt;B（C的父节点是B） D--C（D与C相连） E--C（E与C相连） F--C（F与C相连） D--&gt;A（D的父节点是A） E--&gt;A（E的父节点是A）</span></span><br><span class="line">                    <span class="comment">//      现在B挂了，于是C在与自己相连的D、E、F节点中找到父节点指向A的D</span></span><br><span class="line">                    <span class="comment">//      此过程就是为了找到可以替换B的那个节点。</span></span><br><span class="line">                    <span class="comment">// 上面例子中，B为当前要设置为SetBadFlag的关键帧</span></span><br><span class="line">                    <span class="comment">//           A为spcit，也即sParentCandidates</span></span><br><span class="line">                    <span class="comment">//           C为pKF,pC，也即mspChildrens中的一个</span></span><br><span class="line">                    <span class="comment">//           D、E、F为vpConnected中的变量，由于C与D间的权重 比 C与E间的权重大，因此D为pP</span></span><br><span class="line">                        <span class="keyword">if</span>(vpConnected[i]-&gt;mnId == (*spcit)-&gt;mnId)</span><br><span class="line">                        &#123;</span><br><span class="line">                            int w = pKF-&gt;GetWeight(vpConnected[i]);</span><br><span class="line">                            <span class="keyword">if</span>(w&gt;max)</span><br><span class="line">                            &#123;</span><br><span class="line">                                pC = pKF;</span><br><span class="line">                                pP = vpConnected[i];</span><br><span class="line">                                max = w;</span><br><span class="line">                                bContinue = <span class="keyword">true</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(bContinue)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// 因为父节点死了，并且子节点找到了新的父节点，子节点更新自己的父节点</span></span><br><span class="line">                pC-&gt;ChangeParent(pP);</span><br><span class="line">                <span class="comment">// 因为子节点找到了新的父节点并更新了父节点，那么该子节点升级，作为其它子节点的备选父节点</span></span><br><span class="line">                sParentCandidates.insert(pC);</span><br><span class="line">                <span class="comment">// 该子节点处理完毕</span></span><br><span class="line">                mspChildrens.erase(pC);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If a children has no covisibility links with any parent candidate, assign to the original parent of this KF</span></span><br><span class="line">        <span class="comment">// 如果还有子节点没有找到新的父节点</span></span><br><span class="line">        <span class="keyword">if</span>(!mspChildrens.<span class="keyword">empty</span>())</span><br><span class="line">            <span class="keyword">for</span>(set&lt;KeyFrame*&gt;::iterator sit=mspChildrens.begin(); sit!=mspChildrens.end(); sit++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// 直接把父节点的父节点作为自己的父节点</span></span><br><span class="line">                (*sit)-&gt;ChangeParent(mpParent);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        mpParent-&gt;EraseChild(this);</span><br><span class="line">        mTcp = Tcw*mpParent-&gt;GetPoseInverse();</span><br><span class="line">        mbBad = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    mpMap-&gt;EraseKeyFrame(this);</span><br><span class="line">    mpKeyFrameDB-&gt;erase(this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-36-判断一帧图像是否是坏帧，即是否已经被删除"><a href="#2-36-判断一帧图像是否是坏帧，即是否已经被删除" class="headerlink" title="2.36 判断一帧图像是否是坏帧，即是否已经被删除"></a>2.36 判断一帧图像是否是坏帧，即是否已经被删除</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> KeyFrame::isBad()</span><br><span class="line">&#123;</span><br><span class="line">    unique_lock&lt;mutex&gt; lock(mMutexConnections);</span><br><span class="line">    <span class="keyword">return</span> mbBad;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-37-删除与某一帧的联系，并没有删除该关键帧"><a href="#2-37-删除与某一帧的联系，并没有删除该关键帧" class="headerlink" title="2.37 删除与某一帧的联系，并没有删除该关键帧"></a>2.37 删除与某一帧的联系，并没有删除该关键帧</h4><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void KeyFrame::EraseConnection(KeyFrame* pKF)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">bool </span><span class="keyword">bUpdate </span>= false<span class="comment">;</span></span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexConnections)<span class="comment">;</span></span><br><span class="line">        if(mConnectedKeyFrameWeights.count(pKF))</span><br><span class="line">        &#123;</span><br><span class="line">            mConnectedKeyFrameWeights.erase(pKF)<span class="comment">;</span></span><br><span class="line">            <span class="keyword">bUpdate=true;</span></span><br><span class="line"><span class="keyword"> </span>       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if(<span class="keyword">bUpdate)</span></span><br><span class="line"><span class="keyword"> </span>       UpdateBestCovisibles()<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-38-找到在以x-y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数"><a href="#2-38-找到在以x-y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数" class="headerlink" title="2.38 找到在以x,y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数"></a>2.38 找到在以x,y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// r为边长（半径）</span></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; KeyFrame::GetFeaturesInArea(<span class="keyword">const</span> <span class="keyword">float</span> &amp;x, <span class="keyword">const</span> <span class="keyword">float</span> &amp;y, <span class="keyword">const</span> <span class="keyword">float</span> &amp;r) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; vIndices;</span><br><span class="line">    vIndices.reserve(N);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// floor向下取整，mfGridElementWidthInv为每个像素占多少个格子</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMinCellX = max(<span class="number">0</span>,(<span class="keyword">int</span>)<span class="built_in">floor</span>((x-mnMinX-r)*mfGridElementWidthInv));</span><br><span class="line">    <span class="keyword">if</span>(nMinCellX&gt;=mnGridCols)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ceil向上取整</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMaxCellX = min((<span class="keyword">int</span>)mnGridCols<span class="number">-1</span>,(<span class="keyword">int</span>)<span class="built_in">ceil</span>((x-mnMinX+r)*mfGridElementWidthInv));</span><br><span class="line">    <span class="keyword">if</span>(nMaxCellX&lt;<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMinCellY = max(<span class="number">0</span>,(<span class="keyword">int</span>)<span class="built_in">floor</span>((y-mnMinY-r)*mfGridElementHeightInv));</span><br><span class="line">    <span class="keyword">if</span>(nMinCellY&gt;=mnGridRows)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> nMaxCellY = min((<span class="keyword">int</span>)mnGridRows<span class="number">-1</span>,(<span class="keyword">int</span>)<span class="built_in">ceil</span>((y-mnMinY+r)*mfGridElementHeightInv));</span><br><span class="line">    <span class="keyword">if</span>(nMaxCellY&lt;<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> vIndices;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> ix = nMinCellX; ix&lt;=nMaxCellX; ix++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> iy = nMinCellY; iy&lt;=nMaxCellY; iy++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">const</span> <span class="built_in">vector</span>&lt;<span class="keyword">size_t</span>&gt; vCell = mGrid[ix][iy];</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">size_t</span> j=<span class="number">0</span>, jend=vCell.size(); j&lt;jend; j++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">const</span> cv::KeyPoint &amp;kpUn = mvKeysUn[vCell[j]];</span><br><span class="line">                <span class="keyword">const</span> <span class="keyword">float</span> distx = kpUn.pt.x-x;</span><br><span class="line">                <span class="keyword">const</span> <span class="keyword">float</span> disty = kpUn.pt.y-y;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">fabs</span>(distx)&lt;r &amp;&amp; <span class="built_in">fabs</span>(disty)&lt;r)</span><br><span class="line">                    vIndices.push_back(vCell[j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> vIndices;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-39-判断某个坐标点是否在图像内"><a href="#2-39-判断某个坐标点是否在图像内" class="headerlink" title="2.39 判断某个坐标点是否在图像内"></a>2.39 判断某个坐标点是否在图像内</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> KeyFrame::IsInImage(<span class="keyword">const</span> <span class="keyword">float</span> &amp;x, <span class="keyword">const</span> <span class="keyword">float</span> &amp;y) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> (x&gt;=mnMinX &amp;&amp; x&lt;mnMaxX &amp;&amp; y&gt;=mnMinY &amp;&amp; y&lt;mnMaxY);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-40-双目立体投影"><a href="#2-40-双目立体投影" class="headerlink" title="2.40 双目立体投影"></a>2.40 双目立体投影</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> Backprojects a keypoint (if stereo/depth info available) into 3D world coordinates.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  i 第i个keypoint</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>   3D点（相对于世界坐标系）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">cv::Mat KeyFrame::UnprojectStereo(<span class="keyword">int</span> i)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">float</span> z = mvDepth[i];</span><br><span class="line">    <span class="keyword">if</span>(z&gt;<span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 由2维图像反投影到相机坐标系</span></span><br><span class="line">        <span class="comment">// mvDepth是在ComputeStereoMatches函数中求取的</span></span><br><span class="line">        <span class="comment">// mvDepth对应的校正前的特征点，因此这里对校正前特征点反投影</span></span><br><span class="line">        <span class="comment">// 可在Frame::UnprojectStereo中却是对校正后的特征点mvKeysUn反投影</span></span><br><span class="line">        <span class="comment">// 在ComputeStereoMatches函数中应该对校正后的特征点求深度？？ (wubo???)</span></span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">float</span> u = mvKeys[i].pt.x;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">float</span> v = mvKeys[i].pt.y;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">float</span> x = (u-cx)*z*invfx;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">float</span> y = (v-cy)*z*invfy;</span><br><span class="line">        cv::Mat x3Dc = (cv::Mat_&lt;<span class="keyword">float</span>&gt;(<span class="number">3</span>,<span class="number">1</span>) &lt;&lt; x, y, z);</span><br><span class="line"></span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexPose);</span><br><span class="line">        <span class="comment">// 由相机坐标系转换到世界坐标系</span></span><br><span class="line">        <span class="comment">// Twc为相机坐标系到世界坐标系的变换矩阵</span></span><br><span class="line">        <span class="comment">// Twc.rosRange(0,3).colRange(0,3)取Twc矩阵的前3行与前3列</span></span><br><span class="line">        <span class="keyword">return</span> Twc.rowRange(<span class="number">0</span>,<span class="number">3</span>).colRange(<span class="number">0</span>,<span class="number">3</span>)*x3Dc+Twc.rowRange(<span class="number">0</span>,<span class="number">3</span>).col(<span class="number">3</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> cv::Mat();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-41-计算并返回所有地图点的深度中值"><a href="#2-41-计算并返回所有地图点的深度中值" class="headerlink" title="2.41 计算并返回所有地图点的深度中值"></a>2.41 计算并返回所有地图点的深度中值</h4><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@brief</span> 评估当前关键帧场景深度，q=2表示中值</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> q q=2</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> Median Depth</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">float</span> KeyFrame::ComputeSceneMedianDepth(<span class="keyword">const</span> <span class="keyword">int</span> q)</span><br><span class="line">&#123;</span><br><span class="line">    vector&lt;MapPoint*&gt; vpMapPoints;</span><br><span class="line">    cv::Mat Tcw_;</span><br><span class="line">    &#123;</span><br><span class="line">        unique_lock&lt;mutex&gt; lock(mMutexFeatures);</span><br><span class="line">        unique_lock&lt;mutex&gt; lock2(mMutexPose);</span><br><span class="line">        vpMapPoints = mvpMapPoints;</span><br><span class="line">        Tcw_ = Tcw.<span class="keyword">clone</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="keyword">float</span>&gt; vDepths;</span><br><span class="line">    vDepths.reserve(N);</span><br><span class="line">    cv::Mat Rcw2 = Tcw_.row(<span class="number">2</span>).colRange(<span class="number">0</span>,<span class="number">3</span>);</span><br><span class="line">    Rcw2 = Rcw2.t();</span><br><span class="line">    <span class="keyword">float</span> zcw = Tcw_.at&lt;<span class="keyword">float</span>&gt;(<span class="number">2</span>,<span class="number">3</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(mvpMapPoints[i])</span><br><span class="line">        &#123;</span><br><span class="line">            MapPoint* pMP = mvpMapPoints[i];</span><br><span class="line">            cv::Mat x3Dw = pMP-&gt;GetWorldPos();</span><br><span class="line">            <span class="keyword">float</span> z = Rcw2.dot(x3Dw)+zcw; <span class="comment">// (R*x3Dw+t)的第三行，即z</span></span><br><span class="line">            vDepths.push_back(z);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    sort(vDepths.begin(),vDepths.end());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> vDepths[(vDepths.size()<span class="number">-1</span>)/q];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SLAM/" rel="tag"># SLAM</a>
+          
+            <a href="/tags/Tracking/" rel="tag"># Tracking</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/14/ORB-SLAM2源码分析九/" rel="next" title="ORB-SLAM2源码分析九">
+                <i class="fa fa-chevron-left"></i> ORB-SLAM2源码分析九
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/19/ORB-SLAM2源码分析十一/" rel="prev" title="ORB-SLAM2源码分析十一">
+                ORB-SLAM2源码分析十一 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#KeyFrame-类说明"><span class="nav-text">KeyFrame 类说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-KeyFrame-类成员变量说明"><span class="nav-text">1. KeyFrame 类成员变量说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-关键帧id和下一个关键帧id-nNextId用于计数"><span class="nav-text">1.1 关键帧id和下一个关键帧id,nNextId用于计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-mnFrameId记录了该KeyFrame是由哪个Frame初始化的"><span class="nav-text">1.2 mnFrameId记录了该KeyFrame是由哪个Frame初始化的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-该关键帧的时间戳"><span class="nav-text">1.3 该关键帧的时间戳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-网格信息，和Frame中定义的一样，用于加速特征匹配"><span class="nav-text">1.4 网格信息，和Frame中定义的一样，用于加速特征匹配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-用于Tracking的变量"><span class="nav-text">1.5 用于Tracking的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-6-用于local-mapping的变量"><span class="nav-text">1.6 用于local mapping的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-7-用于关键帧数据库的变量"><span class="nav-text">1.7 用于关键帧数据库的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-8-用于回环检测的变量"><span class="nav-text">1.8 用于回环检测的变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-9-相机参数"><span class="nav-text">1.9 相机参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-10-特征点数目"><span class="nav-text">1.10 特征点数目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-11-Bow信息"><span class="nav-text">1.11 Bow信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-12-相对于父关键帧的位姿"><span class="nav-text">1.12 相对于父关键帧的位姿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-13-尺度信息"><span class="nav-text">1.13 尺度信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-14-图像边界"><span class="nav-text">1.14 图像边界</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-15-相机内参"><span class="nav-text">1.15 相机内参</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-16-相机位姿"><span class="nav-text">1.16 相机位姿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-17-关键帧地图点"><span class="nav-text">1.17 关键帧地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-18-Bow"><span class="nav-text">1.18 Bow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-19-网格划分"><span class="nav-text">1.19 网格划分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-20-共视图信息"><span class="nav-text">1.20 共视图信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-21-生成树信息"><span class="nav-text">1.21 生成树信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-22-Bad-flags"><span class="nav-text">1.22 Bad flags</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-23-mHalfBaseline"><span class="nav-text">1.23 mHalfBaseline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-24-map指针"><span class="nav-text">1.24 map指针</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-KeyFrame-成员函数说明"><span class="nav-text">2. KeyFrame 成员函数说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧"><span class="nav-text">2.1 构造函数传入图像帧，地图指针，以及关键帧数据库指针来建立关键帧，用传入的图像帧来赋值关键帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-计算Bow"><span class="nav-text">2.2 计算Bow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-设置相机参数，计算-T-cw-R-cw-t-cw-T-wc-R-wc-t-wc"><span class="nav-text">2.3 设置相机参数，计算$T_{cw},R_{cw},t_{cw},T_{wc},R_{wc},t_{wc}$</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-GetPose"><span class="nav-text">2.4 GetPose</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-GetPoseInverse"><span class="nav-text">2.5 GetPoseInverse</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-GetCameraCenter"><span class="nav-text">2.6 GetCameraCenter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-7-GetStereoCenter"><span class="nav-text">2.7 GetStereoCenter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-8-GetRotation"><span class="nav-text">2.8 GetRotation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-9-GetTranslation"><span class="nav-text">2.9 GetTranslation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-10-为关键帧之间添加连接"><span class="nav-text">2.10 为关键帧之间添加连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-11-按权重对关键帧进行排序-从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中"><span class="nav-text">2.11 按权重对关键帧进行排序,从大到小关键帧放在mvpOrderedConnectedKeyFrames中，权重值存放在mvOrderedWeights中</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-12-得到与该关键帧连接的关键帧，返回的是是关键帧set"><span class="nav-text">2.12 得到与该关键帧连接的关键帧，返回的是是关键帧set</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-13-得到与该关键帧连接的关键帧-已按权值排序-返回mvpOrderedConnectedKeyFrames，是一个vector"><span class="nav-text">2.13 得到与该关键帧连接的关键帧(已按权值排序),返回mvpOrderedConnectedKeyFrames，是一个vector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-14-得到与该关键帧连接的前N个关键帧-已按权值排序"><span class="nav-text">2.14 得到与该关键帧连接的前N个关键帧(已按权值排序)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-15-得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序"><span class="nav-text">2.15 得到与该关键帧连接的权重大于等于w的关键帧，返回的是一个vector，已排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-16-得到该关键帧与pKF的权重"><span class="nav-text">2.16 得到该关键帧与pKF的权重</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-17-在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号"><span class="nav-text">2.17 在关键帧中添加地图点，需要指定地图点的序号，也就是对应的特征点序号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-18-传入地图点序号，清除地图点"><span class="nav-text">2.18 传入地图点序号，清除地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-19-传入地图点指针，清除地图点"><span class="nav-text">2.19 传入地图点指针，清除地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-20-传入地图点序号和新的地图点指针，替换原来的地图点"><span class="nav-text">2.20 传入地图点序号和新的地图点指针，替换原来的地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-21-返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点"><span class="nav-text">2.21 返回地图点set集合，判断每一个地图点是否为空，该地图点是否是坏点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-22-关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值"><span class="nav-text">2.22 关键帧中，大于等于minObs的MapPoints的数量，判断每一个地图点是否为空，该地图点是否是坏点，该地图点的观测关键帧是否大于阈值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-23-获得该关键帧所有的MapPoints"><span class="nav-text">2.23 获得该关键帧所有的MapPoints</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-24-通过地图点的序号来获得关键帧地图点"><span class="nav-text">2.24 通过地图点的序号来获得关键帧地图点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-25-新建一个关键帧后，更新共视图的连接"><span class="nav-text">2.25 新建一个关键帧后，更新共视图的连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-26-增加子树节点"><span class="nav-text">2.26 增加子树节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-27-删除子树节点"><span class="nav-text">2.27 删除子树节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-28-改变父节点"><span class="nav-text">2.28 改变父节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-29-获得所有子树节点set"><span class="nav-text">2.29 获得所有子树节点set</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-30-获得该帧的父节点"><span class="nav-text">2.30 获得该帧的父节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-31-判断某一帧是否含有某一个关键帧子节点"><span class="nav-text">2.31 判断某一帧是否含有某一个关键帧子节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-32-将某一关键帧加入回环边集合"><span class="nav-text">2.32 将某一关键帧加入回环边集合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-33-获得回环关键帧集合"><span class="nav-text">2.33 获得回环关键帧集合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-34-设置某一关键帧不可擦除"><span class="nav-text">2.34 设置某一关键帧不可擦除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-35-删除关键帧，修改父子连接关系"><span class="nav-text">2.35 删除关键帧，修改父子连接关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-36-判断一帧图像是否是坏帧，即是否已经被删除"><span class="nav-text">2.36 判断一帧图像是否是坏帧，即是否已经被删除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-37-删除与某一帧的联系，并没有删除该关键帧"><span class="nav-text">2.37 删除与某一帧的联系，并没有删除该关键帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-38-找到在以x-y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数"><span class="nav-text">2.38 找到在以x,y为中心，边长为2r的方形内特征点，先遍历该圆域区间所属的边长为2r的格子区间内的所有特征点，再判断该点的尺度信息是否满足要求，再判断该特征点离中心点的距离是否满足半径要求，返回该区间的所有的特征点，参考普通帧的GetFeaturesInArea函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-39-判断某个坐标点是否在图像内"><span class="nav-text">2.39 判断某个坐标点是否在图像内</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-40-双目立体投影"><span class="nav-text">2.40 双目立体投影</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-41-计算并返回所有地图点的深度中值"><span class="nav-text">2.41 计算并返回所有地图点的深度中值</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
