@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. bias更新时的预积分测量值更新在第一篇的介绍当中，都是在假设积分区间内陀螺和加计的bias恒定的基础上推导的。当bias发生变化时，若按照前述公式，预积分测量值需要重新计算一遍，这将非常的computational expensive。为了解决这个问题，提出了利用线性化来进行bias变化时预积分项的一阶近似更新方法。下面先给出各更新公式，然后再做推导。令$\overline{\mathbf">
+<meta name="keywords" content="Camera,IMU,Preintegration">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IMU预积分二">
+<meta property="og:url" content="http://yoursite.com/2019/07/08/IMU预积分二/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="1. bias更新时的预积分测量值更新在第一篇的介绍当中，都是在假设积分区间内陀螺和加计的bias恒定的基础上推导的。当bias发生变化时，若按照前述公式，预积分测量值需要重新计算一遍，这将非常的computational expensive。为了解决这个问题，提出了利用线性化来进行bias变化时预积分项的一阶近似更新方法。下面先给出各更新公式，然后再做推导。令$\overline{\mathbf">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-11T06:36:45.615Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IMU预积分二">
+<meta name="twitter:description" content="1. bias更新时的预积分测量值更新在第一篇的介绍当中，都是在假设积分区间内陀螺和加计的bias恒定的基础上推导的。当bias发生变化时，若按照前述公式，预积分测量值需要重新计算一遍，这将非常的computational expensive。为了解决这个问题，提出了利用线性化来进行bias变化时预积分项的一阶近似更新方法。下面先给出各更新公式，然后再做推导。令$\overline{\mathbf">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/07/08/IMU预积分二/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>IMU预积分二 | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">18</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">8</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">23</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/08/IMU预积分二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IMU预积分二
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-08 17:04:22" itemprop="dateCreated datePublished" datetime="2019-07-08T17:04:22+08:00">2019-07-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-11 14:36:45" itemprop="dateModified" datetime="2019-07-11T14:36:45+08:00">2019-07-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/IMU/" itemprop="url" rel="index"><span itemprop="name">IMU</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="1-bias更新时的预积分测量值更新"><a href="#1-bias更新时的预积分测量值更新" class="headerlink" title="1. bias更新时的预积分测量值更新"></a>1. bias更新时的预积分测量值更新</h3><p>在第一篇的介绍当中，都是在假设积分区间内陀螺和加计的bias恒定的基础上推导的。<br>当bias发生变化时，若按照前述公式，预积分测量值需要重新计算一遍，这将非常的computational expensive。<br>为了解决这个问题，提出了利用线性化来进行bias变化时预积分项的一阶近似更新方法。下面先给出各更新公式，然后再做推导。令$\overline{\mathbf{b}}_{i}^{g}$和$\overline{\mathbf{b}}_{i}^{a}$为旧的bias，新的bias（$\hat{\mathbf{b}}_{i}^{g}$和$\hat{\mathbf{b}}_{i}^{a}$）由旧的bias与更新量（$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$）相加得到，即$\hat{\mathbf{b}}_{i}^{g} \leftarrow \overline{\mathbf{b}}_{i}^{g}+\delta \mathbf{b}_{i}^{g}$、$\hat{\mathbf{b}}_{i}^{a} \leftarrow \overline{\mathbf{b}}_{i}^{a}+\delta \mathbf{b}_{i}^{a}$。于是有预积分关于bias估计值的一阶近似更新公式如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\Delta \tilde{\mathbf{R}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}\right) \approx \Delta \tilde{\mathbf{R}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}\right) \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)\\[2ex]
+{\Delta \tilde{\mathbf{v}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right) \approx \Delta \tilde{\mathbf{v}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)+\frac{\partial \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}} \\[2ex] 
+{\Delta \tilde{\mathbf{p}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right) \approx \Delta \tilde{\mathbf{p}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)+\frac{\partial \Delta \overline{\boldsymbol{p}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}}\end{array}</script><p>做符号化简如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\Delta \hat{\mathbf{R}}_{i j} \triangleq \Delta \tilde{\mathbf{R}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}\right), \Delta \overline{\mathbf{R}}_{i j} \triangleq \Delta \tilde{\mathbf{R}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}\right)} \\[2ex]
+{\Delta \hat{\mathbf{v}}_{i j} \triangleq \Delta \tilde{\mathbf{v}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right), \Delta \overline{\mathbf{v}}_{i j} \triangleq \Delta \tilde{\mathbf{v}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)} \\[2ex]
+{\Delta \hat{\mathbf{p}}_{i j} \triangleq \Delta \tilde{\mathbf{p}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right), \Delta \overline{\mathbf{p}}_{i j}=\Delta \tilde{\mathbf{p}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)}\end{array}</script><p>于是前面的更新公式可简化为：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+{\Delta \hat{\mathbf{R}}_{i j} \approx \Delta \overline{\mathbf{R}}_{i j} \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)} \\[2ex] 
+{\Delta \hat{\mathbf{v}}_{i j} \approx \Delta \overline{\mathbf{v}}_{i j}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}} \\[2ex] 
+{\Delta \hat{\mathbf{p}}_{i j} \approx \Delta \overline{\mathbf{p}}_{i j}+\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}}\end{array}</script><p>接下来推导各式中的偏导项。</p>
+<ul>
+<li>（1）${\Delta \hat{\mathbf{R}}_{i j} \approx \Delta \overline{\mathbf{R}}_{i j} \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)}$中的偏导项$\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}$</li>
+</ul>
+<script type="math/tex; mode=display">
+\begin{aligned} 
+\Delta \hat{\mathbf{R}}_{i j} &=\Delta \tilde{\mathbf{R}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}\right) \\[2ex] 
+&=\prod_{k=1}^{j-1} \operatorname{Exp}\left(\left(\tilde{\boldsymbol{\omega}}_{k}-\hat{\mathbf{b}}_{i}^{g}\right) \Delta t\right) \\[2ex] 
+&=\prod_{k=1}^{j-1} \operatorname{Exp}\left(\left(\tilde{\mathbf{\omega}}_{k}-\left(\overline{\mathbf{b}}_{i}^{g}+\delta \mathbf{b}_{i}^{g}\right)\right) \Delta t\right) \\[2ex] 
+&=\prod_{k=i}^{j-1} \operatorname{Exp}\left(\left(\tilde{\mathbf{\omega}}_{k}-\overline{\mathbf{b}}_{i}^{g}\right) \Delta t-\delta \mathbf{b}_{i}^{g} \Delta t\right)\\[2ex]
+&\approx \prod_{k=i}^{j-1}\left(\operatorname{Exp}\left(\left(\tilde{\mathbf{\omega}}_{k}-\overline{\mathbf{b}}_{i}^{g}\right) \Delta t\right) \cdot \operatorname{Exp}\left(-\mathbf{J}_{r}^{k} \delta \mathbf{b}_{i}^{g} \Delta t\right)\right) \\[2ex]
+&=\Delta \overline{\mathbf{R}}_{i j} \prod_{k=i}^{j-1} \operatorname{Exp}\left(-\Delta \overline{\mathbf{R}}_{k+1 j}^{T} \mathbf{J}_{r}^{k} \delta \mathbf{b}_{i}^{g} \Delta t\right) 
+\end{aligned}</script><p>于是</p>
+<script type="math/tex; mode=display">
+\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}}=\sum_{k=i}^{j-1}\left(-\Delta \overline{\mathbf{R}}_{k+1 j}^{T} \mathbf{J}_{r}^{k} \Delta t\right)</script><p>其中</p>
+<script type="math/tex; mode=display">
+\mathbf{J}_{r}^{k}=\mathbf{J}_{r}\left(\left(\tilde{\boldsymbol{\omega}}_{k}-\mathbf{b}_{i}^{g}\right) \Delta t\right)</script><ul>
+<li>（2）${\Delta \hat{\mathbf{v}}_{i j} \approx \Delta \overline{\mathbf{v}}_{i j}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}}$中的偏导项$\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{g}}$和$\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}}$：</li>
+</ul>
+<script type="math/tex; mode=display">
+\begin{aligned} 
+\Delta \hat{\mathbf{v}}_{i j} &=\Delta \tilde{\mathbf{v}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g},\hat{\mathbf{b}}_{i}^{a}\right) \\[2ex] 
+&=\sum_{k=i}^{j-1}\left[\Delta \tilde{\mathbf{R}}_{i k}\left(\hat{\mathbf{b}}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\hat{\mathbf{b}}_{i}^{a}\right) \Delta t\right] \\[2ex]
+&\approx \sum_{k=i}^{j-1}\left[\Delta \overline{\mathbf{R}}_{i k} \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}-\delta \mathbf{b}_{i}^{a}\right) \Delta t\right]\\[2ex] 
+&\approx \sum_{k=i}^{j-1}\left[\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\mathbf{I}+\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)^{\wedge}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}-\delta \mathbf{b}_{i}^{a}\right) \Delta t\right]\\[2ex]
+&\begin{aligned}=\sum_{k=i}^{j-1} &\left[\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right) \Delta t-\Delta \overline{\mathbf{R}}_{i k} \delta \mathbf{b}_{i}^{a} \Delta t\right.\\[2ex] &+\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)^{\wedge}\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right) \Delta t \\[2ex] &\left. -\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)^{\wedge} \delta \mathbf{b}_{i}^{a} \Delta t \right] \end{aligned}\\[2ex]
+&\approx \Delta \overline{\mathbf{v}}_{i j}+\sum_{k=i}^{j-1}\left\{-\left[\Delta \overline{\mathbf{R}}_{i k} \Delta t\right] \delta \mathbf{b}_{i}^{a}-\left[\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t\right] \delta \mathbf{b}_{i}^{g}\right\}\\[2ex]
+&= \Delta \overline{\mathbf{v}}_{i j}-\sum_{k=i}^{j-1} \Delta \overline{\mathbf{R}}_{i k} \Delta t \delta \mathbf{b}_{i}^{a}-\sum_{k=i}^{j-1} \Delta \overline{\mathbf{R}}_{i k}\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \mathbf{b}^{g}} \Delta t \delta \mathbf{b}_{i}^{g}\\[2ex]
+&=\Delta \overline{\mathbf{v}}_{i j}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \mathbf{b}^{a}} \delta \mathbf{b}_{i}^{a}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \mathbf{b}^{g}} \delta \mathbf{b}_{i}^{g}
+\end{aligned}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{\overline{g}}} &=-\sum_{k=1}^{j-1}\left(\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t\right) \\ \frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} &=-\sum_{k=1}^{j-1}\left(\Delta \overline{\mathbf{R}}_{i k} \Delta t\right) \end{aligned}</script><ul>
+<li>（3）$\Delta \hat{\mathbf{p}}_{i j} \approx \Delta \overline{\mathbf{p}}_{i j}+\frac{\partial \Delta \mathbf{p}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \mathbf{p}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}$中的偏导项$\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{g}}$和$\frac{\partial \Delta \overline{\mathbf{p}}_{j}}{\partial \overline{\mathbf{b}}^{a}}$：<script type="math/tex; mode=display">
+\begin{aligned} \Delta \hat{\mathbf{p}}_{i j} &=\Delta \tilde{\mathbf{p}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right) \\[2ex] 
+&=\sum_{k=1}^{j-1}\left[\Delta \tilde{\mathbf{v}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right) \Delta t+\frac{1}{2} \Delta \tilde{\mathbf{R}}_{i k}\left(\hat{\mathbf{b}}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\hat{\mathbf{b}}_{i}^{a}\right) \Delta t^{2}\right]\\[2ex]
+&=\sum_{k=i}^{j-1}\left[\Delta \tilde{\mathbf{v}}_{i j}\left(\hat{\mathbf{b}}_{i}^{g}, \hat{\mathbf{b}}_{i}^{a}\right) \Delta t\right]+\frac{1}{2} \sum_{k=i}^{j-1}\left[\Delta \tilde{\mathbf{R}}_{i k}\left(\hat{\mathbf{b}}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\hat{\mathbf{b}}_{i}^{a}\right) \Delta t^{2}\right] \\[2ex]
+&=\sum_{k=i}^{j-1}\left[\left(\Delta \overline{\mathbf{v}}_{i k}+\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}\right) \Delta t\right] + \frac{\Delta t^{2}}{2} \sum_{k=i}^{j-1}\left[\Delta \tilde{\mathbf{R}}_{i k}\left(\hat{\mathbf{b}}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\hat{\mathbf{b}}_{i}^{a}\right)\right] \\[2ex] 
+&=\sum_{k=1}^{j-1}\left[\Delta \overline{\mathbf{v}}_{i k} \Delta t+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t\right) \delta \mathbf{b}_{i}^{g}+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t\right) \delta \mathbf{b}_{i}^{a}\right]\\[2ex]
+&\quad +\frac{\Delta t^{2}}{2} \sum_{k=i}^{j-1}\left[\Delta \overline{\mathbf{R}}_{i k} \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}-\delta \mathbf{b}_{i}^{a}\right)\right] \\[2ex]
+&=\sum_{k=1}^{j-1}\left[\Delta \overline{\mathbf{v}}_{i k} \Delta t+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t\right) \delta \mathbf{b}_{i}^{g}+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t\right) \delta \mathbf{b}_{i}^{a}\right]\\[2ex]
+&\quad +\frac{\Delta t^{2}}{2} \sum_{k=i}^{j-1}\left[\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\mathbf{I}+\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)^{\wedge}\right) \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}-\delta \mathbf{b}_{i}^{a}\right)\right] \\[2ex]
+&=\sum_{k=1}^{j-1}\left[\Delta \overline{\mathbf{v}}_{i k} \Delta t+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t\right) \delta \mathbf{b}_{i}^{g}+\left(\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t\right) \delta \mathbf{b}_{i}^{a}\right]\\[2ex]
+&\quad +\frac{\Delta t^{2}}{2} \sum_{k=i}^{j-1}\left[\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)-\Delta \overline{\mathbf{R}}_{i k} \delta \mathbf{b}_{i}^{a}-\Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right] \\[2ex]
+&=\sum_{k=i}^{j-1}\left\{\left[\Delta \overline{\mathbf{v}}_{i k} \Delta t+\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right) \Delta t^{2}\right]\right.\\[2ex]
+&\quad+\left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t^{2}\right] \delta \mathbf{b}_{i}^{g} \\[2ex]
+&\quad+ \left. \left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \Delta t^{2}\right] \delta \mathbf{b}_{i}^{a} \right\} \\[2ex]
+&=\Delta \overline{\mathbf{p}}_{i j} \\[2ex]
+&\quad+\left\{\sum_{k=i}^{j-1}\left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t^{2}\right]\right\} \delta \mathbf{b}_{i}^{g}\\[2ex]
+&\quad+ \left\{\sum_{k=i}^{j-1}\left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \Delta t^{2}\right]\right\} \delta \mathbf{b}_{i}^{a}\\[2ex]
+\end{aligned}</script>所以有：<script type="math/tex; mode=display">
+\begin{aligned} \frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} &=\sum_{k=i}^{j-1}\left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \cdot\left(\tilde{\mathbf{a}}_{k}-\overline{\mathbf{b}}_{i}^{a}\right)^{\wedge} \frac{\partial \Delta \overline{\mathbf{R}}_{i k}}{\partial \overline{\mathbf{b}}^{g}} \Delta t^{2}\right] \\[2ex] \frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} &=\sum_{k=i}^{j-1}\left[\frac{\partial \Delta \overline{\mathbf{v}}_{i k}}{\partial \overline{\mathbf{b}}^{a}} \Delta t-\frac{1}{2} \Delta \overline{\mathbf{R}}_{i k} \Delta t^{2}\right] \end{aligned}</script></li>
+</ul>
+<h3 id="2-残差"><a href="#2-残差" class="headerlink" title="2. 残差"></a>2. 残差</h3><p>残差指的是预积分计算值（由非IMU的其他方式估计的预积分值）与测量值的差距。<br>根据各预积分的定义，可得 $\Delta \mathbf{R}_{i j}$、$\Delta \mathbf{v}_{i j}$ 和 $\Delta \mathbf{p}_{i j}$ 的理想值表达式如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\Delta \mathbf{R}_{i j}=\mathbf{R}_{i}^{T} \mathbf{R}_{j}} \\[2ex] 
+{\Delta \mathbf{v}_{i j}=\mathbf{R}_{i}^{T}\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)} \\[2ex] 
+{\Delta \mathbf{p}_{i j}=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)}\end{array}</script><p>则有三项残差项如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\begin{aligned} \mathbf{r}_{\Delta \mathbf{R}_{i j}} & \triangleq \log \left\{\left[\Delta \tilde{\mathbf{R}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}\right) \cdot \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)\right]^{T} \cdot \mathbf{R}_{i}^{T} \mathbf{R}_{j}\right\} \\[2ex] 
+& \triangleq \log \left[\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \Delta \mathbf{R}_{i j}\right] \end{aligned}
+\\[2ex]
+\begin{aligned} \mathbf{r}_{\Delta \mathbf{v}_{i j}} \triangleq & \mathbf{R}_{i}^{T}\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right) \\[2ex] &-\left[\Delta \tilde{\mathbf{v}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}\right] \\[2ex] 
+\triangleq & \Delta \mathbf{v}_{i j}-\Delta \hat{\mathbf{v}}_{i j} \end{aligned}
+\\[2ex]
+\begin{aligned} \mathbf{r}_{\Delta \mathbf{p}_{i j}} \triangleq & \mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right) \\[2ex] &-\left[\Delta \tilde{\mathbf{p}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}, \overline{\mathbf{b}}_{i}^{a}\right)+\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}+\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \overline{\mathbf{b}}^{a}} \delta \mathbf{b}_{i}^{a}\right]\\[2ex]
+\triangleq &\Delta \mathbf{p}_{i j}-\Delta \hat{\mathbf{p}}_{i j}
+\end{aligned}
+\end{array}</script><p>在状态估计中，通常以等为导航求解的目标，同时由于bias的作用在以mems器件为基础的应用中不可忽略，因此bias 也常常被当做是状态量进行估计，但估计中经常采取的是估计bias的偏差的方式，即估计$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$，所以，全部的导航状态应该是$\mathbf{R}_{i}, \mathbf{p}_{i}, \mathbf{v}_{i}, \mathbf{R}_{j}, \mathbf{p}_{j}, \mathbf{v}_{j}, \delta \mathbf{b}_{i}^{g}, \delta \mathbf{b}_{i}^{a}$。在非线性最小二乘计算过程中，通常需要“增量”来更新状态，最终计算指标（一般即残差$\mathbf{r}_{\Delta \mathbf{R}_{i j}}$、$\mathbf{r}_{\Delta \mathbf{v}_{i j}}$和$\mathbf{r}_{\Delta \mathbf{p}_{i j}}$），这个过程叫做“lifting”，对于上述的导航状态，需要进行如下的“lifting”操作：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{R}_{i} \leftarrow \mathbf{R}_{i} \cdot \operatorname{Exp}\left(\delta \vec{\phi}_{i}\right) ; \mathbf{p}_{i} \leftarrow \mathbf{p}_{i}+\mathbf{R}_{i} \cdot \delta \mathbf{p}_{i} ; \mathbf{v}_{i} \leftarrow \mathbf{v}_{i}+\delta \mathbf{v}_{i}} \\ {\mathbf{R}_{j} \leftarrow \mathbf{R}_{j} \cdot \operatorname{Exp}\left(\delta \vec{\phi}_{j}\right) ; \mathbf{p}_{j} \leftarrow \mathbf{p}_{j}+\mathbf{R}_{j} \cdot \delta \mathbf{p}_{j} ; \mathbf{v}_{j} \leftarrow \mathbf{v}_{j}+\delta \mathbf{v}_{j}} \\ {\delta \mathbf{b}_{i}^{g} \leftarrow \delta \mathbf{b}_{i}^{g}+\widetilde{\delta \mathbf{b}_{i}^{g}} ; \delta \mathbf{b}_{i}^{a} \leftarrow \delta \mathbf{b}_{i}^{a}+\widetilde{\delta \mathbf{b}_{i}^{a}}}\end{array}</script><p>下面开始求各残差项关于各状态增量的Jacobian。</p>
+<h3 id="3-残差的Jacobian"><a href="#3-残差的Jacobian" class="headerlink" title="3. 残差的Jacobian"></a>3. 残差的Jacobian</h3><ul>
+<li><p>（1）Jacobian of $\mathbf{r}_{\Delta \mathbf{R}_{i j}}$<br>零项：$\mathbf{r}_{\Delta \mathbf{R}_{i j}}$不含有变量$\mathbf{p}_{i}, \mathbf{p}_{j}, \mathbf{v}_{i}, \mathbf{v}_{j}$以及$\delta \mathbf{b}_{i}^{a}$，因此$\mathbf{r}_{\Delta \mathbf{R}_{i j}}$关于这些状态的增量的Jacobian都为0（零矩阵）：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \mathbf{p}_{i}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \mathbf{p}_{j}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \mathbf{v}_{i}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \mathbf{v}_{j}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial {\delta} \mathbf{b}_{i}^{a}}=\mathbf{0}</script><p>无线性项：<br>复杂项：<br>对于$\phi_i$：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right)& = \log \left[\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T}\left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right)^{T} \mathbf{R}_{j}\right]\\[2ex]
+&=\log \left[\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \operatorname{Exp}\left(-\delta {\phi}_{i}\right) \mathbf{R}_{i}^{T} \mathbf{R}_{j}\right]\\[2ex]
+&=\log \left[\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \mathbf{R}_{i}^{T} \mathbf{R}_{j} \operatorname{Exp}\left(-\mathbf{R}_{j}^{T} \mathbf{R}_{i} \delta {\phi}_{i}\right)\right]\\[2ex]
+&=\log \left\{\operatorname{Exp}\left[\log \left(\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \mathbf{R}_{i}^{T} \mathbf{R}_{j}\right)\right] \cdot \operatorname{Exp}\left(\mathbf{-} \mathbf{R}_{j}^{T} \mathbf{R}_{i} \delta {\phi}_{i}\right)\right\}\\[2ex]
+&=\log \left[\operatorname{Exp}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{i}\right)\right) \cdot \operatorname{Exp}\left(-\mathbf{R}_{j}^{T} \mathbf{R}_{i} \delta {\phi}_{i}\right)\right]\\[2ex]
+&\approx \mathbf{r}_{\Delta R_{i j}}\left(\mathbf{R}_{i}\right)-\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{i}\right)\right) \mathbf{R}_{j}^{T} \mathbf{R}_{i} \delta {\phi}_{i}\\[2ex]
+&=\mathbf{r}_{\Delta \mathbf{R}_{i j}}-\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right) \mathbf{R}_{j}^{T} \mathbf{R}_{i} \delta {\phi}_{i}
+\end{aligned}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial {\phi}_{i}}=-\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right) \mathbf{R}_{j}^{T} \mathbf{R}_{i}</script><p>对于$\phi_j$：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{j} \operatorname{Exp}\left(\delta {\phi}_{j}\right)\right)} \\[2ex] {=\log \left[\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \mathbf{R}_{i}^{T} \mathbf{R}_{j} \operatorname{Exp}\left(\delta {\phi}_{j}\right)\right]} \\[2ex] 
+{=\log \left\{\operatorname{Exp}\left[\log \left(\left(\Delta \hat{\mathbf{R}}_{i j}\right)^{T} \mathbf{R}_{i}^{T} \mathbf{R}_{j}\right)\right] \cdot \operatorname{Exp}\left(\delta {\phi}_{j}\right)\right\}}\\[2ex]
+=\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{j}\right)+\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left(\mathbf{R}_{j}\right)\right) \delta {\phi}_{j}\\[2ex]
+=\mathbf{r}_{\Delta \mathbf{R}_{i j}}+\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right) \delta {\phi}_{j}
+\end{array}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \delta {\phi}_{j}}=\mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right)</script><p>对于$\delta b^g_i$：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\mathbf{r}_{\Delta R_{i j}}\left(\delta \mathbf{b}_{i}^{g}+\widetilde{\delta \mathbf{b}_{i}^{g}}\right)\\[2ex]
+=\log \left\{\left[\Delta \tilde{\mathbf{R}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}\right) \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}}\left(\delta \mathbf{b}_{i}^{g}+\widetilde{\delta \mathbf{b}_{i}^{g}}\right)\right)\right]^{T} \mathbf{R}_{i}^{T} \mathbf{R}_{j}\right\}\\[2ex]
+=\log \left\{ \left[\Delta \tilde{\mathbf{R}}_{i j}\left(\overline{\mathbf{b}}_{i}^{g}\right) \operatorname{Exp}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right)\operatorname{Exp}\left(\mathbf{J}_{r}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right) \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right)\right]^{T}\Delta \mathbf{R}_{i j}\right\}\\[2ex]
+=\log\left\{\left[\Delta \hat{\mathbf{R}}_{i j}\operatorname{Exp}\left(\varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right)\right]^T\Delta \mathbf{R}_{i j}\right\} \\[2ex]
+=\log\left[ \operatorname{Exp}\left(- \varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right) \Delta \hat{\mathbf{R}}_{i j}^T \Delta \mathbf{R}_{i j}\right]\\[2ex]
+=\log\left[ \operatorname{Exp}\left(- \varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right) \operatorname{Exp}\left(\log\left(\Delta \hat{\mathbf{R}}_{i j}^T \Delta \mathbf{R}_{i j}\right)\right)\right]\\[2ex]
+=\log\left[ \operatorname{Exp}\left(- \varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right) \operatorname{Exp}\left( \mathbf{r}_{\Delta \mathbf{R}_{i j}} \left( \delta \mathbf{b}_{i}^{g}\right)\right)\right]\\[2ex]
+=\log\left[ \operatorname{Exp}\left( \mathbf{r}_{\Delta \mathbf{R}_{i j}} \left( \delta \mathbf{b}_{i}^{g}\right)\right)\operatorname{Exp}\left(- \operatorname{Exp}\left( \mathbf{r}_{\Delta \mathbf{R}_{i j}} \left( \delta \mathbf{b}_{i}^{g}\right)\right)\varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\right)\right]\\[2ex]
+\approx \mathbf{r}_{\Delta \mathbf{R}_{i j}} \left( \delta \mathbf{b}_{i}^{g}\right) - \mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\left( \delta \mathbf{b}_{i}^{g} \right)\right)\operatorname{Exp}\left(- \mathbf{r}_{\Delta \mathbf{R}_{i j}} \left( \delta \mathbf{b}_{i}^{g}\right)\right)\varepsilon \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\\[2ex]
+= \mathbf{r}_{\Delta \mathbf{R}_{i j}} - \mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right)\operatorname{Exp}\left(- \mathbf{r}_{\Delta \mathbf{R}_{i j}}\right)\mathbf{J}_{r}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right) \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \widetilde{\delta \mathbf{b}_{i}^{g}}\\[2ex]
+\end{array}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{R}_{i j}}}{\partial \delta {b}_{i}^g}=- \mathbf{J}_{r}^{-1}\left(\mathbf{r}_{\Delta \mathbf{R}_{i j}}\right)\operatorname{Exp}\left(- \mathbf{r}_{\Delta \mathbf{R}_{i j}}\right)\mathbf{J}_{r}\left(\frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}} \delta \mathbf{b}_{i}^{g}\right) \frac{\partial \Delta \overline{\mathbf{R}}_{i j}}{\partial \overline{\mathbf{b}}^{g}}</script></li>
+<li><p>（2）Jacobian of $\mathbf{r}_{\Delta \mathbf{v}_{i j}}$<br>零项：$\mathbf{r}_{\Delta \mathbf{v}_{i j}}$不含有变量$\mathbf{R}_{j}, \mathbf{p}_{i}, \mathbf{p}_{j}$，因此$\mathbf{r}_{\Delta \mathbf{v}_{i j}}$，关于这些状态的增量的Jacobian都为0（零矩阵）：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \mathbf{p}_{i}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \mathbf{p}_{j}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \mathbf{\phi}_{i}}=\mathbf{0}</script><p>线性项：$\mathbf{r}_{\Delta \mathbf{v}_{i j}}$关于$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$是线性的，$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$的lifting也是线性的，因此$\mathbf{r}_{\Delta \mathbf{v}_{i j}}$关于$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$的增量的Jacobian可直接由线性系数求得：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial {\delta \mathbf{b}_{i}^{g}}}=-\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \mathbf{b}^{g}},\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial {\delta \mathbf{b}_{i}^{a}}}=-\frac{\partial \Delta \overline{\mathbf{v}}_{i j}}{\partial \mathbf{b}^{a}},</script><p>复杂项：<br>对于$\delta \mathbf{v}_{i}$的jacobian：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{v}_{i}+\delta \mathbf{v}_{i}\right) &=\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\delta \mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j} \\ &=\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j}-\mathbf{R}_{i}^{T} \delta \mathbf{v}_{i} \\ &=\mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{v}_{i}\right)-\mathbf{R}_{i}^{T} \delta \mathbf{v}_{i} \end{aligned}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \delta \mathbf{v}_{i}}=-\mathbf{R}_{i}^{T}</script><p>对于$\delta \mathbf{v}_{j}$的jacobian：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{v}_{j}+\delta \mathbf{v}_{j}\right) &=\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}+\delta \mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j} \\ &=\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j}+\mathbf{R}_{i}^{T} \delta \mathbf{v}_{j} \\ &=\mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{v}_{j}\right)+\mathbf{R}_{i}^{T} \delta \mathbf{v}_{j} \end{aligned}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \delta \mathbf{v}_{j}}=\mathbf{R}_{i}^{T}</script><p>对于$\delta \phi_i$的Jacobian：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right) &= \left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right)^{T}\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j} \\[2ex]
+&= \operatorname{Exp}\left(-\delta {\phi}_{i}\right) \cdot \mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j}\\[2ex]
+&\approx \left(\mathbf{I}-\left(\delta {\phi}_{i}\right)^{\wedge}\right) \cdot \mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j}\\[2ex]
+&=\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)-\Delta \hat{\mathbf{v}}_{i j}-\left(\delta {\phi}_{i}\right)^{\wedge} \cdot \mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)\\[2ex]
+&=\mathbf{r}_{\Delta \mathbf{v}_{i j}}\left(\mathbf{R}_{i}\right)+\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)\right]^{\wedge} \cdot \delta {\phi}_{i}\\[2ex]
+&=\mathbf{r}_{\Delta \mathbf{v}_{i j}}+\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)\right]^{\wedge} \cdot \delta {\phi}_{i}
+\end{aligned}</script><p>所以有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{v}_{i j}}}{\partial \delta \phi_i}=\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)\right]^{\wedge}</script></li>
+<li>（3）Jacobian of $\mathbf{r}_{\Delta \mathbf{p}_{i j}}$<br>零项：$\mathbf{r}_{\Delta \mathbf{p}_{i j}}$不含有变量$\mathbf{R}_{j}, \mathbf{v}_{j}$，因此$\mathbf{r}_{\Delta \mathbf{p}_{i j}}$关于这些状态的增量的Jacobian都为0（零矩阵）：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \mathbf{\phi}_{j}}=\mathbf{0},
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \mathbf{v}_{j}}=\mathbf{0},</script>线性项：$\mathbf{r}_{\Delta \mathbf{p}_{i j}}$关于$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$是线性的，$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$的lifting也是线性的，因此$\mathbf{r}_{\Delta \mathbf{p}_{i j}}$关于$\delta \mathbf{b}_{i}^{g}$和$\delta \mathbf{b}_{i}^{a}$的增量的Jacobian可直接由线性系数求得：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial {\delta \mathbf{b}_{i}^{g}}}=-\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \mathbf{b}^{g}},\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial {\delta \mathbf{b}_{i}^{a}}}=-\frac{\partial \Delta \overline{\mathbf{p}}_{i j}}{\partial \mathbf{b}^{a}},</script>复杂项：<br>对于$\delta \mathbf{p}_{i}$的jacobian：<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{p}_{i}+\mathbf{R}_{i} \cdot \delta \mathbf{p}_{i}\right)} \\[2ex]
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{R}_{i} \cdot \delta \mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}} \\[2ex] 
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}-\mathbf{I} \cdot \delta \mathbf{p}_{i}} \\[2ex] 
+{=\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{p}_{i}\right)-\mathbf{I} \cdot \delta \mathbf{p}_{i}}\\[2ex]
+=\mathbf{r}_{\Delta p_{i j}}-\mathbf{I} \cdot \delta \mathbf{p}_{i}
+\end{array}</script>所以有：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \mathbf{p}_{i}}=-\mathbf{I}</script>对于$\delta \mathbf{p}_{j}$的jacobian：<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{r}_{\Delta \mathrm{p}_{i j}}\left(\mathbf{p}_{j}+\mathbf{R}_{j} \cdot \delta \mathbf{p}_{j}\right)} \\[2ex] 
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}+\mathbf{R}_{j} \cdot \delta \mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}} \\[2ex] 
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}+\mathbf{R}_{i}^{T} \mathbf{R}_{j} \cdot \delta \mathbf{p}_{j}} \\[2ex]
+{=\mathbf{r}_{\Delta \mathrm{p}_{i j}}\left(\mathbf{p}_{j}\right)+\mathbf{R}_{i}^{T} \mathbf{R}_{j} \cdot \delta \mathbf{p}_{j}}\end{array}</script>所以有：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \mathbf{p}_{j}}=\mathbf{R}_{i}^{T} \mathbf{R}_{j}</script>对于$\delta \mathbf{v}_{i}$的jacobian：<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{v}_{i}+\delta \mathbf{v}_{i}\right)} \\[2ex]
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\delta \mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}} \\[2ex] 
+{=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}-\mathbf{R}_{i}^{T} \Delta t_{i j} \cdot \delta \mathbf{v}_{i}} \\[2ex] 
+{=\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{v}_{i}\right)-\mathbf{R}_{i}^{T} \Delta t_{i j} \cdot \delta \mathbf{v}_{i}}\\[2ex]
+=\mathbf{r}_{\Delta \mathbf{p}_{i j}}-\mathbf{R}_{i}^{T} \Delta t_{i j} \cdot \delta \mathbf{v}_{i}
+\end{array}</script>所以有：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \mathbf{v}_{i}}=-\mathbf{R}_{i}^{T} \Delta t_{i j}</script>对于$\delta \mathbf{\phi}_{i}$的jacobian：<script type="math/tex; mode=display">
+\begin{array}{l}{\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right)} \\[2ex]
+=\left(\mathbf{R}_{i} \operatorname{Exp}\left(\delta {\phi}_{i}\right)\right)^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}\\[2ex] 
+=\operatorname{Exp}\left(-\delta {\phi}_{i}\right) \cdot \mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j} \\[2ex] 
+=\left(\mathbf{I}-\left(\delta {\phi}_{i}\right)^{\wedge}\right) \cdot \mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j}\\[2ex]
+\begin{aligned}=& \mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)-\Delta \hat{\mathbf{p}}_{i j} \\ &-\left(\delta {\phi}_{i}\right)^{\wedge} \mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right) \end{aligned}\\[2ex]
+=\mathbf{r}_{\Delta \mathbf{p}_{i j}}\left(\mathbf{R}_{i}\right)+\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)\right]^{\wedge} \cdot \delta {\phi}_{i}\\[2ex]
+=\mathbf{r}_{\Delta \mathbf{p}_{i j}}+\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta_{i j}^{2}\right)\right]^{\wedge} \cdot \delta {\phi}_{i}
+\end{array}</script>所以有：<script type="math/tex; mode=display">
+\frac{\partial \mathbf{r}_{\Delta \mathbf{p}_{i j}}}{\partial \delta \mathbf{\phi}_{i}}=\left[\mathbf{R}_{i}^{T} \cdot\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)\right]^{\wedge}</script></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Camera/" rel="tag"># Camera</a>
+          
+            <a href="/tags/IMU/" rel="tag"># IMU</a>
+          
+            <a href="/tags/Preintegration/" rel="tag"># Preintegration</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/01/IMU预积分一/" rel="next" title="IMU预积分一：基本原理和白噪声">
+                <i class="fa fa-chevron-left"></i> IMU预积分一：基本原理和白噪声
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">23</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-bias更新时的预积分测量值更新"><span class="nav-text">1. bias更新时的预积分测量值更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-残差"><span class="nav-text">2. 残差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-残差的Jacobian"><span class="nav-text">3. 残差的Jacobian</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

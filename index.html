@@ -311,7 +311,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">22</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">23</span></a>
 
   </li>
         
@@ -430,7 +430,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/01/IMU预积分/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/08/IMU预积分二/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="lemonlikelihood">
@@ -450,7 +450,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2019/07/01/IMU预积分/" class="post-title-link" itemprop="url">IMU预积分</a>
+                <a href="/2019/07/08/IMU预积分二/" class="post-title-link" itemprop="url">IMU预积分二</a>
               
             
           </h1>
@@ -475,12 +475,24 @@
                 
               
 
-              <time title="Created: 2019-07-01 14:02:28 / Modified: 14:03:51" itemprop="dateCreated datePublished" datetime="2019-07-01T14:02:28+08:00">2019-07-01</time>
+              <time title="Created: 2019-07-08 17:04:22" itemprop="dateCreated datePublished" datetime="2019-07-08T17:04:22+08:00">2019-07-08</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-11 14:36:45" itemprop="dateModified" datetime="2019-07-11T14:36:45+08:00">2019-07-11</time>
               
             
           </span>
@@ -537,13 +549,198 @@
         
           
             <p>
-              
-              
+              1. bias更新时的预积分测量值更新在第一篇的介绍当中，都是在假设积分区间内陀螺和加计的bias恒定的基础上推导的。当bias发生变化时，若按照前述公式，预积分测量值需要重新计算一遍，这将非常的computational expensive。为了解决这个问题，提出了利用线性化来进行bias变化时预
+              ...
             </p>
           <!--noindex-->
           
             <div class="post-button text-center">
-              <a class="btn" href="/2019/07/01/IMU预积分/#more" rel="contents">
+              <a class="btn" href="/2019/07/08/IMU预积分二/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/01/IMU预积分一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/07/01/IMU预积分一/" class="post-title-link" itemprop="url">IMU预积分一：基本原理和白噪声</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-01 14:02:28" itemprop="dateCreated datePublished" datetime="2019-07-01T14:02:28+08:00">2019-07-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-08 17:02:41" itemprop="dateModified" datetime="2019-07-08T17:02:41+08:00">2019-07-08</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/IMU/" itemprop="url" rel="index"><span itemprop="name">IMU</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>
+              1. IMU 测量模型（Sensor Model）和运动学模型（Kinetic Model）一个IMU惯导测量装置包括3个轴的加速度测量仪和三个轴的角速度测量仪，在VIO系统中，世界坐标系通常认为是一个惯性系，且一般会选择初始时刻水平地理系。由于SLAM的运行场景一般较小（重力变化不大），运行时间也
+              ...
+            </p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/07/01/IMU预积分一/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -2069,180 +2266,6 @@ sin\theta & cos\theta
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/11/ORB-SLAM2源码分析五/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="lemonlikelihood">
-      <meta itemprop="description" content="学而时习之，不亦乐乎">
-      <meta itemprop="image" content="/images/header.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随心小笔">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/06/11/ORB-SLAM2源码分析五/" class="post-title-link" itemprop="url">ORB-SLAM2源码分析五</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-06-11 13:39:56 / Modified: 13:56:49" itemprop="dateCreated datePublished" datetime="2019-06-11T13:39:56+08:00">2019-06-11</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/ORB-SLAM2/" itemprop="url" rel="index"><span itemprop="name">ORB-SLAM2</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>
-              ORBmatcher类说明单目SLAM初始化相关，双目和RGBD不会使用这个类
-1. ORBmatcher 成员变量说明1.1 ORBmatcher 成员变量说明static const int TH_LOW;static const int TH_HIGH;static const int HIS
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/06/11/ORB-SLAM2源码分析五/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2291,7 +2314,7 @@ sin\theta & cos\theta
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-count">23</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
