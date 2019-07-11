@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="随心小笔">
 <meta property="og:description" content="Tracking 线程分析1. Tracking流程图  2. Tracking 成员变量说明2.1 Tracking 状态枚举123456789enum eTrackingState&amp;#123;        SYSTEM_NOT_READY=-1,        NO_IMAGES_YET=0,        NOT_INITIALIZED=1,        OK=2,        LOS">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-18T08:54:38.632Z">
+<meta property="og:updated_time" content="2019-07-11T06:49:11.861Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ORB-SLAM2源码分析二">
 <meta name="twitter:description" content="Tracking 线程分析1. Tracking流程图  2. Tracking 成员变量说明2.1 Tracking 状态枚举123456789enum eTrackingState&amp;#123;        SYSTEM_NOT_READY=-1,        NO_IMAGES_YET=0,        NOT_INITIALIZED=1,        OK=2,        LOS">
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-06-18 16:54:38" itemprop="dateModified" datetime="2019-06-18T16:54:38+08:00">2019-06-18</time>
+                <time title="Modified: 2019-07-11 14:49:11" itemprop="dateModified" datetime="2019-07-11T14:49:11+08:00">2019-07-11</time>
               
             
           </span>
@@ -1661,6 +1661,46 @@ st->op1->op2->op3->op4->e</textarea><textarea id="flowchart-1-options" style="di
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 

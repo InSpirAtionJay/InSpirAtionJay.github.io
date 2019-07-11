@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="随心小笔">
 <meta property="og:description" content="1. IMU 测量模型（Sensor Model）和运动学模型（Kinetic Model）一个IMU惯导测量装置包括3个轴的加速度测量仪和三个轴的角速度测量仪，在VIO系统中，世界坐标系通常认为是一个惯性系，且一般会选择初始时刻水平地理系。由于SLAM的运行场景一般较小（重力变化不大），运行时间也不会太长，且使用的IMU器件一般为mems器件（精度低，陀螺仪静置时无法敏感地感知地球自转）。因此不">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-08T09:02:41.292Z">
+<meta property="og:updated_time" content="2019-07-11T06:56:07.944Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="IMU预积分一：基本原理和白噪声">
 <meta name="twitter:description" content="1. IMU 测量模型（Sensor Model）和运动学模型（Kinetic Model）一个IMU惯导测量装置包括3个轴的加速度测量仪和三个轴的角速度测量仪，在VIO系统中，世界坐标系通常认为是一个惯性系，且一般会选择初始时刻水平地理系。由于SLAM的运行场景一般较小（重力变化不大），运行时间也不会太长，且使用的IMU器件一般为mems器件（精度低，陀螺仪静置时无法敏感地感知地球自转）。因此不">
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-08 17:02:41" itemprop="dateModified" datetime="2019-07-08T17:02:41+08:00">2019-07-08</time>
+                <time title="Modified: 2019-07-11 14:56:07" itemprop="dateModified" datetime="2019-07-11T14:56:07+08:00">2019-07-11</time>
               
             
           </span>
@@ -682,11 +682,11 @@ p_j &= p_i + \sum_{k=i}^{j-1} \left[v_k \Delta t + \frac{1}{2} g \Delta t^2 +
 \begin{array}{l}
 {\Delta \tilde{\mathbf{R}}_{i j} \approx \Delta \mathbf{R}_{i j} \operatorname{Exp}\left(\delta {\phi}_{i j}\right)=\mathbf{R}_{i}^{T} \mathbf{R}_{j} \operatorname{Exp}\left(\delta {\phi}_{i j}\right)} \\[2ex] 
 {\Delta \tilde{\mathbf{v}}_{i j} \approx \Delta \mathbf{v}_{i j}+\delta \mathbf{v}_{i j}=\mathbf{R}_{i}^{T}\left(\mathbf{v}_{j}-\mathbf{v}_{i}-\mathbf{g} \cdot \Delta t_{i j}\right)+\delta \mathbf{v}_{i j}} \\[2ex] 
-{\Delta \tilde{\mathbf{p}}_{i j} \approx \Delta \mathbf{p}_{i j}+\delta \mathbf{p}_{i j}=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)+\delta \mathbf{p}_{i j}}\end{array}</script>上式表达式为预积分测量值（${\Delta \tilde{\mathbf{R}}_{i j}$含IMU测量值以及仪器bias）与理想值之间的关系，理想值($\Delta \mathbf{R}_{i j}$含测量值仪器、bias以及白噪声)，即形如“测量值=理想值+噪声”的形式。</li>
+{\Delta \tilde{\mathbf{p}}_{i j} \approx \Delta \mathbf{p}_{i j}+\delta \mathbf{p}_{i j}=\mathbf{R}_{i}^{T}\left(\mathbf{p}_{j}-\mathbf{p}_{i}-\mathbf{v}_{i} \cdot \Delta t_{i j}-\frac{1}{2} \mathbf{g} \cdot \Delta t_{i j}^{2}\right)+\delta \mathbf{p}_{i j}}\end{array}</script>上式表达式为预积分测量值（$\Delta \tilde{\mathbf{R}}_{i j}$含IMU测量值以及仪器bias）与理想值之间的关系，理想值($\Delta \mathbf{R}_{i j}$含测量值仪器、bias以及白噪声)，即形如“测量值=理想值+噪声”的形式。</li>
 </ul>
-<h3 id="4-預积分白噪声分布分析"><a href="#4-預积分白噪声分布分析" class="headerlink" title="4. 預积分白噪声分布分析"></a>4. 預积分白噪声分布分析</h3><p>令預积分白噪声为</p>
+<h3 id="4-预积分白噪声分布分析"><a href="#4-预积分白噪声分布分析" class="headerlink" title="4. 预积分白噪声分布分析"></a>4. 预积分白噪声分布分析</h3><p>令预积分白噪声为</p>
 <script type="math/tex; mode=display">
-\mathbf{\eta}_{i j}^{\Delta} \triangleq\left[\begin{array}{ccc}{\delta {\phi}_{i j}^{T}} & {\delta \mathbf{v}_{i j}^{T}} & {\delta \mathbf{p}_{i j}^{T}}\end{array}\right]^{T}</script><p>我们希望其满足高斯分布，即$\mathbf{\eta}_{i j}^{\Delta} \sim N\left(\mathbf{0}_{9 \times 1}, \mathbf{\Sigma}_{i j}\right)$。由于$\mathbf{\eta}_{i j}^{\Delta}$是$\delta {\phi}_{i j}^{T}}$、${\delta \mathbf{v}_{i j}^{T}}$以及${\delta \mathbf{p}_{i j}^{T}}$的线性组合，下面分别对这三个噪声项的分布进行分析。</p>
+\mathbf{\eta}_{i j}^{\Delta} \triangleq\left[\begin{array}{ccc}{\delta {\phi}_{i j}^{T}} & {\delta \mathbf{v}_{i j}^{T}} & {\delta \mathbf{p}_{i j}^{T}}\end{array}\right]^{T}</script><p>我们希望其满足高斯分布，即$\mathbf{\eta}_{i j}^{\Delta} \sim N\left(\mathbf{0}_{9 \times 1}, \mathbf{\Sigma}_{i j}\right)$。由于$\mathbf{\eta}_{i j}^{\Delta}$是$\delta {\phi}_{i j}^{T}$、${\delta \mathbf{v}_{i j}^{T}}$以及${\delta \mathbf{p}_{i j}^{T}}$的线性组合，下面分别对这三个噪声项的分布进行分析。</p>
 <ul>
 <li><p>(1)$\delta {\phi}_{i j}$的分布形式</p>
 <script type="math/tex; mode=display">
@@ -1018,7 +1018,7 @@ B_{j-1}&=\left[\begin{array}{cc}{\mathbf{J}_{r}^{j-1} \Delta t} & {\mathbf{0}} \
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-IMU-测量模型（Sensor-Model）和运动学模型（Kinetic-Model）"><span class="nav-text">1. IMU 测量模型（Sensor Model）和运动学模型（Kinetic Model）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-测量预测更新"><span class="nav-text">2. 测量预测更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-白噪声预分离"><span class="nav-text">3. 白噪声预分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-預积分白噪声分布分析"><span class="nav-text">4. 預积分白噪声分布分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-预积分白噪声递推形式"><span class="nav-text">4. 预积分白噪声递推形式</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-IMU-测量模型（Sensor-Model）和运动学模型（Kinetic-Model）"><span class="nav-text">1. IMU 测量模型（Sensor Model）和运动学模型（Kinetic Model）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-测量预测更新"><span class="nav-text">2. 测量预测更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-白噪声预分离"><span class="nav-text">3. 白噪声预分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-预积分白噪声分布分析"><span class="nav-text">4. 预积分白噪声分布分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-预积分白噪声递推形式"><span class="nav-text">4. 预积分白噪声递推形式</span></a></li></ol></div>
             
 
           </div>

@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="随心小笔">
 <meta property="og:description" content="主函数说明 mono_kitty.cc1. main 入口函数，读取3个文件参数，初始化系统 strVocFile: 字典词包的路径 strSettingFile: 系统中装有一些如相机参数、view窗口的配置文件，格式为YAML strSequence: 数据集路径  2. LoadImages 函数 LoadImages(const string &amp;amp;strPathToSequence,">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-05-28T08:51:13.332Z">
+<meta property="og:updated_time" content="2019-07-11T06:49:34.535Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ORB-SLAM2源码分析一">
 <meta name="twitter:description" content="主函数说明 mono_kitty.cc1. main 入口函数，读取3个文件参数，初始化系统 strVocFile: 字典词包的路径 strSettingFile: 系统中装有一些如相机参数、view窗口的配置文件，格式为YAML strSequence: 数据集路径  2. LoadImages 函数 LoadImages(const string &amp;amp;strPathToSequence,">
@@ -474,12 +474,24 @@
                 
               
 
-              <time title="Created: 2019-05-28 09:51:42 / Modified: 16:51:13" itemprop="dateCreated datePublished" datetime="2019-05-28T09:51:42+08:00">2019-05-28</time>
+              <time title="Created: 2019-05-28 09:51:42" itemprop="dateCreated datePublished" datetime="2019-05-28T09:51:42+08:00">2019-05-28</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-11 14:49:34" itemprop="dateModified" datetime="2019-07-11T14:49:34+08:00">2019-07-11</time>
               
             
           </span>
@@ -1421,6 +1433,46 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 
