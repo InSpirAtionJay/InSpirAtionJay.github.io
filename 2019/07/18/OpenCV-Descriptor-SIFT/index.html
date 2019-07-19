@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. SIFT 简介$\quad$SIFT的全称是Scale Invariant Feature Transform，尺度不变特征变换，由加拿大教授David G.Lowe提出的。SIFT特征对旋转、尺度缩放、亮度变化等保持不变性，是一种非常稳定的局部特征。 1.1 SIFT算法具有的特点 图像的局部特征，对旋转、尺度缩放、亮度变化保持不变，对视角变化、仿射变换、噪声也保持一定程度的稳定性。 独特">
+<meta name="keywords" content="OpenCV,Descriptors">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV Descriptor SIFT">
+<meta property="og:url" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="1. SIFT 简介$\quad$SIFT的全称是Scale Invariant Feature Transform，尺度不变特征变换，由加拿大教授David G.Lowe提出的。SIFT特征对旋转、尺度缩放、亮度变化等保持不变性，是一种非常稳定的局部特征。 1.1 SIFT算法具有的特点 图像的局部特征，对旋转、尺度缩放、亮度变化保持不变，对视角变化、仿射变换、噪声也保持一定程度的稳定性。 独特">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/pyramid.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/Gaussian.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/descriptor.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/descriptor128.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/SIFT.png">
+<meta property="og:updated_time" content="2019-07-19T05:16:35.572Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenCV Descriptor SIFT">
+<meta name="twitter:description" content="1. SIFT 简介$\quad$SIFT的全称是Scale Invariant Feature Transform，尺度不变特征变换，由加拿大教授David G.Lowe提出的。SIFT特征对旋转、尺度缩放、亮度变化等保持不变性，是一种非常稳定的局部特征。 1.1 SIFT算法具有的特点 图像的局部特征，对旋转、尺度缩放、亮度变化保持不变，对视角变化、仿射变换、噪声也保持一定程度的稳定性。 独特">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/pyramid.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OpenCV Descriptor SIFT | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">22</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">10</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">34</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/18/OpenCV-Descriptor-SIFT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenCV Descriptor SIFT
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-18 12:50:56" itemprop="dateCreated datePublished" datetime="2019-07-18T12:50:56+08:00">2019-07-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-19 13:16:35" itemprop="dateModified" datetime="2019-07-19T13:16:35+08:00">2019-07-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Descriptors/" itemprop="url" rel="index"><span itemprop="name">Descriptors</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="1-SIFT-简介"><a href="#1-SIFT-简介" class="headerlink" title="1. SIFT 简介"></a>1. SIFT 简介</h3><p>$\quad$SIFT的全称是Scale Invariant Feature Transform，尺度不变特征变换，由加拿大教授David G.Lowe提出的。SIFT特征对旋转、尺度缩放、亮度变化等保持不变性，是一种非常稳定的局部特征。</p>
+<h4 id="1-1-SIFT算法具有的特点"><a href="#1-1-SIFT算法具有的特点" class="headerlink" title="1.1 SIFT算法具有的特点"></a>1.1 SIFT算法具有的特点</h4><ol>
+<li>图像的局部特征，对旋转、尺度缩放、亮度变化保持不变，对视角变化、仿射变换、噪声也保持一定程度的稳定性。</li>
+<li>独特性好，信息量丰富，适用于海量特征库进行快速、准确的匹配。</li>
+<li>多量性，即使是很少几个物体也可以产生大量的SIFT特征。</li>
+<li>高速性，经优化的SIFT匹配算法甚至可以达到实时性。</li>
+<li>扩招性，可以很方便的与其他的特征向量进行联合。</li>
+</ol>
+<h4 id="1-2-SIFT特征检测的步骤"><a href="#1-2-SIFT特征检测的步骤" class="headerlink" title="1.2 SIFT特征检测的步骤"></a>1.2 SIFT特征检测的步骤</h4><ol>
+<li><strong><em>尺度空间的极值检测</em></strong> 搜索所有尺度空间上的图像，通过高斯微分函数来识别潜在的对尺度和旋转不变的兴趣点。</li>
+<li><strong><em>特征点定位</em></strong> 在每个候选的位置上，通过一个拟合精细模型来确定位置尺度，关键点的选取依据他们的稳定程度。</li>
+<li><strong><em>特征方向赋值</em></strong> 基于图像局部的梯度方向，分配给每个关键点位置一个或多个方向，后续的所有操作都是对于关键点的方向、尺度和位置进行变换，从而提供这些特征的不变性。</li>
+<li><strong><em>特征点描述</em></strong> 在每个特征点周围的邻域内，在选定的尺度上测量图像的局部梯度，这些梯度被变换成一种表示，这种表示允许比较大的局部形状的变形和光照变换。</li>
+</ol>
+<h4 id="1-3-SIFT算法中的一些符号说明"><a href="#1-3-SIFT算法中的一些符号说明" class="headerlink" title="1.3 SIFT算法中的一些符号说明"></a>1.3 SIFT算法中的一些符号说明</h4><p>$I(x,y)$表示原图像。<br>$G(x,y,\sigma)$表示高斯滤波器，其中$G(x, y, \sigma)=\frac{1}{2 \pi \sigma^{2}} \exp \left(-\left(x^{2}+y^{2}\right) / 2 \sigma^{2}\right)$。<br>$L(x,y,\sigma)$表示由一个高斯滤波器与原图像卷积而生成的图像，即$L(x, y, \sigma)=G(x, y, \sigma) \otimes I(x, y)$。一系列的$\sigma_{i}$，则可以生成一系列的$L(x,y,\sigma)$图像，此时我们把这一系列的$L(x,y,\sigma)$图像称为原图像的一个尺度空间表示。<br>$DOG$表示高斯差分（Difference of Gaussians)，尺度为$\sigma$的高斯差分图像由尺度为$k\sigma$与尺度为$\sigma$的$L$图像生成的，$k$为两相邻尺度空间倍数的常数。$D(x, y, \sigma)=(G(x, y, k \sigma)-G(x, y, \sigma)) \otimes I(x, y)=L(x, y, k \sigma)-L(x, y, \sigma)$。<br>$O$：高斯金字塔的组数（Octave），其中值得注意的是，在实际构建中，第一组的索引可以为0也可以为-1，这个在后面解释原理。<br>$S$：高斯金字塔每一组的层数。在实际最开始构建尺度空间图像，即$L$图像的时候，构建了$S+3$层，一定要把这个$S+3$与$S$区分开，为什么是$S+3$后面分析。</p>
+<h3 id="2-构建高斯差分金字塔"><a href="#2-构建高斯差分金字塔" class="headerlink" title="2. 构建高斯差分金字塔"></a>2. 构建高斯差分金字塔</h3><p>$\quad$在一定的范围内，无论物体是大还是小，人眼都可以分辨出来。然而计算机要有相同的能力却不是那么的容易，在未知的场景中，计算机视觉并不能提供物体的尺度大小，其中的一种方法是把物体不同尺度下的图像都提供给机器，让机器能够对物体在不同的尺度下有一个统一的认知。在建立统一认知的过程中，要考虑的就是在图像在不同的尺度下都存在的特征点。</p>
+<h4 id="2-1-多分辨率图像金字塔"><a href="#2-1-多分辨率图像金字塔" class="headerlink" title="2.1 多分辨率图像金字塔"></a>2.1 多分辨率图像金字塔</h4><p>$\quad$在早期图像的多尺度通常使用图像金字塔表示形式。<br><img src="/2019/07/18/OpenCV-Descriptor-SIFT/pyramid.png" alt="pyramid.png"><br>$\quad$图像金字塔是同一图像在不同的分辨率下得到的一组结果，其生成过程一般包括两个步骤：</p>
+<ol>
+<li>对原始图像进行平滑.</li>
+<li>对处理后的图像进行降采样（通常是水平、垂直方向的1/2.降采样后得到一系列不断尺寸缩小的图像。显然，一个传统的金字塔中，每一层的图像是其上一层图像长、高的各一半。多分辨率的图像金字塔虽然生成简单，但其本质是降采样，图像的局部特征则难以保持，也就是无法保持特征的尺度不变性。</li>
+</ol>
+<h4 id="2-2-高斯尺度空间"><a href="#2-2-高斯尺度空间" class="headerlink" title="2.2 高斯尺度空间"></a>2.2 高斯尺度空间</h4><p>$\quad$我们还可以通过图像的模糊程度来模拟人在距离物体由远到近时物体在视网膜上成像过程，距离物体越近其尺寸越大图像也越模糊，这就是高斯尺度空间，使用不同的参数模糊图像（分辨率不变），是尺度空间的另一种表现形式。<br>$\quad$我们知道图像和高斯函数进行卷积运算能够对图像进行模糊，使用不同的“高斯核”可得到不同模糊程度的图像。一副图像其高斯尺度空间可由其和不同的高斯卷积得到：</p>
+<script type="math/tex; mode=display">
+L(x, y, \sigma)=G(x, y, \sigma) \otimes I(x, y)</script><p>$\quad$其中，$G(x,y,\sigma)$是高斯核函数。</p>
+<script type="math/tex; mode=display">
+G(x, y, \sigma)=\frac{1}{2 \pi \sigma^{2}} e^{\frac{x^{2}+y^{2}}{2 \sigma^{2}}}</script><p>$\quad$$\sigma$称为尺度空间因子，它是高斯正态分布的标准差，反映了图像被模糊的程度，其值越大图像越模糊，对应的尺度也就越大。$L(x,y,\sigma)$代表着图像的高斯尺度空间。构建尺度空间的目的是为了检测出在不同的尺度下都存在的特征点，而检测特征点较好的算子是Δ2G(高斯拉普拉斯,LoG）</p>
+<script type="math/tex; mode=display">
+\Delta^{2}=\frac{\partial^{2}}{\partial x^{2}}+\frac{\partial^{2}}{\partial y^{2}}</script><p>$\quad$使用LoG虽然能较好的检测到图像中的特征点，但是其运算量过大，通常可使用DoG（差分高斯，Difference of Gaussina）来近似计算LoG[Marr and Hidreth]。设k为相邻两个高斯尺度空间的比例因子，则DoG的定义为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} D(x, y, \sigma) &=[G(x, y, k \sigma)-G(x, y, \sigma)] * I(x, y) \\ &=L(x, y, k \sigma)-L(x, y, \sigma) \end{aligned}</script><p>$\quad$从上式可以知道，将相邻的两个高斯空间的图像相减就得到了DoG的响应图像。为了得到DoG图像，先要构建高斯尺度空间，而高斯的尺度空间可以在图像金字塔降采样的基础上加上高斯滤波得到，也就是对图像金字塔的每层图像使用不同的参数σ进行高斯模糊，使每层金字塔有多张高斯模糊过的图像。降采样时，金字塔上边一组图像的第一张是由其下面一组图像倒数第三张降采样得到。<br>$\quad$易知，高斯金字塔有多组，每组又有多层。一组中的多个层之间的尺度是不一样的（也就是使用的高斯参数$\sigma$是不同的），相邻两层之间的尺度相差一个比例因子$k$。如果每组有$S$层，则：</p>
+<script type="math/tex; mode=display">
+k=2^{\frac{1}{s}}</script><p>$\quad$上一组图像的最底层图像是由下一组中尺度为2σ的图像进行因子为2的降采样得到的（高斯金字塔先从底层建立）。高斯金字塔构建完成后，将相邻的高斯金字塔相减就得到了DoG金字塔。<br>$\quad$高斯金字塔的组数一般是：</p>
+<script type="math/tex; mode=display">
+o=\left[\log _{2} \min (m, n)\right]-a</script><p>$\quad$$o$表示高斯金字塔的层数，$m,n$分别是图像的行和列。减去的系数$a$可以为下列式子中的任意值：</p>
+<script type="math/tex; mode=display">
+0,1,2...\cdots \log{2}{\min(m,n)}</script><p>$\quad$和具体需要的金字塔的顶层图像的大小有关。<br>$\quad$高斯模糊参数$\sigma$(尺度空间），可由下面关系式得：</p>
+<script type="math/tex; mode=display">
+\sigma(o, s)=\sigma_{0} \cdot 2^{\frac{o+s}{s}}</script><p>$\quad$其中o为所在的组，s为所在的层，$\sigma_0$为初始的尺度，S为每组的层数。<br>$\quad$在Lowe的算法实现中$\sigma_0=1.6,O_min=−1,S=3$就是首先将原图像的长和宽各扩展一倍。<br>$\quad$从上面可以得知同一组内相邻层的图像尺度关系：</p>
+<script type="math/tex; mode=display">
+\sigma_{s+1}=k \cdot \sigma_{s}=2^{\frac{1}{s}} \cdot \sigma_{s}</script><p>$\quad$相邻组之间的尺度关系：</p>
+<script type="math/tex; mode=display">
+\sigma_{o+1}=2 \sigma_{o}</script><h4 id="2-3-第一组第一层图像的生成"><a href="#2-3-第一组第一层图像的生成" class="headerlink" title="2.3 第一组第一层图像的生成"></a>2.3 第一组第一层图像的生成</h4><p>$\quad$很多初涉SIFT的都会被这个问题所困惑，这里要分两种情况：其一是把第一组的索引定为0；其二是把第一组的索引定为-1。<br>$\quad$我们先考虑第一组索引为0的情况，我们知道第一组第一层的图像是由原图像与$\sigma_0$（一般设置为1.6）的高斯滤波器卷积生成，那么原图像是谁呢？是$I(x,y)$吗？不是！为了图像反走样的需要，通常假设输入图像是经过高斯平滑处理的，其值为$\sigma_n=0.5$，即半个像元。意思就是说我们采集到的图像$I(x,y)$，已经被$\sigma=\sigma_n=0.5$的高斯滤波器平滑过了。所以我们不能直接对$I(x,y)$用$\sigma_0$的高斯滤波器平滑，而应该用$\sigma=\sqrt{\sigma_{0}^{2}-\sigma_{n}^{2}}$的高斯滤波器去平滑$I(x,y)$，即</p>
+<script type="math/tex; mode=display">
+FirstLayer(x, y)=I(x, y) \otimes G\left(x, y, \sqrt{\sigma_{0}^{2}-\sigma_{n}^{2}}\right)</script><p>$\quad$其中$FirstLayer(x,y)$表示整个尺度空间为第1组第1层的图像，$\sigma_0$一般取1.6，$\sigma_n=0.5$。<br>$\quad$现在我们来考虑把第一组的索引定为-1的情况。那么首先第一个问题便是为什么要把索引定为-1。如果索引为0，如上面那种情况所示，整个尺度空间的第1组的第1层图像已经是由原图像模糊生成的了，那么也就是说已经丢失了细节信息，那么原图像我们完全没有利用上。基于这种考虑，我们先将图像放大2倍，这样原图像的细节就隐藏在了其中。由上面一种情况分析，我们已经知道了$I(x,y)$看成是已经被$\sigma_n=0.5$模糊过的图像，那么将$I(x,y)$放大2倍后得到$I_s(x,y)$，则可以看为是被$2\sigma=1$的高斯核模糊过的图像。那么由$I_s$生成第1组第1层的图像用的高斯滤波器的$\sigma=\sqrt{\sigma_{0}^{2}-(2\sigma_{n})^{2}}$。可以表示为</p>
+<script type="math/tex; mode=display">
+FirstLayer(x, y)=I(x, y) \otimes G\left(x, y, \sqrt{\sigma_{0}^{2}-(2\sigma_{n})^{2}}\right)</script><p>$\quad$其中$FirstLayer(x,y)$表示整个尺度空间为第1组第1层的图像，$I_s(x,y)$是由$I(x,y)$用双线性插值放大后的图像。$\sigma_0$一般取1.6，$\sigma_n=0.5$。</p>
+<h4 id="2-4-尺度空间中生成了多少幅图像"><a href="#2-4-尺度空间中生成了多少幅图像" class="headerlink" title="2.4 尺度空间中生成了多少幅图像"></a>2.4 尺度空间中生成了多少幅图像</h4><p>$\quad$我们知道$S$是我们最终构建出来的用来寻找特征点的高斯差分图像，而特征点的寻找需要查找的是空间局部极小值，即在某一层上查找局部极值点的时候需要用到上一层与下一层的高斯差分图像，所以如果我们需要查找$S$层的特征点，需要$S+2$层高斯差分图像，然后查找其中的第2层到第$S+1$层。<br><img src="/2019/07/18/OpenCV-Descriptor-SIFT/Gaussian.png" alt="Gaussian.png"><br>$\quad$而每一个高斯差分图像$G(x,y,\sigma)$都需要两幅尺度空间的图像$L(x,y,k\sigma)$与$L(x,y,\sigma)$进行差分生成，这里假设$S =3$，则我们需要的高斯差分图像有$S+2 = 5$张，分别为</p>
+<script type="math/tex; mode=display">G(x,y,\sigma),G(x,y,k\sigma),G(x,y,k^2\sigma),G(x,y,k^3\sigma),G(x,y,k^4\sigma)</script><p>其中的$G(x,y,k\sigma),G(x,y,k^2\sigma),G(x,y,k^3\sigma)$这三张图像是我们用来查找局部极值点的图像。那么我们则需要$S+3 = 6$张尺度空间图像来生成上面那些高斯差分图像，它们分别为：</p>
+<script type="math/tex; mode=display">
+L(x,y,\sigma),L(x,y,k\sigma),L(x,y,k^2\sigma),L(x,y,k^3\sigma),L(x,y,k^4\sigma),L(x,y,k^5\sigma)</script><p>$\quad$从上面的分析，我们知道对于尺度空间来说，我们一共需要S+3层图像来构建出来S+2层高斯差分图像。所以，如果整个尺度空间一共有O组，每组有S+3层图像。共O*(S+3)张尺度图像，如果我们查找OpenCV中的SIFT源码，则很容易找到如下代码来说明问题：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">pyr</span><span class="selector-class">.resize</span>(<span class="selector-tag">nOctaves</span>*(<span class="selector-tag">nOctaveLayers</span> + 3));</span><br></pre></td></tr></table></figure></p>
+<p>$\quad$上面代码中的pyr代表了整个尺度空间的图像，nOctaves为组数，nOctaveLayers即为我们定义的S。</p>
+<h4 id="2-5-为什么是倒数第3张"><a href="#2-5-为什么是倒数第3张" class="headerlink" title="2.5 为什么是倒数第3张"></a>2.5 为什么是倒数第3张</h4><p>$\quad$相信你在看很多SIFT算法描述里都这样写着，取上一张的倒数第3张图像隔行采样后作为下一组的第一张图像。答案是为了保证尺度空间的连续性，我们下面来仔细分析。<br>$\quad$我们知道对于尺度空间第$o$组，第$s$层的图像，它的尺度为$\sigma=\sigma_0k^{(o+s/S)}$，其中，$k=1 / 2, o \in[0,1,2, \ldots, \text { nOctave }-1], s \in[0,1,2, \ldots, S+2]$。那么我们从第0组开始，看它各层的尺度。<br>第0组：$\sigma_{o} \rightarrow 2^{1 / 3} \sigma_{0} \rightarrow 2^{2 / 3} \sigma_{0} \rightarrow 2^{3 / 3} \sigma_{0} \rightarrow 2^{4 / 3} \sigma_{0} \rightarrow 2^{5 / 3} \sigma_{0}$<br>第1组：$2\sigma_{o} \rightarrow 2 \ast 2^{1 / 3} \sigma_{0} \rightarrow 2 \ast 2^{2 / 3} \sigma_{0} \rightarrow 2 \ast 2^{3 / 3} \sigma_{0} \rightarrow 2 \ast 2^{4 / 3} \sigma_{0} \rightarrow 2 \ast 2^{5 / 3} \sigma_{0}$<br>$\quad$我们只分析2组便可以看出，第1组的第0层图像恰好与第0组的倒数第三幅图像一致，尺度都为$ 2 \sigma $，所以我们不需要再根据原图来重新卷积生成每组的第0张图像，只需采用上一层的倒数第3张来降采样即可。<br>$\quad$我们也可以继续分析，第0组尺度空间得到的高斯差分图像的尺度为：$\sigma_{0} \rightarrow 2^{1 / 3} \sigma_{0} \rightarrow 2^{2 / 3} \sigma_{0} \rightarrow 2^{3 / 3} \sigma_{0} \rightarrow 2^{4 / 3} \sigma_{0}$<br>而第1组尺度空间得到的高斯差分图像的尺度为：$2\sigma_{0} \rightarrow 2 \ast 2^{1 / 3} \sigma_{0} \rightarrow 2 \ast 2^{2 / 3} \sigma_{0} \rightarrow 2 \ast 2^{3 / 3} \sigma_{0} \rightarrow 2 \ast 2^{4 / 3} \sigma_{0}$<br>如果我们把它们的中间三项取出来拼在一起，则尺度为$2^{1 / 3} \sigma_{0} \rightarrow 2^{2 / 3} \sigma_{0} \rightarrow 2^{3 / 3} \sigma_{0} \rightarrow 2 \ast 2^{1 / 3} \sigma_{0} \rightarrow 2 \ast 2^{2 / 3} \sigma_{0} \rightarrow 2 \ast 2^{3 / 3} \sigma_{0} $，正好连续！！这一效果带来的直接的好处是在尺度空间的极值点确定过程中，我们不会漏掉任何一个尺度上的极值点，而是能够综合考虑量化的尺度因子。</p>
+<h4 id="2-6-用第i-1层的图像生成第i层的图像"><a href="#2-6-用第i-1层的图像生成第i层的图像" class="headerlink" title="2.6 用第i-1层的图像生成第i层的图像"></a>2.6 用第i-1层的图像生成第i层的图像</h4><p>$\quad$值得注意的是，在SITF的源码里，尺度空间里的每一层的图像（除了第1层）都是由其前面一层的图像和一个相对$\sigma$的高斯滤波器卷积生成，而不是由原图和对应尺度的高斯滤波器生成的，这一方面是因为我前面提到的不存在所谓意思上的“原图”，我们的输入图像$I(x,y)$已经是尺度为$\sigma$的图像了。另一方面是由于如果用原图计算，那么相邻两层之间相差的尺度实际上非常小，这样会造成在做高斯差分图像的时候，大部分值都趋近于0，以致于后面我们很难检测到特征点。<br>$\quad$基于上面两点原因（个人认为原因1是最主要的，原因2只是根据实际尝试后的一个猜想，并无理论依据），所以对于每一组的第i+1层的图像，都是由第i层的图像和一个相对尺度的高斯滤波器卷积生成。<br>$\quad$那么相对尺度如何计算呢，我们首先考虑第0组，它们的第i+1层图像与第i层图像之间的相对尺度为$\sigma_{Diff_i}=\sqrt{\left(\sigma_{0} k^{i+1}\right)^{2}-\left(\sigma_{0} k^{i}\right)^{2}}$，为了保持尺度的连续性，后面的每一组都用这样一样相对尺度（SIFT实际代码里是这样做的）。</p>
+<h3 id="3-特征点的搜索"><a href="#3-特征点的搜索" class="headerlink" title="3. 特征点的搜索"></a>3. 特征点的搜索</h3><h4 id="3-1-搜索策略"><a href="#3-1-搜索策略" class="headerlink" title="3.1 搜索策略"></a>3.1 搜索策略</h4><p>$\quad$角点的搜索是通过同一组内各DoG相邻层之间比较完成的。为了寻找尺度空间的极值点，每一个采样点要和它所有的相邻点进行比较，看其是否比它的图像域和尺度域的相邻点大或小。对于其中的任意一个检测点都要和它同尺度的8个相邻点和上下相邻尺度对应的9×2个点共26个点比较，以确保在尺度空间和二维图像位置空间都检测到极值点。也就是，比较是在一个3×3的立方体内进行。搜索过程从每组的第二层开始，以第二层为当前层，对第二层的DoG图像中的每个点取一个3×3的立方体，立方体上下层为第一层与第三层。这样，搜索得到的极值点既有位置坐标（DoG的图像坐标），又有空间尺度坐标（层坐标）。当第二层搜索完成后，再以第三层作为当前层，其过程与第二层的搜索类似。当S=3时，每组里面要搜索3层。</p>
+<h4 id="3-2-子像元插值并剔除不好的极值点"><a href="#3-2-子像元插值并剔除不好的极值点" class="headerlink" title="3.2 子像元插值并剔除不好的极值点"></a>3.2 子像元插值并剔除不好的极值点</h4><p>$\quad$通过比较检测得到的DoG的局部极值点实在离散的空间搜索得到的，由于离散空间是对连续空间采样得到的结果，因此在离散空间找到的极值点不一定是真正意义上的极值点，因此要设法将不满足条件的点剔除掉。可以通过尺度空间DoG函数进行曲线拟合寻找极值点，这一步的本质是去掉DoG局部曲率非常不对称的点。下图显示了一维信号离散空间得到的极值点与连续空间的极值点之间的差别。利用已知的离散空间点插值到连续空间极值点的方法叫子像元插值。<br>$\quad$首先我们来看一个一维函数插值的例子。我们已经知道$f(x)$上几个点的函数值$f(−1)=1,f(0)=6,f(1)=5$，求$f(x)$在$[−1,1]$上的最大值。<br>$\quad$如果我们只考虑离散的情况，那么只用简单比较一下，便知最大值为$f(0)=6$，下面我们用子像元插值法来考虑连续区间的上情况：<br>$\quad$利用泰勒级数，可以将$f(x)$在$f(0)$附近展开为：</p>
+<script type="math/tex; mode=display">
+f(x) \approx f(0)+f^{\prime}(0) x+\frac{f^{\prime \prime}(0)}{2} x^{2}</script><p>$\quad$另外我们知道$f(x)$在$x$处的导数写成离散的形式为$f^{\prime}(x)=\frac{f(x+1)-f(x)}{2}$，二阶导数写成离散形式为$f^{\prime \prime}(x)=f(x+1)+f(x-1)-2 f(x)$。</p>
+<p>$\quad$所以，我们可以算出$f(x) \approx 6+2 x+\frac{-6}{2} x^{2}=6+2 x-3 x^{2}$<br>$\quad$求取函数$f(x)$的极大值和极大值所在的位置：</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}{f^{\prime}(x)=2-6 x=0, \quad \hat{x}=\frac{1}{3}} \\ {f(\hat{x})=6+2 \times \frac{1}{3}-3 \times\left(\frac{1}{3}\right)^{2}=6 \frac{1}{3}}\end{array}</script><p>$\quad$现在回到我们SIFT点检测中来，我们要考虑的是一个三维问题，假设我们在尺度为$\sigma$的尺度图像$D(x,y)$上检测到了一个局部极值点，空间位置为$(x,y,\sigma)$，由上面的分析我们知道，它只是一个离散情况下的极值点，连续情况下，极值点可能落在了$(x,y,\sigma)$的附近，设其偏离了$(x,y,\sigma)$的坐标为$(x + \Delta x,y + \Delta y,\sigma + \Delta \sigma)$。则对$(x + \Delta x,y + \Delta y,\sigma + \Delta \sigma)$可以表示为在点$(x,y,\sigma)$处的泰勒展开：</p>
+<script type="math/tex; mode=display">
+D(x + \Delta x, y + \Delta y, \sigma + \Delta \sigma)=D(x, y, \sigma)+\left[\begin{array}{ccc}{\frac{\partial D}{x}} & {\frac{\partial D}{y}} & {\frac{\partial D}{\sigma}}\end{array}\right]\left[\begin{array}{c}{\Delta x} \\ {\Delta y} \\ {\Delta \sigma}\end{array}\right]  \\
++\frac{1}{2}\begin{bmatrix}\Delta x \Delta y \Delta \sigma \end{bmatrix}
+\begin{bmatrix}
+\frac{\partial^{2} D}{\partial x^{2}} & \frac{\partial^{2} D}{\partial x \partial y}  & \frac{\partial^{2} D}{\partial x \partial \sigma}\\
+\frac{\partial^{2} D}{\partial y d x} & \frac{\partial^{2} D}{\partial y^{2}} & \frac{\partial^{2} D}{\partial y \partial \sigma}\\
+\frac{\partial^{2} D}{\partial \sigma \partial x} & \frac{\partial^{2} D}{\partial \sigma \partial y} & \frac{\partial^{2} D}{\partial \sigma^{2}}
+\end{bmatrix}
+\left[\begin{array}{l}{\Delta x} \\ {\Delta y} \\ {\Delta \sigma}\end{array}\right]</script><p>$\quad$可以将上式写成矢量形式如下：</p>
+<script type="math/tex; mode=display">
+D(x)=D+\frac{\partial D^{T}}{\partial x} \Delta x+\frac{1}{2} \Delta x^{T} \frac{\partial^{2} D^{T}}{\partial x^{2}} \Delta x</script><p>$\quad$令上式的一阶导数等于0，可以求得$\Delta x=-\frac{\partial^{2} D^{-1}}{\partial x^{2}} \frac{\partial D(x)}{\partial x}$<br>$\quad$然后再把求得的Δx代入到D(x)的泰勒展开式中：<br>$\quad$通过多次迭代(Lowe算法里最多迭代5次)，得到最终候选点的精确位置与尺度$\hat{x}$，将其代入公式</p>
+<script type="math/tex; mode=display">
+D(\hat{x})=D+\frac{1}{2} \frac{\partial D^{T}}{\partial x} \hat{x}</script><p>$\quad$求得$D(\hat{x})$，设对比度的阈值为$T$，若$|D(\hat{x})|&gt;=T$，则该特征点保留，否则剔除。</p>
+<h4 id="3-3-删除边缘效应"><a href="#3-3-删除边缘效应" class="headerlink" title="3.3 删除边缘效应"></a>3.3 删除边缘效应</h4><p>$\quad$为了得到稳定的特征点，只是删除DoG响应值低的点是不够的。由于DoG对图像中的边缘有比较强的响应值，而一旦特征点落在图像的边缘上，这些点就是不稳定的点。一方面图像边缘上的点是很难定位的，具有定位歧义性；另一方面这样的点很容易受到噪声的干扰而变得不稳定。<br>$\quad$一个平坦的DoG响应峰值往往在横跨边缘的地方有较大的主曲率，而在垂直边缘的方向有较小的主曲率。而主曲率可以通过2×2的Hessian矩阵H求出：</p>
+<script type="math/tex; mode=display">
+H(x, y)=\left[\begin{array}{ll}{D_{x x}(x, y)} & {D_{x y}(x, y)} \\ {D_{x y}(x, y)} & {D_{y y}(x, y)}\end{array}\right]</script><p>$\quad$上式中，D值可以通过求取邻近点像素的差分得到。H的特征值与D的主曲率成正比例。我们可以避免求取具体的特征值，因为我们只关心特征值的比例。令$\alpha=\lambda_{max}$为最大的特征值，$\beta=\lambda_{min}$为最小的特征值，那么，我们通过H矩阵直迹计算它们的和，通过H矩阵的行列式计算它们的乘积：</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}{\operatorname{Tr}(H)=D_{x x}+D_{y y}=\alpha+\beta} \\ {\operatorname{Det}(H)=D_{x x} D_{y y}-\left(D_{x y}\right)^{2}=\alpha \beta}\end{array}</script><p>$\quad$如果$\gamma$为最大特征值与最小特征值之间的比例，那么$\alpha=\gamma \beta$，这样便有</p>
+<script type="math/tex; mode=display">
+\frac{T r(H)^{2}}{\operatorname{Det}(H)}=\frac{(\alpha+\beta)^{2}}{\alpha \beta}=\frac{(\gamma+1)^{2}}{\gamma}</script><p>$\quad$上式的结果只与两个特征值的比例有关，而与具体特征值无关。当两个特征值相等时,$\frac{(\gamma+1)^{2}}{\gamma}$最小。随着$\gamma$的增加，$\frac{(\gamma+1)^{2}}{\gamma}$的值也增加。所以要想检查主曲率的比例小于某一阈值$\gamma$，只要检查下式是否成立：</p>
+<script type="math/tex; mode=display">
+\frac{\operatorname{Tr}(H)^{2}}{\operatorname{Det}(H)}<\frac{(\gamma+1)^{2}}{\gamma}</script><p>$\quad$Lowe在论文中给出的$\gamma=10$。也就是说对于主曲率比值大于10的特征点将被删除。</p>
+<h3 id="4-求取特征点的主方向"><a href="#4-求取特征点的主方向" class="headerlink" title="4. 求取特征点的主方向"></a>4. 求取特征点的主方向</h3><p>$\quad$经过上面的步骤已经找到了在不同尺度下都存在的特征点，为了实现图像旋转不变性，需要给特征点的方向进行赋值。利用特征点邻域像素的梯度分布特性来确定其方向参数，再利用图像的梯度直方图求取关键点局部结构的稳定方向。<br>$\quad$找到了特征点，也就可以得到该特征点的尺度σ，也就可以得到特征点所在的尺度图像：</p>
+<script type="math/tex; mode=display">
+L(x, y)=G(x, y, \sigma) * I(x, y)</script><p>$\quad$计算以特征点为中心、以3×1.5σ为半径的区域图像的幅角和幅值，每个点$L(x,y)$的梯度的模$m(x,y)$以及方向$θ(x,y)$可通过下面公式求得：</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}{m(x, y)=\sqrt{[L(x+1, y)-L(x-1, y)]^{2}+[L(x, y+1)-L(x, y-1)]^{2}}} \\ {\theta(x, y)=\arctan \frac{L(x, y+1)-L(x, y-1)}{L(x+1, y)-L(x-1, y)}}\end{array}</script><p>$\quad$计算得到梯度方向后，就要使用直方图统计特征点邻域内像素对应的梯度方向和幅值。梯度方向的直方图的横轴是梯度方向的角度（梯度方向的范围是0到360度，直方图每36度一个柱共10个柱，或者每45度一个柱共8个柱），纵轴是梯度方向对应梯度幅值的累加，在直方图的峰值就是特征点的主方向。在Lowe的论文还提到了使用高斯函数对直方图进行平滑以增强特征点近的邻域点对关键点方向的作用，并减少突变的影响。为了得到更精确的方向，通常还可以对离散的梯度直方图进行插值拟合。具体而言，关键点的方向可以由和主峰值最近的三个柱值通过抛物线插值得到。在梯度直方图中，当存在一个相当于主峰值80%能量的柱值时，则可以将这个方向认为是该特征点辅助方向。所以，一个特征点可能检测到多个方向（也可以理解为，一个特征点可能产生多个坐标、尺度相同，但是方向不同的特征点）。Lowe在论文中指出：15%的关键点具有多方向，而且这些点对匹配的稳定性很关键。<br>$\quad$得到特征点的主方向后，对于每个特征点可以得到三个信息$(x,y,\sigma,\theta)$，即位置、尺度和方向。由此可以确定一个SIFT特征区域，一个SIFT特征区域由三个值表示，中心表示特征点位置，半径表示关键点的尺度，箭头表示主方向。具有多个方向的关键点可以被复制成多份，然后将方向值分别赋给复制后的特征点，一个特征点就产生了多个坐标、尺度相等，但是方向不同的特征点。</p>
+<h3 id="5-生成特征点的描述符"><a href="#5-生成特征点的描述符" class="headerlink" title="5. 生成特征点的描述符"></a>5. 生成特征点的描述符</h3><p>$\quad$通过以上的步骤已经找到了SIFT特征点位置、尺度和方向信息，下面就需要使用一组向量来描述关键点也就是生成特征点描述子，这个描述符不只包含特征点，也含有特征点周围对其有贡献的像素点。<strong><em>描述子应具有较高的独立性，以保证匹配率。</em></strong><br>$\quad$特征描述符的生成大致有三个步骤：</p>
+<ol>
+<li>校正旋转主方向，确保旋转不变性。</li>
+<li>生成描述子，最终形成一个128维的特征向量</li>
+<li>归一化处理，将特征向量长度进行归一化处理，进一步消除光照的影响。</li>
+</ol>
+<p>$\quad$为了保证特征矢量的旋转不变性，要以特征点为中心，在附近邻域内将坐标轴旋转$\theta$（特征点的主方向）角度，即将坐标轴旋转为特征点的主方向。旋转后邻域内像素的新坐标为：</p>
+<script type="math/tex; mode=display">
+\left[\begin{array}{l}{x^{\prime}} \\ {y^{\prime}}\end{array}\right]=\left[\begin{array}{cc}{\cos \theta} & {-\sin \theta} \\ {\sin \theta} & {\cos \theta}\end{array}\right]\left[\begin{array}{l}{x} \\ {y}\end{array}\right]</script><p>$\quad$旋转后以主方向为中心取8×8的窗口。下图所示，左图的中央为当前关键点的位置，每个小格代表为关键点邻域所在尺度空间的一个像素，求取每个像素的梯度幅值与梯度方向，箭头方向代表该像素的梯度方向，长度代表梯度幅值，然后利用高斯窗口对其进行加权运算。最后在每4×4的小块上绘制8个方向的梯度直方图，计算每个梯度方向的累加值，即可形成一个种子点，如右图所示。每个特征点由4个种子点组成，每个种子点有8个方向的向量信息。这种邻域方向性信息联合增强了算法的抗噪声能力，同时对于含有定位误差的特征匹配也提供了比较理性的容错性。<br><img src="/2019/07/18/OpenCV-Descriptor-SIFT/descriptor.png" alt="descriptor.png"><br>$\quad$与求主方向不同，此时每个种子区域的梯度直方图在0-360之间划分为8个方向区间，每个区间为45度，即每个种子点有8个方向的梯度强度信息。在实际的计算过程中，为了增强匹配的稳健性，Lowe建议对每个关键点使用4×4共16个种子点来描述，这样一个关键点就可以产生128维的SIFT特征向量。<br><img src="/2019/07/18/OpenCV-Descriptor-SIFT/descriptor128.png" alt="descriptor128.png"><br>$\quad$通过对特征点周围的像素进行分块，计算块内梯度直方图，生成具有独特性的向量，这个向量是该区域图像信息的一种抽象，具有唯一性。</p>
+<h3 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h3><p>$\quad$SIFT特征以其对旋转、尺度缩放、亮度等保持不变性，是一种非常稳定的局部特征，在图像处理和计算机视觉领域有着很重要的作用，其本身也是非常复杂的，下面对其计算过程做一个粗略总结。</p>
+<ol>
+<li><strong><em>DoG尺度空间的极值检测</em></strong> 首先是构造DoG尺度空间，在SIFT中使用不同参数的高斯模糊来表示不同的尺度空间。而构造尺度空间是为了检测在不同尺度下都存在的特征点，特征点的检测比较常用的方法是Δ2G（高斯拉普拉斯LoG），但是LoG的运算量是比较大的，Marr和Hidreth曾指出，可以使用DoG（差分高斯）来近似计算LoG，所以在DoG的尺度空间下检测极值点。</li>
+<li><strong><em>删除不稳定的极值点</em></strong> 主要删除两类：低对比度的极值点以及不稳定的边缘响应点。</li>
+<li><strong><em>确定特征点的主方向</em></strong> 以特征点的为中心、以3×1.5σ为半径的领域内计算各个像素点的梯度的幅角和幅值，然后使用直方图对梯度的幅角进行统计。直方图的横轴是梯度的方向，纵轴为梯度方向对应梯度幅值的累加值，直方图中最高峰所对应的方向即为特征点的方向。</li>
+<li><strong><em>生成特征点的描述子</em></strong> 首先将坐标轴旋转为特征点的方向，以特征点为中心的16×16的窗口的像素的梯度幅值和方向，将窗口内的像素分成16块，每块是其像素内8个方向的直方图统计，共可形成128维的特征向量。</li>
+</ol>
+<h3 id="7-OpenCV-函数"><a href="#7-OpenCV-函数" class="headerlink" title="7. OpenCV 函数"></a>7. OpenCV 函数</h3><p><img src="/2019/07/18/OpenCV-Descriptor-SIFT/SIFT.png" alt="SIFT.png"><br>nfeatures 表示需要提取的最大特征点数目，如果设置为0，算法会返回所有能够提取到的特征点。<br>nOctaveLayers 每一组的层数，最终的层数（默认为3），最初建立的金字塔层数是nOctaveLayers+3<br>contrastThreshold 对比度阈值，默认为0.04，局部最大曲率截断阈值，检测得到的特征点在局部亚像素级是否具有较大主曲率，主曲率大于0.04保留，否则剔除<br>edgeThreshold 边缘阈值，默认为10，检测两个特征值的比例，如果比例大于阈值，则认为是好的特征点，需要保留，否则剔除<br>sigma 金字塔的尺度信息</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OpenCV/" rel="tag"># OpenCV</a>
+          
+            <a href="/tags/Descriptors/" rel="tag"># Descriptors</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/18/OpenCV-Descriptor-FAST/" rel="next" title="OpenCV Descriptor FAST">
+                <i class="fa fa-chevron-left"></i> OpenCV Descriptor FAST
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">34</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-SIFT-简介"><span class="nav-text">1. SIFT 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-SIFT算法具有的特点"><span class="nav-text">1.1 SIFT算法具有的特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-SIFT特征检测的步骤"><span class="nav-text">1.2 SIFT特征检测的步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-SIFT算法中的一些符号说明"><span class="nav-text">1.3 SIFT算法中的一些符号说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-构建高斯差分金字塔"><span class="nav-text">2. 构建高斯差分金字塔</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-多分辨率图像金字塔"><span class="nav-text">2.1 多分辨率图像金字塔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-高斯尺度空间"><span class="nav-text">2.2 高斯尺度空间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-第一组第一层图像的生成"><span class="nav-text">2.3 第一组第一层图像的生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-尺度空间中生成了多少幅图像"><span class="nav-text">2.4 尺度空间中生成了多少幅图像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-为什么是倒数第3张"><span class="nav-text">2.5 为什么是倒数第3张</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-用第i-1层的图像生成第i层的图像"><span class="nav-text">2.6 用第i-1层的图像生成第i层的图像</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-特征点的搜索"><span class="nav-text">3. 特征点的搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-搜索策略"><span class="nav-text">3.1 搜索策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-子像元插值并剔除不好的极值点"><span class="nav-text">3.2 子像元插值并剔除不好的极值点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-删除边缘效应"><span class="nav-text">3.3 删除边缘效应</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-求取特征点的主方向"><span class="nav-text">4. 求取特征点的主方向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-生成特征点的描述符"><span class="nav-text">5. 生成特征点的描述符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-总结"><span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-OpenCV-函数"><span class="nav-text">7. OpenCV 函数</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

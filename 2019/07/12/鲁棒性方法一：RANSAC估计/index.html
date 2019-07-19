@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1. 直线的RANSAC估计方法RANSAC(RANdom SAmple Consensus)方法是由Fischler和Bolles于1981年所引入的鲁棒方法。最初它被用于三点确定摄像机姿态的估计，现在无论在计算机视觉领域还是在其它学科的估计问题中都有广泛的应用。对于处理大比例的外点，RANSAC是十分有效的。我们先从直线估计的简单例子来说明RANSAC的基本思想。在几何上，鲁棒估计一条直线可描">
+<meta name="keywords" content="Optimization,Fundamental Matrix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="鲁棒性方法一：RANSAC估计">
+<meta property="og:url" content="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/index.html">
+<meta property="og:site_name" content="随心小笔">
+<meta property="og:description" content="1. 直线的RANSAC估计方法RANSAC(RANdom SAmple Consensus)方法是由Fischler和Bolles于1981年所引入的鲁棒方法。最初它被用于三点确定摄像机姿态的估计，现在无论在计算机视觉领域还是在其它学科的估计问题中都有广泛的应用。对于处理大比例的外点，RANSAC是十分有效的。我们先从直线估计的简单例子来说明RANSAC的基本思想。在几何上，鲁棒估计一条直线可描">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/RANSAC.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/distance.png">
+<meta property="og:updated_time" content="2019-07-12T07:32:38.954Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="鲁棒性方法一：RANSAC估计">
+<meta name="twitter:description" content="1. 直线的RANSAC估计方法RANSAC(RANdom SAmple Consensus)方法是由Fischler和Bolles于1981年所引入的鲁棒方法。最初它被用于三点确定摄像机姿态的估计，现在无论在计算机视觉领域还是在其它学科的估计问题中都有广泛的应用。对于处理大比例的外点，RANSAC是十分有效的。我们先从直线估计的简单例子来说明RANSAC的基本思想。在几何上，鲁棒估计一条直线可描">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/RANSAC.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>鲁棒性方法一：RANSAC估计 | 随心小笔</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/lemonlikelihood" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">随心小笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">夏日炎炎，你是我偶然撞到的风景</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags<span class="badge">22</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories<span class="badge">10</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">34</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>Schedule</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-sitemap">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/sitemap.xml" rel="section"><i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>Sitemap</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/12/鲁棒性方法一：RANSAC估计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lemonlikelihood">
+      <meta itemprop="description" content="学而时习之，不亦乐乎">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随心小笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">鲁棒性方法一：RANSAC估计
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-12 10:38:23 / Modified: 15:32:38" itemprop="dateCreated datePublished" datetime="2019-07-12T10:38:23+08:00">2019-07-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Optimization/" itemprop="url" rel="index"><span itemprop="name">Optimization</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             Views:  
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <span id="busuanzi_value_page_pv"></span>次阅读
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="1-直线的RANSAC估计方法"><a href="#1-直线的RANSAC估计方法" class="headerlink" title="1. 直线的RANSAC估计方法"></a>1. 直线的RANSAC估计方法</h3><p>RANSAC(RANdom SAmple Consensus)方法是由Fischler和Bolles于1981年所引入的鲁棒方法。最初它被用于三点确定摄像机姿态的估计，现在无论在计算机视觉领域还是在其它学科的估计问题中都有广泛的应用。对于处理大比例的外点，RANSAC是十分有效的。我们先从直线估计的简单例子来说明RANSAC的基本思想。<br>在几何上，鲁棒估计一条直线可描述为：给定一组二维测量数据点，寻找一条直线使得测量点到该直线的几何距离的平方和达到最小，即该直线最小化测量点到直线的几何距离平方和，并且使得内点偏离该直线的距离小于$t$个单位。因此，这个问题有两个要求:</p>
+<ol>
+<li>用一条直线拟合测量数据点；</li>
+<li>根据阈值 t 将测量数据分为内点与外点； </li>
+</ol>
+<p>其中，阈值$t$是根据测量噪声而设置的，具体做法将在下文中讨论。</p>
+<hr>
+<p>RANSAC直线拟合的思想是比较简单的，主要有以下几步：</p>
+<ol>
+<li>随机选择两点(确定一条直线所需要的最小点集)；由这两个点确定一条线l；</li>
+<li>根据阈值t，确定与直线 l 的几何距离小于 t 的数据点集S(l)，并称它为直线 l 的一致集；</li>
+<li>重复若干次随机选择，得到直线l1,l2,l3,…,ln和相应的一致集S(1),S(2),S(3),…,S(n)；</li>
+<li>使用几何距离，求最大一致集的最佳拟合直线，作为数据点的最佳匹配直线。</li>
+</ol>
+<p>如果随机选择的两点中存在外点，则这两点所确定的直线一般不会有大的一致集，所以根据一致集的大小对所估计的直线进行评价有利于获取得更好的拟合直线，如图所示。正如Fischler和Bolles所指出：RANSAC与通常的数据最佳拟合技术相反，不是用尽可能多的数据点去获得模型的估计，而是用尽可能少的可行数据并尽量地扩大一致性数据集。</p>
+<hr>
+<h3 id="2-RANSAC一般估计方法"><a href="#2-RANSAC一般估计方法" class="headerlink" title="2. RANSAC一般估计方法"></a>2. RANSAC一般估计方法</h3><p>根据上节估计直线的思想，对于一般模型$M$和给定的测量数据点集$D$，RANSAC估计模型参数$p$的一般步骤如下:</p>
+<ol>
+<li>确定求解模型 M ，即确定模型参数 p ，所需要的最小数据点的个数 n 。由 n 个数据点组成的子集称为模型 M 的一个样本;</li>
+<li>从数据点集 D 中随机地抽取一个样本 J由该样本计算模型的一个实例 M_p(J) ，确定与M_p(J) 之间几何距离 &lt; 阈值 t 的数据点所构成的集合，并记为 S(M_p(J)),称为实例M_p(J)的一致集;</li>
+<li>如果在一致集 S(M_p(J))中数据点的个数#S(M_p(J)) &gt; 阈值 T, 则用 S(M_p(J))重新估计模型 M，并输出结果；如果#S(M_p(J)) &lt; 阈值 T，返回到步骤 2;</li>
+<li>经过 K 次随机抽样,选择最大的一致集S(M_p(J)) ,用S(M_p(J)) 重新估计模型 M，并输出结果。</li>
+</ol>
+<h3 id="3-抽样次数"><a href="#3-抽样次数" class="headerlink" title="3. 抽样次数"></a>3. 抽样次数</h3><p>样本由从测量数据集中均匀随机抽取的子集所构成，每个样本所包含数据点的个数$n$是确定模型参数所需要数据点的最小数目。例如:直线最少需要两个数据点才能确定，即 $n = 2$；圆最少需要3 个数据点，即 $n = 3$ 。至于为什么要选择最小数目，下文将给出解释。为了陈述方便，称不包含外点的样本为好样本，否则称为坏样本。在执行 RANSAC 时，通常没有必要尝试每一种可能的抽样，实际上尝试每一种可能的抽样在计算上也是不可行的。只要选择足够多的抽样次数$K$，保证至少能得一个好样本就可以了。假定数据点集中含有内点的比例是$wE$，那么一个样本为好样本的概率$p=w^n$ 。于是，为了得到一个好样本需要抽样次数 K 的期望为：</p>
+<script type="math/tex; mode=display">
+E(K)=1 \cdot p_{1}+2 \cdot p_{2}+3 \cdot p_{3}+\ldots</script><p>其中, $p_j$为在$j$次抽样中得到一个好样本的概率，显然，</p>
+<script type="math/tex; mode=display">
+p_{j}=\left(1-w^{n}\right)^{j-1} w^{n}</script><p>因此，</p>
+<script type="math/tex; mode=display">
+\begin{aligned} & E(K)=w^{n}+2\left(1-w^{n}\right) w^{n}+3\left(1-w^{n}\right)^{2} w^{n}+\ldots \\=& w^{n}\left(1+2\left(1-w^{n}\right)+3\left(1-w^{n}\right)^{2}+\ldots\right) \\=& w^{n}\left.\left(\frac{x}{1-x}\right)^{\prime}\right|_{x=1-w^{n}}=w^{-n} \end{aligned}</script><p>所以，为了保证得到一个好样本，抽样次数$K$应大于$w^{-n}$。这很自然地联系到$K$的标准差$SD[K]$，即抽样次数$K=E[K]+S D[K]$，就能保证得到一个好样本。不难计算</p>
+<script type="math/tex; mode=display">
+S D[K]=\frac{\sqrt{1-w^{n}}}{w^{n}}</script><p>因此，</p>
+<script type="math/tex; mode=display">
+K=\frac{1+\sqrt{1-w^{n}}}{w^{n}}</script><p>处理这个问题的另一种方法，是使得在K次抽样中所有样本均为坏样本的概率非常小，以保证获得一个好样本的概率非常大。记$z$为在$K$次抽样中所有样本均为坏样本的概率，则</p>
+<script type="math/tex; mode=display">
+z=\left(1-w^{n}\right)^{K}</script><p>所以，</p>
+<script type="math/tex; mode=display">
+K=\frac{\log z}{\log \left(1-w^{n}\right)}</script><p>换句话说，在$K=\frac{\log z}{\log \left(1-w^{n}\right)}$抽样中得到一个好样本的概率为$1-z$。<br><img src="/2019/07/12/鲁棒性方法一：RANSAC估计/RANSAC.png" alt="RANSAC.png"><br>取$w = 0.45$( 内点的比例为 45%)，$z =0.02$( 以 0.98 的概率获得一个好样本 ) ，表 (17.1.1) 给出了样本所含数据点个数$n$与抽样次数$K$的一些对应值。可以看出，随$n$增加抽样次数$K$将急剧增加，因此所需要数据点总数也将急剧增加，这就是为什么在执行 RANSAC 时需要对模型进行最小参数化使得样本由尽可能少的数据组成的原因。<br>值得说明的是，抽样次数$K$与外点的比例不是正相关的，抽样的计算代价即使在外点数目很大的时候也是可以被接受的。图 17.1.2 给出 $n = 5$ 时，抽样次数$K$与外点的比例$(1 − w )$之间的变化关系。</p>
+<h3 id="3-距离阈值"><a href="#3-距离阈值" class="headerlink" title="3. 距离阈值"></a>3. 距离阈值</h3><p>待补。。。<br><img src="/2019/07/12/鲁棒性方法一：RANSAC估计/distance.png" alt="distance.png"></p>
+<h3 id="4-终止阈值"><a href="#4-终止阈值" class="headerlink" title="4. 终止阈值"></a>4. 终止阈值</h3><p>$\quad$终止阈值是难以设置的问题。经验的做法是：给出内点比例$w$的一个估计值$\varepsilon$，如果一致集大小相当于数据集的内点规模则终止。由于很难给出内点比例$w$的一个准确估计，所以经验做法往往不能获得较好的估计结果。由于终止阈值仅仅是用来终止 RANSAC 的抽样，所以通常的做法是:初始时，给出内点比例$w$的一个最保守的估计，然后在抽样过程中不断地修正它，并利用公式$K=\frac{\log z}{\log \left(1-w^{n}\right)}$估计为了得到一个好样本所需要的抽样次数$K$，一旦当前的抽样次数达到或超过这个估计值$K$时，就终止抽样，结束 RANSAC 的抽样过程。在初始时，抽样次数$K$的估计值可能是非常大的，但随着抽样过程对内点比例$w$的更新，抽样次数的估计值将迅速的减小。这种终止抽样的方法是自适应的，详尽的算法如下所述。</p>
+<hr>
+<p><strong>自适应算法(终止 RANSAC 抽样):</strong></p>
+<ol>
+<li>对内点比例作最保守估计w = w_0(如w_0 = 0.1，这意味着在数据点集中可能有90%的外点，这确实是一个保守估计)，应用公式（17.1.2），得到抽样次数K的初始值K_0；</li>
+<li>抽样并更新w_0，K_0：令当前抽样的一致集所含数据点占整个数据点的比例为w，若w&gt;w_0，则更新 w_0 := w ，并且应用公式 (17.1.2) 更新抽样数 K_0 ；否则，保持原来的 w_0，K_0；</li>
+<li>如果抽样次数已达到或超过 K_0，则终止抽样；否则，返回步骤 2。<br>不难看出，抽样次数在更新过程中是单调下降的，所以抽样过程必终止。注意：自适应算法同时还保证了有足够多次抽样，是一种值得推荐的自适应算法。</li>
+</ol>
+<hr>
+<h3 id="5-最终估计"><a href="#5-最终估计" class="headerlink" title="5. 最终估计"></a>5. 最终估计</h3><p>$\quad$RANSAC方法将数据分为内点(最大一致集)和外点(剩下的数据)两个不相交的子集，同时给出模型的估计$M_{p0}$，它由最大一致集所对应的样本计算出来。RANSAC 的最后一步是用所有的内点(最大一致集中的数据点)重新估计模型，该估计要涉及到代数方法或几何方法，最好使用几何方法(为了简化计算也可以应用 Sampson 几何近似)，它们需要迭代最小化，而$M_{p0}$可作为最小化的初始点。<br>$\quad$这个过程的唯一缺点是内点与外点的分类变得不明确。这是因为将距离阈值应用于当前最大一致集所估计的$M_{p}$时，很可能有些点变为内点。解决这个问题的方法是：由内点得到模型估计$M_{p}$；由$M_{p}$应用(17.1.4)重新划分内点与外点；继续这个过程直至内点集收敛。<br>最后,值得指出的是, RANSAC 方法被实践证明是一种非常有效的鲁棒性方法。在可能的情况下,建议读者使用这种方法。</p>
+<h3 id="6-基本矩阵的-RANSAC-估计"><a href="#6-基本矩阵的-RANSAC-估计" class="headerlink" title="6. 基本矩阵的 RANSAC 估计"></a>6. 基本矩阵的 RANSAC 估计</h3><p>作为一个例子，将 RANSAC 用于基本矩阵的估计。我们只需要</p>
+<ol>
+<li>定义样本;</li>
+<li>给定样本，求该样本所对应的基本矩阵;</li>
+<li>由最大一致集重新估计基本矩阵。</li>
+</ol>
+<p><strong>定义样本</strong><br>令$D=\left\{\boldsymbol{m}_{j} \leftrightarrow \boldsymbol{m}_{j}^{\prime} | 1 \leq j \leq n\right\}$是给定的两幅图像的点对应集。由于确定基本矩阵的最低限度需要7个点对应，所以定义点对应集$D$中的7个对应点构成的子集为一个样本，所有样本的集合简称为样本集。</p>
+<p><strong>求样本$k$所对应的基本矩阵$F_k$</strong><br>由于样本$k$中仅有7个点对应，根据基本矩阵的7-点算法，可能得到基本矩阵的3个解$F_{k}^{(1)}, F_{k}^{(2)}, F_{k}^{(3)}$，将一致集最大的解作为该次抽样的基本矩阵。具体方法如下：<br>根据下述公式计算$F_{k}^{(1)}, F_{k}^{(2)}, F_{k}^{(3)}$的一致集：</p>
+<script type="math/tex; mode=display">
+S\left(F_{k}^{(j)}\right)=\left\{\left(m \leftrightarrow m^{\prime}\right) \in D | d^{2}\left(m^{\prime}, F_{k}^{(j)} m\right)+d^{2}\left(m,\left(F_{k}^{(j)}\right)^{T} m^{\prime}\right)<t^{2}\right\}</script><p>其中，$d$表示点到直线的距离，$t$是距离阈值。求$j_0$使得</p>
+<script type="math/tex; mode=display">
+\# S\left(F_{k}^{\left(j_{0}\right)}\right)=\max \left\{\# S\left(F_{k}^{(1)}\right), \# S\left(F_{k}^{(2)}\right), \#\left(F_{k}^{(3)}\right)\right\}</script><p>令$F_{k}=F_{k}^{\left(j_{0}\right)}$为该次抽样的基本矩阵，$S\left(F_{k}\right)=S\left(F_{k}^{\left(j_{0}\right)}\right)$为该次抽样的一致集。<br><strong>由一致集重新估计基本矩阵</strong><br>令$S\left(F_{k_{0}}\right)$是最大的一致集，则$F_{k_{0}}$是最低限度子集所确定的基本矩阵，将它作为初值，用 Sampson 近似方法重新估计基本矩阵：</p>
+<script type="math/tex; mode=display">\min _{\left(m_{j} \leftrightarrow m_{j}^{\prime}\right) \in S\left(F_{k_{0}}\right)}\left(\frac{1}{\left(F m_{j}\right)_{1}^{2}+\left(F m_{j}\right)_{2}^{2}+\left(F^{T} m_{j}^{\prime}\right)_{1}^{2}+\left(F^{T} m_{j}^{\prime}\right)_{2}^{2}}\right) \times\left(m_{j}^{\prime} F m_{j}\right)^{2}</script><h3 id="7-基本矩阵的-RANSAC-自动估计"><a href="#7-基本矩阵的-RANSAC-自动估计" class="headerlink" title="7. 基本矩阵的 RANSAC 自动估计"></a>7. 基本矩阵的 RANSAC 自动估计</h3><p>RANSAC 方法可以从有误匹配的点对应集中估计基本矩阵,这使得从两幅图像自动估计基本矩阵成为可能。基本矩阵自动估计的步骤如下：</p>
+<ol>
+<li>自动提取两幅图像的特征点集并建立初始“匹配对集” ;</li>
+<li>RANSAC 去除错误匹配对:<ul>
+<li>计算当前抽样所确定的基本矩阵F，和它的一致点集 S(F);</li>
+<li>如果当前的一致集大于原先的一致集，则保持当前的一致集 S(F) 和相应的基本矩阵 F，并删去原先的一致集和相应的基本矩阵;</li>
+<li>由自适应算法终止抽样过程，获得最大一致集，最大一致集中的匹配对(内点)是正确匹配对。</li>
+</ul>
+</li>
+<li>由最大一致集 ( 即正确匹配对 ) 重新估计基本矩阵。<br>为了自动估计基本矩阵，首先需要从两幅图像自动建立一个“点对应集”，可以容忍这个点对应集包含有大量的误匹配，因为在 RANSAC 估计方法中，理论上只要存在 8 个“好”的点对应就可以估计出基本矩阵。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Optimization/" rel="tag"># Optimization</a>
+          
+            <a href="/tags/Fundamental-Matrix/" rel="tag"># Fundamental Matrix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/08/IMU预积分二/" rel="next" title="IMU预积分二：残差及其Jacobian">
+                <i class="fa fa-chevron-left"></i> IMU预积分二：残差及其Jacobian
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/12/鲁棒性方法二：M-Estimation/" rel="prev" title="鲁棒性方法二：M-Estimation">
+                鲁棒性方法二：M-Estimation <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="lemonlikelihood">
+            
+              <p class="site-author-name" itemprop="name">lemonlikelihood</p>
+              <div class="site-description motion-element" itemprop="description">学而时习之，不亦乐乎</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">34</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lemonlikelihood" title="GitHub &rarr; https://github.com/lemonlikelihood" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:1914557317@qq.com" title="E-Mail &rarr; mailto:1914557317@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-直线的RANSAC估计方法"><span class="nav-text">1. 直线的RANSAC估计方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-RANSAC一般估计方法"><span class="nav-text">2. RANSAC一般估计方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-抽样次数"><span class="nav-text">3. 抽样次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-距离阈值"><span class="nav-text">3. 距离阈值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-终止阈值"><span class="nav-text">4. 终止阈值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-最终估计"><span class="nav-text">5. 最终估计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-基本矩阵的-RANSAC-估计"><span class="nav-text">6. 基本矩阵的 RANSAC 估计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-基本矩阵的-RANSAC-自动估计"><span class="nav-text">7. 基本矩阵的 RANSAC 自动估计</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonlikelihood</span>
+
+  
+
+
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+  <script src="/js/js.cookie.js?v=7.1.1"></script>
+  <script src="/js/scroll-cookie.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').not('.gist .highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('Copy').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('Copied');
+        else $(this).text('Copy failed');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('Copy');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
