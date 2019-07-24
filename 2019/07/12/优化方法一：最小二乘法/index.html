@@ -112,7 +112,7 @@
 <meta property="og:description" content="1. 非线性最小二乘$\quad$我们先来考虑一个简单的最小二乘问题:  \min _{x} \frac{1}{2}\|f(\boldsymbol{x})\|_{2}^{2}$\quad$这里自变量$\boldsymbol{x} \in \mathbb{R}^{n}$，$f$是任意一个非线性函数，我们设它有$m$维：$f(\boldsymbol{x}) \in \mathbb{R}^{m}$ 。下">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/07/12/优化方法一：最小二乘法/迭代.png">
-<meta property="og:updated_time" content="2019-07-15T11:18:31.715Z">
+<meta property="og:updated_time" content="2019-07-24T05:48:33.268Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="优化方法一：最小二乘法">
 <meta name="twitter:description" content="1. 非线性最小二乘$\quad$我们先来考虑一个简单的最小二乘问题:  \min _{x} \frac{1}{2}\|f(\boldsymbol{x})\|_{2}^{2}$\quad$这里自变量$\boldsymbol{x} \in \mathbb{R}^{n}$，$f$是任意一个非线性函数，我们设它有$m$维：$f(\boldsymbol{x}) \in \mathbb{R}^{m}$ 。下">
@@ -314,7 +314,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">34</span></a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives<span class="badge">36</span></a>
 
   </li>
         
@@ -493,7 +493,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-07-15 19:18:31" itemprop="dateModified" datetime="2019-07-15T19:18:31+08:00">2019-07-15</time>
+                <time title="Modified: 2019-07-24 13:48:33" itemprop="dateModified" datetime="2019-07-24T13:48:33+08:00">2019-07-24</time>
               
             
           </span>
@@ -561,9 +561,16 @@
 \min _{x} \frac{1}{2}\|f(\boldsymbol{x})\|_{2}^{2}</script><p>$\quad$这里自变量$\boldsymbol{x} \in \mathbb{R}^{n}$，$f$是任意一个非线性函数，我们设它有$m$维：$f(\boldsymbol{x}) \in \mathbb{R}^{m}$ 。下面讨论如何求解这样一个优化问题。如果$f$是个数学形式上很简单的函数，那问题也许可以用解析形式来求。令目标函数的导数为零，然后求解$x$的最优值，就和一个求二元函数的极值一样：</p>
 <script type="math/tex; mode=display">
 \frac{\mathrm{d} f}{\mathrm{d} \boldsymbol{x}}=\mathbf{0}</script><p>$\quad$解此方程，就得到了导数为零处的极值。它们可能是极大、极小或鞍点处的值，只要挨个儿比较它们的函数值大小即可。但是，这个方程是否容易求解呢?这取决于$f$导函数的形式。在SLAM中，我们使用李代数来表示机器人的旋转和位移。对于不方便直接求解的最小二乘问题，我们可以用迭代的方式，从一个初始值出发，不断地更新当前的优化变量，使目标函数下降。具体步骤可列写如下:<br><img src="/2019/07/12/优化方法一：最小二乘法/迭代.png" alt="迭代.png"><br>$\quad$这让求解导函数为零的问题，变成了一个不断寻找梯度并下降的过程。直到某个时刻增量非常小，无法再使函数下降。此时算法收敛，目标达到了一个极小，我们完成了寻找极小值的过程。在这个过程中，我们只要找到迭代点的梯度方向即可，而无需寻找全局导函数为零的情况。<br>$\quad$接下来的问题是，增量$\Delta x_{k}$如何确定?——实际上，研究者们已经花费了大量精力探索增量的求解方式。我们将介绍两类办法，它们用不同的手段来寻找这个增量。目前这两种方法在视觉SLAM的优化问题上也被广泛采用，大多数优化库都可以使用它们。</p>
-<h3 id="2-一阶和二阶梯度法"><a href="#2-一阶和二阶梯度法" class="headerlink" title="2. 一阶和二阶梯度法"></a>2. 一阶和二阶梯度法</h3><p>求解增量最直观的方式是将目标函数在$x$附近进行泰勒展开：</p>
+<h3 id="2-一阶和二阶梯度法"><a href="#2-一阶和二阶梯度法" class="headerlink" title="2. 一阶和二阶梯度法"></a>2. 一阶和二阶梯度法</h3><p>$\quad$求解增量最直观的方式是将目标函数在$x$附近进行泰勒展开：</p>
 <script type="math/tex; mode=display">
-\|f(\boldsymbol{x}+\Delta \boldsymbol{x})\|_{2}^{2} \approx\|f(\boldsymbol{x})\|_{2}^{2}+\boldsymbol{J}(\boldsymbol{x}) \Delta \boldsymbol{x}+\frac{1}{2} \Delta \boldsymbol{x}^{T} \boldsymbol{H} \Delta \boldsymbol{x}</script>
+\|f(\boldsymbol{x}+\Delta \boldsymbol{x})\|_{2}^{2} \approx\|f(\boldsymbol{x})\|_{2}^{2}+\boldsymbol{J}(\boldsymbol{x}) \Delta \boldsymbol{x}+\frac{1}{2} \Delta \boldsymbol{x}^{T} \boldsymbol{H} \Delta \boldsymbol{x}</script><p>$\quad$ 这里$\boldsymbol{J}$是$\Vert f(\boldsymbol{x})\Vert _{2}^{2}$关于$\boldsymbol{x}^T$的导数(雅可比矩阵)，而$\boldsymbol{H}$则是二阶导数(海塞(Hessian)矩阵)。我们可以选择保留泰勒展开的一阶或二阶项，对应的求解方法则为一阶梯度或二阶梯度法。如果保留一阶梯度，那么增量的方向为:</p>
+<script type="math/tex; mode=display">
+\Delta \boldsymbol{x}^{*}=-\boldsymbol{J}^{T}(\boldsymbol{x})</script><p>$\quad$它的直观意义非常简单，只要我们沿着反向梯度方向前进即可。当然，我们还需要该方向上取一个步长$\lambda$，求得最快的下降方式。这种方法被称为最速下降法。<br>$\quad$令一方面，如果保留二阶梯度信息，那么增量方程为：</p>
+<script type="math/tex; mode=display">
+\Delta \boldsymbol{x}^{*}=\arg \min \|f(\boldsymbol{x})\|_{2}^{2}+\boldsymbol{J}(\boldsymbol{x}) \Delta \boldsymbol{x}+\frac{1}{2} \Delta \boldsymbol{x}^{T} \boldsymbol{H} \Delta \boldsymbol{x}</script><p>求右侧等式关于$\Delta x$的导数并令它为零，就得到了增量的解。</p>
+<script type="math/tex; mode=display">
+\boldsymbol{H} \Delta \boldsymbol{x}=-\boldsymbol{J}^{T}</script><p>该方法称又为牛顿法。我们看到，一阶和二阶梯度法都十分直观，只要把函数在迭代点附近进行泰勒展开，并针对更新量作最小化即可。由于泰勒展开之后函数变成了多项式,所以求解增量时只需解线性方程即可，避免了直接求导函数为零这样的非线性方程的困难。不过，这两种方法也存在它们自身的问题。最速下降法过于贪心，容易走出锯齿路线，反而增加了迭代次数。而牛顿法则需要计算目标函数的$H$矩阵，这在问题规模较大时非常困难，我们通常倾向于避免$H$的计算。所以，接下来我们详细地介绍两类更加实用的方法:高斯牛顿法和列文伯格——马夸尔特方法。</p>
+
       
     </div>
 
@@ -682,7 +689,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">34</span>
+                    <span class="site-state-item-count">36</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
